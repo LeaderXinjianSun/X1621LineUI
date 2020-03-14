@@ -38,7 +38,9 @@
                 <MenuItem Header="English" Command="{Binding LanguageChangeCommand}" CommandParameter="1"></MenuItem>
             </MenuItem>
         </Menu>
-        <views:HomePage Grid.Row="1"></views:HomePage>
+        <views:HomePage Grid.Row="1" Visibility="{Binding HomePageVisibility}"></views:HomePage>
+        <views:ParameterPage Grid.Row="1" Visibility="{Binding ParameterPageVisibility,FallbackValue=Collapsed}"></views:ParameterPage>
+        <views:SamplePage Grid.Row="1" Visibility="{Binding SamplePageVisibility,FallbackValue=Collapsed}"></views:SamplePage>
         <StatusBar Grid.Row="2">
             <StatusBarItem Visibility="{Binding ItemVisibility0}">
                 <StackPanel Orientation="Horizontal">

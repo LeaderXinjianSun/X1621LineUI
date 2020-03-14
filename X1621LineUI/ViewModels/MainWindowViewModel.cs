@@ -10,6 +10,9 @@ using BingLibrary.hjb.file;
 using System.Data;
 using System.Diagnostics;
 using SXJLibrary;
+using System.IO;
+using OfficeOpenXml;
+using System.Collections.ObjectModel;
 
 namespace X1621LineUI.ViewModels
 {
@@ -160,6 +163,472 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("ItemVisibility5");
             }
         }
+        private string lineID1;
+
+        public string LineID1
+        {
+            get { return lineID1; }
+            set
+            {
+                lineID1 = value;
+                this.RaisePropertyChanged("LineID1");
+            }
+        }
+        private string lineID2;
+
+        public string LineID2
+        {
+            get { return lineID2; }
+            set
+            {
+                lineID2 = value;
+                this.RaisePropertyChanged("LineID2");
+            }
+        }
+        private string homePageVisibility;
+
+        public string HomePageVisibility
+        {
+            get { return homePageVisibility; }
+            set
+            {
+                homePageVisibility = value;
+                this.RaisePropertyChanged("HomePageVisibility");
+            }
+        }
+        private string parameterPageVisibility;
+
+        public string ParameterPageVisibility
+        {
+            get { return parameterPageVisibility; }
+            set
+            {
+                parameterPageVisibility = value;
+                this.RaisePropertyChanged("ParameterPageVisibility");
+            }
+        }
+        private string samplePageVisibility;
+
+        public string SamplePageVisibility
+        {
+            get { return samplePageVisibility; }
+            set
+            {
+                samplePageVisibility = value;
+                this.RaisePropertyChanged("SamplePageVisibility");
+            }
+        }
+
+        private string testerResult0;
+
+        public string TesterResult0
+        {
+            get { return testerResult0; }
+            set
+            {
+                testerResult0 = value;
+                this.RaisePropertyChanged("TesterResult0");
+            }
+        }
+        private string testerResult1;
+
+        public string TesterResult1
+        {
+            get { return testerResult1; }
+            set
+            {
+                testerResult1 = value;
+                this.RaisePropertyChanged("TesterResult1");
+            }
+        }
+        private string testerResult2;
+
+        public string TesterResult2
+        {
+            get { return testerResult2; }
+            set
+            {
+                testerResult2 = value;
+                this.RaisePropertyChanged("TesterResult2");
+            }
+        }
+        private string testerResult3;
+
+        public string TesterResult3
+        {
+            get { return testerResult3; }
+            set
+            {
+                testerResult3 = value;
+                this.RaisePropertyChanged("TesterResult3");
+            }
+        }
+        private string passStatusDisplayText0;
+
+        public string PassStatusDisplayText0
+        {
+            get { return passStatusDisplayText0; }
+            set
+            {
+                passStatusDisplayText0 = value;
+                this.RaisePropertyChanged("PassStatusDisplayText0");
+            }
+        }
+        private string passStatusDisplayText1;
+
+        public string PassStatusDisplayText1
+        {
+            get { return passStatusDisplayText1; }
+            set
+            {
+                passStatusDisplayText1 = value;
+                this.RaisePropertyChanged("PassStatusDisplayText1");
+            }
+        }
+        private string passStatusDisplayText2;
+
+        public string PassStatusDisplayText2
+        {
+            get { return passStatusDisplayText2; }
+            set
+            {
+                passStatusDisplayText2 = value;
+                this.RaisePropertyChanged("PassStatusDisplayText2");
+            }
+        }
+        private string passStatusDisplayText3;
+
+        public string PassStatusDisplayText3
+        {
+            get { return passStatusDisplayText3; }
+            set
+            {
+                passStatusDisplayText3 = value;
+                this.RaisePropertyChanged("PassStatusDisplayText3");
+            }
+        }
+        private string passStatusDisplayForeground0;
+
+        public string PassStatusDisplayForeground0
+        {
+            get { return passStatusDisplayForeground0; }
+            set
+            {
+                passStatusDisplayForeground0 = value;
+                this.RaisePropertyChanged("PassStatusDisplayForeground0");
+            }
+        }
+        private string passStatusDisplayForeground1;
+
+        public string PassStatusDisplayForeground1
+        {
+            get { return passStatusDisplayForeground1; }
+            set
+            {
+                passStatusDisplayForeground1 = value;
+                this.RaisePropertyChanged("PassStatusDisplayForeground1");
+            }
+        }
+        private string passStatusDisplayForeground2;
+
+        public string PassStatusDisplayForeground2
+        {
+            get { return passStatusDisplayForeground2; }
+            set
+            {
+                passStatusDisplayForeground2 = value;
+                this.RaisePropertyChanged("PassStatusDisplayForeground2");
+            }
+        }
+        private string passStatusDisplayForeground3;
+
+        public string PassStatusDisplayForeground3
+        {
+            get { return passStatusDisplayForeground3; }
+            set
+            {
+                passStatusDisplayForeground3 = value;
+                this.RaisePropertyChanged("PassStatusDisplayForeground3");
+            }
+        }
+        private double testTime0;
+
+        public double TestTime0
+        {
+            get { return testTime0; }
+            set
+            {
+                testTime0 = value;
+                this.RaisePropertyChanged("TestTime0");
+            }
+        }
+        private double testTime1;
+
+        public double TestTime1
+        {
+            get { return testTime1; }
+            set
+            {
+                testTime1 = value;
+                this.RaisePropertyChanged("TestTime1");
+            }
+        }
+        private double testTime2;
+
+        public double TestTime2
+        {
+            get { return testTime2; }
+            set
+            {
+                testTime2 = value;
+                this.RaisePropertyChanged("TestTime2");
+            }
+        }
+        private double testTime3;
+
+        public double TestTime3
+        {
+            get { return testTime3; }
+            set
+            {
+                testTime3 = value;
+                this.RaisePropertyChanged("TestTime3");
+            }
+        }
+        private double testIdle0;
+
+        public double TestIdle0
+        {
+            get { return testIdle0; }
+            set
+            {
+                testIdle0 = value;
+                this.RaisePropertyChanged("TestIdle0");
+            }
+        }
+        private double testIdle1;
+
+        public double TestIdle1
+        {
+            get { return testIdle1; }
+            set
+            {
+                testIdle1 = value;
+                this.RaisePropertyChanged("TestIdle1");
+            }
+        }
+        private double testIdle2;
+
+        public double TestIdle2
+        {
+            get { return testIdle2; }
+            set
+            {
+                testIdle2 = value;
+                this.RaisePropertyChanged("TestIdle2");
+            }
+        }
+        private double testIdle3;
+
+        public double TestIdle3
+        {
+            get { return testIdle3; }
+            set
+            {
+                testIdle3 = value;
+                this.RaisePropertyChanged("TestIdle3");
+            }
+        }
+        private double testCycle0;
+
+        public double TestCycle0
+        {
+            get { return testCycle0; }
+            set
+            {
+                testCycle0 = value;
+                this.RaisePropertyChanged("TestCycle0");
+            }
+        }
+        private double testCycle1;
+
+        public double TestCycle1
+        {
+            get { return testCycle1; }
+            set
+            {
+                testCycle1 = value;
+                this.RaisePropertyChanged("TestCycle1");
+            }
+        }
+        private double testCycle2;
+
+        public double TestCycle2
+        {
+            get { return testCycle2; }
+            set
+            {
+                testCycle2 = value;
+                this.RaisePropertyChanged("TestCycle2");
+            }
+        }
+        private double testCycle3;
+
+        public double TestCycle3
+        {
+            get { return testCycle3; }
+            set
+            {
+                testCycle3 = value;
+                this.RaisePropertyChanged("TestCycle3");
+            }
+        }
+        private double testCycleAve;
+
+        public double TestCycleAve
+        {
+            get { return testCycleAve; }
+            set
+            {
+                testCycleAve = value;
+                this.RaisePropertyChanged("TestCycleAve");
+            }
+        }
+        private int testCount0;
+
+        public int TestCount0
+        {
+            get { return testCount0; }
+            set
+            {
+                testCount0 = value;
+                this.RaisePropertyChanged("TestCount0");
+            }
+        }
+        private int testCount1;
+
+        public int TestCount1
+        {
+            get { return testCount1; }
+            set
+            {
+                testCount1 = value;
+                this.RaisePropertyChanged("TestCount1");
+            }
+        }
+        private int testCount2;
+
+        public int TestCount2
+        {
+            get { return testCount2; }
+            set
+            {
+                testCount2 = value;
+                this.RaisePropertyChanged("TestCount2");
+            }
+        }
+        private int testCount3;
+
+        public int TestCount3
+        {
+            get { return testCount3; }
+            set
+            {
+                testCount3 = value;
+                this.RaisePropertyChanged("TestCount3");
+            }
+        }
+        private int passCount0;
+
+        public int PassCount0
+        {
+            get { return passCount0; }
+            set
+            {
+                passCount0 = value;
+                this.RaisePropertyChanged("PassCount0");
+            }
+        }
+        private int passCount1;
+
+        public int PassCount1
+        {
+            get { return passCount1; }
+            set
+            {
+                passCount1 = value;
+                this.RaisePropertyChanged("PassCount1");
+            }
+        }
+        private int passCount2;
+
+        public int PassCount2
+        {
+            get { return passCount2; }
+            set
+            {
+                passCount2 = value;
+                this.RaisePropertyChanged("PassCount2");
+            }
+        }
+        private int passCount3;
+
+        public int PassCount3
+        {
+            get { return passCount3; }
+            set
+            {
+                passCount3 = value;
+                this.RaisePropertyChanged("PassCount3");
+            }
+        }
+        private int testCountOutput;
+
+        public int TestCountOutput
+        {
+            get { return testCountOutput; }
+            set
+            {
+                testCountOutput = value;
+                this.RaisePropertyChanged("TestCountOutput");
+            }
+        }
+        private int testCountInput;
+
+        public int TestCountInput
+        {
+            get { return testCountInput; }
+            set
+            {
+                testCountInput = value;
+                this.RaisePropertyChanged("TestCountInput");
+            }
+        }
+        private double yieldTotal;
+
+        public double YieldTotal
+        {
+            get { return yieldTotal; }
+            set
+            {
+                yieldTotal = value;
+                this.RaisePropertyChanged("YieldTotal");
+            }
+        }
+        private ObservableCollection<string> sampleNgitem;
+
+        public ObservableCollection<string> SampleNgitem
+        {
+            get { return sampleNgitem; }
+            set
+            {
+                sampleNgitem = value;
+                this.RaisePropertyChanged("SampleNgitem");
+            }
+        }
+
+
+
 
         #endregion
         #region 方法绑定
@@ -167,7 +636,7 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand<object> MenuActionCommand { get; set; }
         public DelegateCommand<object> LanguageChangeCommand { get; set; }
         public DelegateCommand FuncTestCommand { get; set; }
-
+        public DelegateCommand StartSampleCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
@@ -175,7 +644,8 @@ namespace X1621LineUI.ViewModels
         Fx5u Fx5u_left1, Fx5u_left2, Fx5u_mid, Fx5u_right1, Fx5u_right2;
         Scan scan1, scan2;
         int CardStatus = 1;
-        private EpsonRC90 epsonRC90;
+        private EpsonRC90 epsonRC90;string LastBanci;
+        DateTime SamStartDatetime1, SamDateBigin1;
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -184,6 +654,7 @@ namespace X1621LineUI.ViewModels
             this.MenuActionCommand = new DelegateCommand<object>(new Action<object>(this.MenuActionCommandExecute));
             this.LanguageChangeCommand = new DelegateCommand<object>(new Action<object>(this.LanguageChangeCommandExecute));
             this.FuncTestCommand = new DelegateCommand(new Action(this.FuncTestCommandExecute));
+            this.StartSampleCommand = new DelegateCommand(new Action(this.StartSampleCommandExecute));
         }
         #endregion
         #region 方法绑定执行函数
@@ -191,7 +662,8 @@ namespace X1621LineUI.ViewModels
         {
             Init();
             UIRun();
-            Task.Run(()=> { IORun(); }); 
+            Task.Run(()=> { IORun(); });
+            Task.Run(()=> { SystemRun(); });
             AddMessage("软件加载完成");
         }
         private void MenuActionCommandExecute(object p)
@@ -199,6 +671,19 @@ namespace X1621LineUI.ViewModels
             switch (p.ToString())
             {
                 case "0":
+                    HomePageVisibility = "Visible";
+                    ParameterPageVisibility = "Collapsed";
+                    SamplePageVisibility = "Collapsed";
+                    break;
+                case "1":
+                    HomePageVisibility = "Collapsed";
+                    ParameterPageVisibility = "Visible";
+                    SamplePageVisibility = "Collapsed";
+                    break;
+                case "2":
+                    HomePageVisibility = "Collapsed";
+                    ParameterPageVisibility = "Collapsed";
+                    SamplePageVisibility = "Visible";
                     break;
                 default:
                     break;
@@ -248,12 +733,22 @@ namespace X1621LineUI.ViewModels
             StatusL1 = !StatusL1;
             AddMessage("功能执行完成");
         }
+        private void StartSampleCommandExecute()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                SampleNgitem[i] = Guid.NewGuid().ToString().Substring(0, 4);
+            }
+        }
         #endregion
         #region 自定义函数
         private void Init()
         {
             #region 初始化
-            MessageStr = "";
+            MessageStr = "";            
+            HomePageVisibility = "Visible";
+            ParameterPageVisibility = "Collapsed";
+            SamplePageVisibility = "Collapsed";
             Station = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "System", "Station", "1"));
             string plc_ip = Inifile.INIGetStringValue(iniParameterPath, "System", "PLC2IP", "192.168.10.2");
             int plc_port = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "System", "PLC2PORT", "8000"));
@@ -324,6 +819,13 @@ namespace X1621LineUI.ViewModels
                 default:
                     break;
             }
+            TestCountInput = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Summary", "liaoinput", "0"));
+            LastBanci = Inifile.INIGetStringValue(iniParameterPath, "Summary", "LastBanci", "null");
+            SampleNgitem = new ObservableCollection<string>();
+            for (int i = 0; i < 8; i++)
+            {
+                SampleNgitem.Add(Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleNgitem" + (i + 1).ToString(), "NA"));
+            }
             epsonRC90 = new EpsonRC90();
             epsonRC90.ModelPrint += ModelPrintEventProcess;
             #endregion
@@ -343,14 +845,206 @@ namespace X1621LineUI.ViewModels
         }
         private async void UIRun()
         {
-            Stopwatch sw = new Stopwatch();
+           
             int cardret = 1;
             int cardcount = 0;
             string MODE = "0";
             while (true)
             {
-                sw.Restart();
+                
                 await Task.Delay(100);
+                #region 界面刷新
+                StatusMid = Fx5u_mid.Connect;
+                StatusR1 = Fx5u_right1.Connect;
+                switch (Station)
+                {
+                    case 1:
+                        StatusR2 = Fx5u_right2.Connect;
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        StatusL2 = Fx5u_left2.Connect;
+                        break;
+                    case 2:
+                    case 6:
+                        StatusL1 = Fx5u_left1.Connect;
+                        StatusL2 = Fx5u_left2.Connect;
+                        break;
+                    default:
+                        break;
+                }
+                StatusRobot = epsonRC90.IOReceiveStatus && epsonRC90.TestSendStatus && epsonRC90.TestReceiveStatus;
+                #endregion
+                #region 良率面板显示
+                //良率界面显示
+                string[] Yieldstrs0 = PassStatusProcess(epsonRC90.YanmadeTester[0].Yield_Nomal);
+                PassStatusDisplayText0 = "测试机1" + Yieldstrs0[0];
+                PassStatusDisplayForeground0 = Yieldstrs0[1];
+                string[] Yieldstrs1 = PassStatusProcess(epsonRC90.YanmadeTester[1].Yield_Nomal);
+                PassStatusDisplayText1 = "测试机2" + Yieldstrs1[0];
+                PassStatusDisplayForeground1 = Yieldstrs1[1];
+                string[] Yieldstrs2 = PassStatusProcess(epsonRC90.YanmadeTester[2].Yield_Nomal);
+                PassStatusDisplayText2 = "测试机3" + Yieldstrs2[0];
+                PassStatusDisplayForeground2 = Yieldstrs2[1];
+                string[] Yieldstrs3 = PassStatusProcess(epsonRC90.YanmadeTester[3].Yield_Nomal);
+                PassStatusDisplayText3 = "测试机4" + Yieldstrs3[0];
+                PassStatusDisplayForeground3 = Yieldstrs3[1];
+
+                switch (epsonRC90.YanmadeTester[0].TestResult)
+                {
+                    case TestResult.Ng:
+                        TesterResult0 = "F";
+                        break;
+                    case TestResult.Pass:
+                        TesterResult0 = "P";
+                        break;
+                    default:
+                        TesterResult0 = "N";
+                        break;
+                }
+                switch (epsonRC90.YanmadeTester[1].TestResult)
+                {
+                    case TestResult.Ng:
+                        TesterResult1 = "F";
+                        break;
+                    case TestResult.Pass:
+                        TesterResult1 = "P";
+                        break;
+                    default:
+                        TesterResult1 = "N";
+                        break;
+                }
+                switch (epsonRC90.YanmadeTester[2].TestResult)
+                {
+                    case TestResult.Ng:
+                        TesterResult2 = "F";
+                        break;
+                    case TestResult.Pass:
+                        TesterResult2 = "P";
+                        break;
+                    default:
+                        TesterResult2 = "N";
+                        break;
+                }
+                switch (epsonRC90.YanmadeTester[3].TestResult)
+                {
+                    case TestResult.Ng:
+                        TesterResult3 = "F";
+                        break;
+                    case TestResult.Pass:
+                        TesterResult3 = "P";
+                        break;
+                    default:
+                        TesterResult3 = "N";
+                        break;
+                }
+                TestCount0 = epsonRC90.YanmadeTester[0].TestCount_Nomal;
+                PassCount0 = epsonRC90.YanmadeTester[0].PassCount_Nomal;
+                TestCount1 = epsonRC90.YanmadeTester[1].TestCount_Nomal;
+                PassCount1 = epsonRC90.YanmadeTester[1].PassCount_Nomal;
+                TestCount2 = epsonRC90.YanmadeTester[2].TestCount_Nomal;
+                PassCount2 = epsonRC90.YanmadeTester[2].PassCount_Nomal;
+                TestCount3 = epsonRC90.YanmadeTester[3].TestCount_Nomal;
+                PassCount3 = epsonRC90.YanmadeTester[3].PassCount_Nomal;
+                
+                TestCountOutput = epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount;
+                if (TestCountInput > 0)
+                {
+                    if ((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) < TestCountInput)
+                    {
+                        YieldTotal = Math.Round((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) / TestCountInput * 100,2);
+                    }
+                    else
+                    {
+                        YieldTotal = 100;
+                    }
+                }
+                else
+                {
+                    YieldTotal = 100;
+                }
+                #endregion
+                #region 时间统计
+                TestTime0 = epsonRC90.YanmadeTester[0].TestSpan;
+                TestTime1 = epsonRC90.YanmadeTester[1].TestSpan;
+                TestTime2 = epsonRC90.YanmadeTester[2].TestSpan;
+                TestTime3 = epsonRC90.YanmadeTester[3].TestSpan;
+                TestIdle0 = epsonRC90.YanmadeTester[0].TestIdle;
+                TestIdle1 = epsonRC90.YanmadeTester[1].TestIdle;
+                TestIdle2 = epsonRC90.YanmadeTester[2].TestIdle;
+                TestIdle3 = epsonRC90.YanmadeTester[3].TestIdle;
+                TestCycle0 = epsonRC90.YanmadeTester[0].TestCycle;
+                TestCycle1 = epsonRC90.YanmadeTester[1].TestCycle;
+                TestCycle2 = epsonRC90.YanmadeTester[2].TestCycle;
+                TestCycle3 = epsonRC90.YanmadeTester[3].TestCycle;
+
+                TestCycleAve = Math.Round((epsonRC90.YanmadeTester[0].TestCycle + epsonRC90.YanmadeTester[1].TestCycle + epsonRC90.YanmadeTester[2].TestCycle + epsonRC90.YanmadeTester[3].TestCycle) / 4, 1);
+                #endregion
+                //#region 样本
+                //SamDateBigin1 = lastSam1.AddHours(4);
+                //SamStartDatetime1 = lastSam1.AddHours(6);
+                //NextSam1.Text = SamStartDatetime1.ToString();
+                //SpanSam1.Text = (SamStartDatetime1 - DateTime.Now).ToString().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
+                //SampleGrid1.Visibility = (DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
+                //if ((DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam.IsChecked.Value)
+                //{
+                //    if (TUCHX1621UI.Model.Tester.IsInSampleMode)
+                //    {
+                //        SampleTextBlock1.Text = "样本测试中";
+                //    }
+                //    else
+                //    {
+                //        if ((DateTime.Now - SamStartDatetime1).TotalSeconds < 0)
+                //        {
+                //            SampleTextBlock1.Text = "请测样本";
+                //        }
+                //        else
+                //        {
+                //            SampleTextBlock1.Text = "强制样本";
+                //        }
+                //    }
+                //}
+                //SampleContentTextBlock1_1.Text = epsonRC90.sampleContent[0][0];
+                //SampleContentTextBlock1_2.Text = epsonRC90.sampleContent[0][1];
+                //SampleContentTextBlock1_3.Text = epsonRC90.sampleContent[0][2];
+                //SampleContentTextBlock1_4.Text = epsonRC90.sampleContent[0][3];
+
+                //SampleContentTextBlock2_1.Text = epsonRC90.sampleContent[1][0];
+                //SampleContentTextBlock2_2.Text = epsonRC90.sampleContent[1][1];
+                //SampleContentTextBlock2_3.Text = epsonRC90.sampleContent[1][2];
+                //SampleContentTextBlock2_4.Text = epsonRC90.sampleContent[1][3];
+
+                //SampleContentTextBlock3_1.Text = epsonRC90.sampleContent[2][0];
+                //SampleContentTextBlock3_2.Text = epsonRC90.sampleContent[2][1];
+                //SampleContentTextBlock3_3.Text = epsonRC90.sampleContent[2][2];
+                //SampleContentTextBlock3_4.Text = epsonRC90.sampleContent[2][3];
+
+                //SampleContentTextBlock4_1.Text = epsonRC90.sampleContent[3][0];
+                //SampleContentTextBlock4_2.Text = epsonRC90.sampleContent[3][1];
+                //SampleContentTextBlock4_3.Text = epsonRC90.sampleContent[3][2];
+                //SampleContentTextBlock4_4.Text = epsonRC90.sampleContent[3][3];
+
+                //SampleContentTextBlock5_1.Text = epsonRC90.sampleContent[4][0];
+                //SampleContentTextBlock5_2.Text = epsonRC90.sampleContent[4][1];
+                //SampleContentTextBlock5_3.Text = epsonRC90.sampleContent[4][2];
+                //SampleContentTextBlock5_4.Text = epsonRC90.sampleContent[4][3];
+
+                //SampleContentTextBlock6_1.Text = epsonRC90.sampleContent[5][0];
+                //SampleContentTextBlock6_2.Text = epsonRC90.sampleContent[5][1];
+                //SampleContentTextBlock6_3.Text = epsonRC90.sampleContent[5][2];
+                //SampleContentTextBlock6_4.Text = epsonRC90.sampleContent[5][3];
+
+                //SampleContentTextBlock7_1.Text = epsonRC90.sampleContent[6][0];
+                //SampleContentTextBlock7_2.Text = epsonRC90.sampleContent[6][1];
+                //SampleContentTextBlock7_3.Text = epsonRC90.sampleContent[6][2];
+                //SampleContentTextBlock7_4.Text = epsonRC90.sampleContent[6][3];
+
+                //SampleContentTextBlock8_1.Text = epsonRC90.sampleContent[7][0];
+                //SampleContentTextBlock8_2.Text = epsonRC90.sampleContent[7][1];
+                //SampleContentTextBlock8_3.Text = epsonRC90.sampleContent[7][2];
+                //SampleContentTextBlock8_4.Text = epsonRC90.sampleContent[7][3];
+                //#endregion
                 #region 刷卡
                 if (cardcount++ > 9)
                 {
@@ -433,6 +1127,270 @@ namespace X1621LineUI.ViewModels
 
                 }
                 #endregion
+                #region 换班
+                if (LastBanci != epsonRC90.GetBanci())
+                {
+                    LastBanci = epsonRC90.GetBanci();
+                    Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
+                    WriteMachineData();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        epsonRC90.YanmadeTester[i].Clean();
+                    }
+                    AddMessage(LastBanci + " 换班数据清零");
+
+                }
+                #endregion
+            }
+        }
+        private string[] PassStatusProcess(double f)
+        {
+            string[] strs = new string[2];
+            if (f > 98)
+            {
+                strs[0] = "良率" + f.ToString() + "% 优秀";
+                strs[1] = "Blue";
+            }
+            else
+            {
+                if (f > 95)
+                {
+                    strs[0] = "良率" + f.ToString() + "% 正常";
+                    strs[1] = "Green";
+                }
+                else
+                {
+                    if (f == 0)
+                    {
+                        strs[0] = "良率" + f.ToString() + "% 未知";
+                        strs[1] = "Black";
+                    }
+                    else
+                    {
+                        strs[0] = "良率" + f.ToString() + "% 异常";
+                        strs[1] = "Red";
+                    }
+                }
+            }
+            return strs;
+        }
+        private void WriteMachineData()
+        {
+            string excelpath = @"D:\X1621MachineData.xlsx";
+
+            try
+            {
+                FileInfo fileInfo = new FileInfo(excelpath);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                if (!File.Exists(excelpath))
+                {                    
+                    using (ExcelPackage package = new ExcelPackage(fileInfo))
+                    {
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("MachineData");
+                        worksheet.Cells[1, 1].Value = "日期时间";
+                        for (int i = 0; i < 4; i++)
+                        {
+                            worksheet.Cells[1, 2 + i * 4].Value = "穴" + (i + 1).ToString() + "测试数";
+                            worksheet.Cells[1, 3 + i * 4].Value = "穴" + (i + 1).ToString() + "良品数";
+                            worksheet.Cells[1, 4 + i * 4].Value = "穴" + (i + 1).ToString() + "不良品数";
+                            worksheet.Cells[1, 5 + i * 4].Value = "穴" + (i + 1).ToString() + "良率";
+                        }
+                        for (int i = 0; i < 4; i++)
+                        {
+                            worksheet.Cells[1, 18 + i * 4].Value = "穴" + (i + 1).ToString() + "测试数AAB";
+                            worksheet.Cells[1, 19 + i * 4].Value = "穴" + (i + 1).ToString() + "良品数AAB";
+                            worksheet.Cells[1, 20 + i * 4].Value = "穴" + (i + 1).ToString() + "不良品数AAB";
+                            worksheet.Cells[1, 21 + i * 4].Value = "穴" + (i + 1).ToString() + "良率AAB";
+                        }
+                        package.Save();
+                    }
+                }
+                using (ExcelPackage package = new ExcelPackage(fileInfo))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    int newrow = worksheet.Dimension.End.Row + 1;
+                    worksheet.Cells[newrow, 1].Value = System.DateTime.Now.ToString();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        worksheet.Cells[newrow, 2 + i * 4].Value = epsonRC90.YanmadeTester[i].TestCount_Nomal;
+                        worksheet.Cells[newrow, 3 + i * 4].Value = epsonRC90.YanmadeTester[i].PassCount_Nomal;
+                        worksheet.Cells[newrow, 4 + i * 4].Value = epsonRC90.YanmadeTester[i].FailCount_Nomal;
+                        worksheet.Cells[newrow, 5 + i * 4].Value = epsonRC90.YanmadeTester[i].Yield_Nomal;
+
+                        worksheet.Cells[newrow, 18 + i * 4].Value = epsonRC90.YanmadeTester[i].TestCount;
+                        worksheet.Cells[newrow, 19 + i * 4].Value = epsonRC90.YanmadeTester[i].PassCount;
+                        worksheet.Cells[newrow, 20 + i * 4].Value = epsonRC90.YanmadeTester[i].FailCount;
+                        worksheet.Cells[newrow, 21 + i * 4].Value = epsonRC90.YanmadeTester[i].Yield;
+                    }
+                    package.Save();
+                }
+                //AddMessage("保存机台生产数据完成");
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
+        }
+        private void SystemRun()
+        {
+            Stopwatch sw = new Stopwatch();
+            string stm = "";
+            while (true)
+            {
+                System.Threading.Thread.Sleep(10);
+                sw.Restart();
+                #region 扫码
+                try
+                {
+                    //扫码（载具）【A轨道】
+                    if (Fx5u_mid.ReadM("M2797"))
+                    {
+                        AddMessage("轨道A扫码");
+
+                        Fx5u_mid.SetM("M2797", false);
+                        Fx5u_mid.SetMultiM("M2597", new bool[4] { false, false, false, false });
+                        switch (Station)
+                        {
+                            case 5:
+                            case 1:
+                                Fx5u_right1.SetM("M2596", false);
+                                Fx5u_right1.SetM("M2597", false);
+                                break;
+                            default:
+                                break;
+                        }
+                        scan1.GetBarCode(Scan1GetBarcodeCallback);
+                    }
+                    //扫码（载具）【B轨道】
+                    if (Fx5u_mid.ReadM("M2802"))
+                    {
+                        AddMessage("轨道B扫码");
+                        Fx5u_mid.SetM("M2802", false);
+                        Fx5u_mid.SetMultiM("M2602", new bool[4] { false, false, false, false });
+                        switch (Station)
+                        {
+                            case 5:
+                            case 1:
+                                Fx5u_right1.SetM("M2602", false);
+                                Fx5u_right1.SetM("M2602", false);
+                                break;
+                            default:
+                                break;
+                        }
+                        scan2.GetBarCode(Scan2GetBarcodeCallback);
+                    }
+                }
+                catch 
+                { }
+                #endregion
+                #region 上顶
+                try
+                {
+                    //A轨道
+                    if (Fx5u_mid.ReadM("M2798"))
+                    {
+                        AddMessage("轨道A上顶");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            switch (Station)
+                            {
+                                case 1:
+                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                    break;
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                    break;
+                                case 6:
+                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            mysql.executeQuery(stm);
+                        }
+                        epsonRC90.BordBarcode[0] = epsonRC90.TemporaryBordBarcode[0];
+                        epsonRC90.ResetBord(0);
+                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
+                        mysql.executeQuery(stm);
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2798", false);
+                    }
+                    //B轨道
+                    if (Fx5u_mid.ReadM("M2803"))
+                    {
+                        AddMessage("轨道B上顶");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            switch (Station)
+                            {
+                                case 1:
+                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                    break;
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                    break;
+                                case 6:
+                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            mysql.executeQuery(stm);
+                        }
+                        epsonRC90.BordBarcode[1] = epsonRC90.TemporaryBordBarcode[1];
+                        epsonRC90.ResetBord(1);
+                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
+                        mysql.executeQuery(stm);
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2803", false);
+                    }
+                }
+                catch 
+                { }
+
+                #endregion
+                #region 测完下放
+                try
+                {
+                    if (Fx5u_mid.ReadM("M2799"))
+                    {
+                        AddMessage("轨道A测完下放");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                        }
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2799", false);
+
+                    }
+                    if (Fx5u_mid.ReadM("M2804"))
+                    {
+                        AddMessage("轨道B测完下放");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                        }
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2804", false);
+
+                    }
+                }
+                catch
+                { }
+                
+                #endregion
                 UICycle = sw.ElapsedMilliseconds;
             }
         }
@@ -509,18 +1467,534 @@ namespace X1621LineUI.ViewModels
                 ConCycle = sw.ElapsedMilliseconds;
             }
         }
-        private void StationEnterRun()
+        void Scan1GetBarcodeCallback(string barcode)
         {
-            while (true)
+            epsonRC90.TemporaryBordBarcode[0] = barcode;
+            if (barcode != "Error")
             {
-                System.Threading.Thread.Sleep(100);
+                Mysql mysql = new Mysql();
+                if (mysql.Connect())
+                {
+                    string stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC LIMIT 0,5";
+                    DataSet ds = mysql.Select(stm);
+                    DataTable dt = ds.Tables["table0"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        if (dt.Rows[0]["STATUS"] == DBNull.Value)
+                        {
+                            Fx5u_mid.SetM("M2600", true);
+                            switch (Station)
+                            {
+                                case 1:
+                                    DockStation1Check(0);
+                                    break;
+                                case 5:
+                                    DockStation2Check(0);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if ((string)dt.Rows[0]["STATUS"] == "OFF")
+                            {
+                                Fx5u_mid.SetM("M2600", true);
+                                switch (Station)
+                                {
+                                    case 1:
+                                        DockStation1Check(0);
+                                        break;
+                                    case 5:
+                                        DockStation2Check(0);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                AddMessage("板 " + barcode + " 已测过");
+                                Fx5u_mid.SetM("M2599", true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Fx5u_mid.SetM("M2600", true);
+                        switch (Station)
+                        {
+                            case 1:
+                                DockStation1Check(0);
+                                break;
+                            case 5:
+                                DockStation2Check(0);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Fx5u_mid.SetM("M2597", true);
+                }
+                else
+                {
+                    AddMessage("Mysql数据库查询失败");
+                    Fx5u_mid.SetM("M2598", true);
+                }
+                mysql.DisConnect();
+            }
+            else
+            {
+                Fx5u_mid.SetM("M2598", true);
             }
         }
-        private void DockStation1Run()
+        void DockStation1Check(int lineIndex)
+        {
+            string lineid = lineIndex == 0 ? LineID1 : LineID2;
+            try
+            {
+                Mysql mysql = new Mysql();
+                if (mysql.Connect())
+                {
+                    string stm = "SELECT * FROM BODLINE WHERE LineID = '" + lineid + "' ORDER BY SIDATE DESC";
+                    DataSet ds = mysql.Select(stm);
+                    DataTable dt = ds.Tables["table0"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                        if (bordcount < 5)//轨道+测试机板数量 < 5 不存储，放板
+                        {
+                            if (lineIndex == 0)
+                            {
+                                Fx5u_right1.SetM("M2596", true);
+                                AddMessage("线A内接驳台1后板数:" + bordcount.ToString() + " < 5,直接放板");
+                            }
+                            else
+                            {
+                                //B轨道
+                                Fx5u_right1.SetM("M2602", true);
+                                AddMessage("线B内接驳台1后板数:" + bordcount.ToString() + " < 5,直接放板");
+                            }
+                        }
+                        else
+                        {
+                            int station8count = (int)dt.Rows[0]["Station8"];
+                            if (station8count < 5)//轨道+测试机板数量 >= 5 存储，接驳台2#数量<5，不存储，放板
+                            {
+                                if (lineIndex == 0)
+                                {
+                                    Fx5u_right1.SetM("M2596", true);
+                                    AddMessage("线A内接驳台2板数:" + station8count.ToString() + " < 5,直接放板");
+                                }
+                                else
+                                {
+                                    //B轨道
+                                    Fx5u_right1.SetM("M2602", true);
+                                    AddMessage("线B内接驳台1后板数:" + bordcount.ToString() + " < 5,直接放板");
+                                }
+
+                            }
+                            else
+                            {
+                                int station7count = (int)dt.Rows[0]["Station7"];
+                                if (station7count < 10) //轨道 + 测试机板数量 >= 5 存储，接驳台2#数量>=5，本身已存板数<10，存储
+                                {
+                                    if (lineIndex == 0)
+                                    {
+                                        Fx5u_right1.SetM("M2597", true);
+                                        AddMessage("线A内接驳台1板数:" + station7count.ToString() + " < 10,存储板");
+                                    }
+                                    else
+                                    {
+                                        //B轨道
+                                        Fx5u_right1.SetM("M2603", true);
+                                        AddMessage("线B内接驳台1板数:" + station7count.ToString() + " < 10,存储板");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                mysql.DisConnect();
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
+        }
+        void DockStation2Check(int lineIndex)
+        {
+            string lineid = lineIndex == 0 ? LineID1 : LineID2;
+            try
+            {
+                Mysql mysql = new Mysql();
+                if (mysql.Connect())
+                {
+                    string stm = "SELECT * FROM BODLINE WHERE LineID = '" + lineid + "' ORDER BY SIDATE DESC";
+                    DataSet ds = mysql.Select(stm);
+                    DataTable dt = ds.Tables["table0"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        int bordcount = (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station11"];
+                        if (bordcount < 1)//轨道+测试机板数量 < 1 不存储，放板
+                        {
+                            if (lineIndex == 0)
+                            {
+                                Fx5u_right1.SetM("M2596", true);
+                                AddMessage("线A内接驳台2后板数:" + bordcount.ToString() + " < 5,直接放板");
+                            }
+                            else
+                            {
+                                //B轨道
+                                Fx5u_right1.SetM("M2602", true);
+                                AddMessage("线B内接驳台2后板数:" + bordcount.ToString() + " < 1,直接放板");
+                            }
+                        }
+                        else
+                        {
+                            int station8count = (int)dt.Rows[0]["Station8"];
+                            if (station8count < 5)//轨道+测试机板数量 >= 1 存储，本身已存板数<5，存储
+                            {
+                                if (lineIndex == 0)
+                                {
+                                    Fx5u_right1.SetM("M2597", true);
+                                    AddMessage("线A内接驳台2板数:" + station8count.ToString() + " < 5,存储板");
+                                }
+                                else
+                                {
+                                    //B轨道
+                                    Fx5u_right1.SetM("M2603", true);
+                                    AddMessage("线B内接驳台2板数:" + station8count.ToString() + " < 5,存储板");
+                                }
+
+                            }
+                        }
+                    }
+                }
+                mysql.DisConnect();
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
+        }
+        void Scan2GetBarcodeCallback(string barcode)
+        {
+            epsonRC90.TemporaryBordBarcode[1] = barcode;
+            if (barcode != "Error")
+            {
+                Mysql mysql = new Mysql();
+                if (mysql.Connect())
+                {
+                    string stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC LIMIT 0,5";
+                    DataSet ds = mysql.Select(stm);
+                    DataTable dt = ds.Tables["table0"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        if (dt.Rows[0]["STATUS"] == DBNull.Value)
+                        {
+
+                            Fx5u_mid.SetM("M2605", true);
+                            switch (Station)
+                            {
+                                case 1:
+                                    DockStation1Check(1);
+                                    break;
+                                case 5:
+                                    DockStation2Check(1);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if ((string)dt.Rows[0]["STATUS"] == "OFF")
+                            {
+                                Fx5u_mid.SetM("M2605", true);
+                                switch (Station)
+                                {
+                                    case 1:
+                                        DockStation1Check(1);
+                                        break;
+                                    case 5:
+                                        DockStation2Check(1);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                AddMessage("板 " + barcode + " 已测过");
+                                Fx5u_mid.SetM("M2604", true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Fx5u_mid.SetM("M2605", true);
+                        switch (Station)
+                        {
+                            case 1:
+                                DockStation1Check(1);
+                                break;
+                            case 5:
+                                DockStation2Check(1);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Fx5u_mid.SetM("M2602", true);
+                }
+                else
+                {
+                    AddMessage("Mysql数据库查询失败");
+                    Fx5u_mid.SetM("M2603", true);
+                }
+                mysql.DisConnect();
+            }
+            else
+            {
+                Fx5u_mid.SetM("M2603", true);
+            }
+        }
+        void StationEnterRun()
         {
             while (true)
             {
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(10000);
+                try
+                {
+                    Mysql mysql = new Mysql();
+                    if (mysql.Connect())
+                    {
+                        //【轨道A】
+                        string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID1 + "' ORDER BY SIDATE DESC";
+                        DataSet ds = mysql.Select(stm);
+                        DataTable dt = ds.Tables["table0"];
+                        if (dt.Rows.Count > 0)
+                        {
+                            int bordcount = (int)dt.Rows[0]["Station1"] + (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station7"] + (int)dt.Rows[0]["Station8"] + (int)dt.Rows[0]["Station9"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                            if (!Fx5u_mid.ReadM("M2596") && bordcount < 21 && (int)dt.Rows[0]["Station7"] < 1)//不在进板；有进板需求；轨道1空
+                            {
+                                Fx5u_mid.SetM("M2796", false);
+                                Fx5u_mid.SetM("M2596", true);
+                                AddMessage("线A内板数:" + bordcount.ToString() + " < 21,申请进板");
+                            }
+                            if (Fx5u_mid.ReadM("M2796"))
+                            {
+                                Fx5u_mid.SetM("M2796", false);
+                                Fx5u_mid.SetM("M2596", false);
+                                stm = "UPDATE BODLINE SET Station9 = 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                mysql.executeQuery(stm);
+                                AddMessage("线A进入1块板");
+                            }
+                        }
+
+                        //【轨道B】
+                        stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID2 + "' ORDER BY SIDATE DESC";
+                        ds = mysql.Select(stm);
+                        dt = ds.Tables["table0"];
+                        if (dt.Rows.Count > 0)
+                        {
+                            int bordcount = (int)dt.Rows[0]["Station1"] + (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station7"] + (int)dt.Rows[0]["Station8"] + (int)dt.Rows[0]["Station9"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                            if (!Fx5u_mid.ReadM("M2601") && bordcount < 21 && (int)dt.Rows[0]["Station7"] < 1)//不在进板；有进板需求；轨道1空
+                            {
+                                Fx5u_mid.SetM("M2801", false);
+                                Fx5u_mid.SetM("M2601", true);
+                                AddMessage("线B内板数:" + bordcount.ToString() + " < 21,申请进板");
+                            }
+                            if (Fx5u_mid.ReadM("M2801"))
+                            {
+                                Fx5u_mid.SetM("M2801", false);
+                                Fx5u_mid.SetM("M2601", false);
+                                stm = "UPDATE BODLINE SET Station9 = Station9 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                mysql.executeQuery(stm);
+                                AddMessage("线B进入1块板");
+                            }
+                        }
+                    }
+                    mysql.DisConnect();
+                }
+                catch (Exception ex)
+                {
+                    AddMessage(ex.Message);
+                }
+
+            }
+        }
+        void DockStation1Run()
+        {
+            int cycle1 = 0, cycle2 = 0;
+            while (true)
+            {
+                System.Threading.Thread.Sleep(500);
+
+                try
+                {
+                    //A轨道
+                    cycle1++;
+                    if (cycle1 > 20)
+                    {
+                        cycle1 = 0;
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID1 + "' ORDER BY SIDATE DESC";
+                            DataSet ds = mysql.Select(stm);
+                            DataTable dt = ds.Tables["table0"];
+                            if (dt.Rows.Count > 0)
+                            {
+                                int station7count = (int)dt.Rows[0]["Station7"];
+                                if (station7count > 0)
+                                {
+                                    int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                                    if (bordcount < 5)//轨道+测试机板数量 < 5 ，下1块板
+                                    {
+                                        Fx5u_left2.SetM("M2610", true);
+                                        AddMessage("线A内接驳台1后板数:" + bordcount.ToString() + " < 5,下1块板");
+                                    }
+                                    else
+                                    {
+                                        int station8count = (int)dt.Rows[0]["Station8"];
+                                        if (station8count < 5)//轨道 + 测试机板数量 >= 5 ，接驳台2#数量<5，下1块板
+                                        {
+                                            Fx5u_left2.SetM("M2610", true);
+                                            AddMessage("线A内接驳台2板数:" + station8count.ToString() + " < 5,下1块板");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ;//没有存储板，无动作
+                                }
+
+                            }
+                        }
+                        mysql.DisConnect();
+                    }
+                   
+                    if (Fx5u_left2.ReadM("M2798"))//存储响应【A轨道】
+                    {
+                        Fx5u_left2.SetM("M2798", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台1存储1块板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2799"))//放新板响应【A轨道】
+                    {
+                        Fx5u_left2.SetM("M2799", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台1放1块新板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2800"))//放存储板响应【A轨道】
+                    {
+                        Fx5u_left2.SetM("M2800", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台1放1块存储板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    //B轨道
+                    cycle2++;
+                    if (cycle2 > 20)
+                    {
+                        cycle2 = 0;
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID2 + "' ORDER BY SIDATE DESC";
+                            DataSet ds = mysql.Select(stm);
+                            DataTable dt = ds.Tables["table0"];
+                            if (dt.Rows.Count > 0)
+                            {
+                                int station7count = (int)dt.Rows[0]["Station7"];
+                                if (station7count > 0)
+                                {
+                                    int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                                    if (bordcount < 5)//轨道+测试机板数量 < 5 ，下1块板
+                                    {
+                                        Fx5u_left2.SetM("M2611", true);
+                                        AddMessage("线B内接驳台1后板数:" + bordcount.ToString() + " < 5,下1块板");
+                                    }
+                                    else
+                                    {
+                                        int station8count = (int)dt.Rows[0]["Station8"];
+                                        if (station8count < 5)//轨道 + 测试机板数量 >= 5 ，接驳台2#数量<5，下1块板
+                                        {
+                                            Fx5u_left2.SetM("M2611", true);
+                                            AddMessage("线B内接驳台2板数:" + station8count.ToString() + " < 5,下1块板");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ;//没有存储板，无动作
+                                }
+
+                            }
+                        }
+                        mysql.DisConnect();
+                    }
+                    
+                    if (Fx5u_left2.ReadM("M2804"))//存储响应【B轨道】
+                    {
+                        Fx5u_left2.SetM("M2804", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台1存储1块板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2805"))//放新板响应【B轨道】
+                    {
+                        Fx5u_left2.SetM("M2805", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台1放1块新板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2806"))//放存储板响应【B轨道】
+                    {
+                        Fx5u_left2.SetM("M2806", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台1放1块存储板");
+                        }
+                        mysql.DisConnect();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddMessage(ex.Message);
+                }
             }
         }
         private void DockStation2Run()
