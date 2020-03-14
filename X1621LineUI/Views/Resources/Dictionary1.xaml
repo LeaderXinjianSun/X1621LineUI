@@ -1,0 +1,51 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:X1621LineUI.Views.Resources">
+    <Style TargetType="Ellipse" x:Key="EllipseStatusBase">
+        <Setter Property="Fill" Value="Red"></Setter>
+        <Setter Property="Width" Value="20"></Setter>
+        <Setter Property="Height" Value="20"></Setter>
+    </Style>
+    <Style TargetType="Ellipse" BasedOn="{StaticResource EllipseStatusBase}" x:Key="EllipseStatusL1">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusL1}" Value="True">
+                <Setter Property="Fill" Value="Green"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="Ellipse" BasedOn="{StaticResource EllipseStatusBase}" x:Key="EllipseStatusL2">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusL2}" Value="True">
+                <Setter Property="Fill" Value="Green"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="Ellipse" BasedOn="{StaticResource EllipseStatusBase}" x:Key="EllipseStatusMid">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusMid}" Value="True">
+                <Setter Property="Fill" Value="Green"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="Ellipse" BasedOn="{StaticResource EllipseStatusBase}" x:Key="EllipseStatusRobot">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusRobot}" Value="True">
+                <Setter Property="Fill" Value="Green"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="Ellipse" BasedOn="{StaticResource EllipseStatusBase}" x:Key="EllipseStatusR1">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusR1}" Value="True">
+                <Setter Property="Fill" Value="Green"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="Ellipse" BasedOn="{StaticResource EllipseStatusBase}" x:Key="EllipseStatusR2">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusR2}" Value="True">
+                <Setter Property="Fill" Value="Green"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

@@ -1,12 +1,87 @@
-﻿<Window x:Class="X1621LineUI.MainWindow"
+﻿<Controls:MetroWindow x:Class="X1621LineUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:local="clr-namespace:X1621LineUI"
+        xmlns:views="clr-namespace:X1621LineUI.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 20200314}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Icon="AVARY01.ico" Closing="Window_Closing">
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Views\Resources\Dictionary1.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Controls:MetroWindow.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding AppLoadedEventCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Menu VerticalAlignment="Center">
+            <MenuItem Header="{DynamicResource MenuHomeProperty}" Command="{Binding MenuActionCommand}" CommandParameter="0"></MenuItem>
+            <MenuItem Header="{DynamicResource MenuParameterProperty}" Command="{Binding MenuActionCommand}" CommandParameter="1"></MenuItem>
+            <MenuItem Header="{DynamicResource MenuSampleProperty}" Command="{Binding MenuActionCommand}" CommandParameter="2"></MenuItem>
+            <MenuItem Header="{DynamicResource MenuMaterialProperty}" Command="{Binding MenuActionCommand}" CommandParameter="3"></MenuItem>
+            <MenuItem Header="{DynamicResource MenuLanguageProperty}">
+                <MenuItem Header="简体" Command="{Binding LanguageChangeCommand}" CommandParameter="0"></MenuItem>
+                <MenuItem Header="English" Command="{Binding LanguageChangeCommand}" CommandParameter="1"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <views:HomePage Grid.Row="1"></views:HomePage>
+        <StatusBar Grid.Row="2">
+            <StatusBarItem Visibility="{Binding ItemVisibility0}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Width="40">L1</TextBlock>
+                    <Ellipse Style="{StaticResource EllipseStatusL1}"></Ellipse>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem Visibility="{Binding ItemVisibility1}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Width="40">L2</TextBlock>
+                    <Ellipse Style="{StaticResource EllipseStatusL2}"></Ellipse>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Width="40">MID</TextBlock>
+                    <Ellipse Style="{StaticResource EllipseStatusMid}"></Ellipse>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Width="40">Robot</TextBlock>
+                    <Ellipse Style="{StaticResource EllipseStatusRobot}"></Ellipse>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Width="40">R1</TextBlock>
+                    <Ellipse Style="{StaticResource EllipseStatusR1}"></Ellipse>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem Visibility="{Binding ItemVisibility5}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Width="40">R2</TextBlock>
+                    <Ellipse Style="{StaticResource EllipseStatusR2}"></Ellipse>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding UICycle,StringFormat=UICycle:{0}ms}"></TextBlock>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding ConCycle,StringFormat=ConCycle:{0}ms}"></TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
-</Window>
+</Controls:MetroWindow>
