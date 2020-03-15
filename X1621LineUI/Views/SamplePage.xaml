@@ -181,31 +181,31 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="上一次测样本时刻"></TextBlock>
-                    <TextBlock Name="LastSam1"></TextBlock>
+                    <TextBlock Text="{Binding LastSam1}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="下一次测样本时刻"></TextBlock>
-                    <TextBlock Name="NextSam1"></TextBlock>
+                    <TextBlock Text="{Binding NextSam1}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="样本倒计时"></TextBlock>
-                    <TextBlock Name="SpanSam1" Foreground="Purple" FontSize="20"></TextBlock>
+                    <TextBlock Text="{Binding SpanSam1}" Foreground="Purple" FontSize="20"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="上一次清洁时刻"></TextBlock>
-                    <TextBlock Name="LastClean1"></TextBlock>
+                    <TextBlock Text="{Binding LastClean1}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="下一次清洁时刻"></TextBlock>
-                    <TextBlock Name="NextClean1"></TextBlock>
+                    <TextBlock Text="{Binding NextClean1}"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="清洁倒计时"></TextBlock>
-                    <TextBlock Name="SpanClean1" Foreground="Purple" FontSize="20"></TextBlock>
+                    <TextBlock Text="{Binding SpanClean1}" Foreground="Purple" FontSize="20"></TextBlock>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10">
-                    <CheckBox Name="IsSam" Content="样本"></CheckBox>
-                    <CheckBox Name="IsClean" Content="清洁"></CheckBox>
+                    <CheckBox IsChecked="{Binding IsSam}"  Content="样本"></CheckBox>
+                    <CheckBox IsChecked="{Binding IsClean}" Content="清洁"></CheckBox>
                     <Button Width="60" Height="60" Margin="0,10,0,0" Content="样本开始" Command="{Binding StartSampleCommand}"></Button>
                 </StackPanel>
                 <StackPanel>
@@ -213,25 +213,25 @@
                         <TextBlock Text="NG项目1 " VerticalAlignment="Center"></TextBlock>
                         <TextBox Text="{Binding SampleNgitem[0]}" Width="100" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         <TextBlock Text="治具1ID " VerticalAlignment="Center"></TextBlock>
-                        <TextBox Name="FlexID1" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding FlexID[0]}" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="NG项目2 " VerticalAlignment="Center"></TextBlock>
                         <TextBox Text="{Binding SampleNgitem[1]}" Width="100" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         <TextBlock Text="治具2ID " VerticalAlignment="Center"></TextBlock>
-                        <TextBox Name="FlexID2" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding FlexID[1]}" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="NG项目3 " VerticalAlignment="Center"></TextBlock>
                         <TextBox Text="{Binding SampleNgitem[2]}" Width="100" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         <TextBlock Text="治具3ID " VerticalAlignment="Center"></TextBlock>
-                        <TextBox Name="FlexID3" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding FlexID[2]}" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="NG项目4 " VerticalAlignment="Center"></TextBlock>
                         <TextBox Text="{Binding SampleNgitem[3]}" Width="100" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         <TextBlock Text="治具4ID " VerticalAlignment="Center"></TextBlock>
-                        <TextBox Name="FlexID4" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding FlexID[3]}" IsReadOnly="True" Width="60" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="NG项目5 " VerticalAlignment="Center"></TextBlock>
@@ -251,15 +251,15 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="样本数量 " VerticalAlignment="Center"></TextBlock>
-                        <TextBox Name="NGItem_count" Width="40" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding NGItemCount}" Width="40" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         <TextBlock Text=" 个" VerticalAlignment="Center"></TextBlock>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="样本次数 " VerticalAlignment="Center"></TextBlock>
-                        <TextBox Name="NGItemLimit_count" Width="40" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                        <TextBox Text="{Binding NGItemLimit}" Width="40" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                         <TextBlock Text=" 次" VerticalAlignment="Center"></TextBlock>
                     </StackPanel>
-                    <!--<Button Width="60" Height="60" Margin="0,10,0,0" Content="保存" Click="SaveSamParamClick"></Button>-->
+                    <Button Width="60" Height="60" Margin="0,10,0,0" Content="保存" Command="{Binding SaveSamParamCommand}"></Button>
                 </StackPanel>
             </StackPanel>
         </Grid>

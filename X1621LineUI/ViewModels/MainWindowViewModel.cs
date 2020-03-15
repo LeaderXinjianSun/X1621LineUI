@@ -626,6 +626,160 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("SampleNgitem");
             }
         }
+        private ObservableCollection<string> sampleItemsStatus;
+
+        public ObservableCollection<string> SampleItemsStatus
+        {
+            get { return sampleItemsStatus; }
+            set
+            {
+                sampleItemsStatus = value;
+                this.RaisePropertyChanged("SampleItemsStatus");
+            }
+        }
+        private DateTime lastSam1;
+
+        public DateTime LastSam1
+        {
+            get { return lastSam1; }
+            set
+            {
+                lastSam1 = value;
+                this.RaisePropertyChanged("LastSam1");
+            }
+        }
+        private DateTime nextSam1;
+
+        public DateTime NextSam1
+        {
+            get { return nextSam1; }
+            set
+            {
+                nextSam1 = value;
+                this.RaisePropertyChanged("NextSam1");
+            }
+        }
+        private string spanSam1;
+
+        public string SpanSam1
+        {
+            get { return spanSam1; }
+            set
+            {
+                spanSam1 = value;
+                this.RaisePropertyChanged("SpanSam1");
+            }
+        }
+        private DateTime lastClean1;
+
+        public DateTime LastClean1
+        {
+            get { return lastClean1; }
+            set
+            {
+                lastClean1 = value;
+                this.RaisePropertyChanged("LastClean1");
+            }
+        }
+        private DateTime nextClean1;
+
+        public DateTime NextClean1
+        {
+            get { return nextClean1; }
+            set
+            {
+                nextClean1 = value;
+                this.RaisePropertyChanged("NextClean1");
+            }
+        }
+        private string spanClean1;
+
+        public string SpanClean1
+        {
+            get { return spanClean1; }
+            set
+            {
+                spanClean1 = value;
+                this.RaisePropertyChanged("SpanClean1");
+            }
+        }
+        private bool iSam;
+
+        public bool IsSam
+        {
+            get { return iSam; }
+            set
+            {
+                iSam = value;
+                this.RaisePropertyChanged("IsSam");
+            }
+        }
+        private bool isClean;
+
+        public bool IsClean
+        {
+            get { return isClean; }
+            set
+            {
+                isClean = value;
+                this.RaisePropertyChanged("IsClean");
+            }
+        }
+        private ObservableCollection<string> flexID;
+
+        public ObservableCollection<string> FlexID
+        {
+            get { return flexID; }
+            set
+            {
+                flexID = value;
+                this.RaisePropertyChanged("FlexID");
+            }
+        }
+        private int nGItemCount;
+
+        public int NGItemCount
+        {
+            get { return nGItemCount; }
+            set
+            {
+                nGItemCount = value;
+                this.RaisePropertyChanged("NGItemCount");
+            }
+        }
+        private int nGItemLimit;
+
+        public int NGItemLimit
+        {
+            get { return nGItemLimit; }
+            set
+            {
+                nGItemLimit = value;
+                this.RaisePropertyChanged("NGItemLimit");
+            }
+        }
+        private string sampleGridVisibility;
+
+        public string SampleGridVisibility
+        {
+            get { return sampleGridVisibility; }
+            set
+            {
+                sampleGridVisibility = value;
+                this.RaisePropertyChanged("SampleGridVisibility");
+            }
+        }
+        private string sampleText;
+
+        public string SampleText
+        {
+            get { return sampleText; }
+            set
+            {
+                sampleText = value;
+                this.RaisePropertyChanged("SampleText");
+            }
+        }
 
 
 
@@ -637,9 +791,11 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand<object> LanguageChangeCommand { get; set; }
         public DelegateCommand FuncTestCommand { get; set; }
         public DelegateCommand StartSampleCommand { get; set; }
+        public DelegateCommand SaveSamParamCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
+        private string iniFilepath = @"d:\test.ini";
         private 读写器530SDK.CReader reader = new 读写器530SDK.CReader();
         Fx5u Fx5u_left1, Fx5u_left2, Fx5u_mid, Fx5u_right1, Fx5u_right2;
         Scan scan1, scan2;
@@ -655,6 +811,7 @@ namespace X1621LineUI.ViewModels
             this.LanguageChangeCommand = new DelegateCommand<object>(new Action<object>(this.LanguageChangeCommandExecute));
             this.FuncTestCommand = new DelegateCommand(new Action(this.FuncTestCommandExecute));
             this.StartSampleCommand = new DelegateCommand(new Action(this.StartSampleCommandExecute));
+            this.SaveSamParamCommand = new DelegateCommand(new Action(this.SaveSamParamCommandExecute));
         }
         #endregion
         #region 方法绑定执行函数
@@ -733,12 +890,25 @@ namespace X1621LineUI.ViewModels
             StatusL1 = !StatusL1;
             AddMessage("功能执行完成");
         }
-        private void StartSampleCommandExecute()
+        private async void StartSampleCommandExecute()
+        {
+            if (epsonRC90.TestSendStatus && !Tester.IsInSampleMode && IsSam)
+            {
+                await epsonRC90.TestSentNet.SendAsync("StartSample");
+            }
+        }
+        private void SaveSamParamCommandExecute()
         {
             for (int i = 0; i < 8; i++)
             {
-                SampleNgitem[i] = Guid.NewGuid().ToString().Substring(0, 4);
+                Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItem" + i.ToString(), SampleNgitem[i]);
             }
+            for (int i = 0; i < 4; i++)
+            {
+                FlexID[i] = Inifile.INIGetStringValue(iniFilepath, "A", "id1", "99999");
+            }
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemCount", NGItemCount.ToString());
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
         }
         #endregion
         #region 自定义函数
@@ -826,6 +996,24 @@ namespace X1621LineUI.ViewModels
             {
                 SampleNgitem.Add(Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleNgitem" + (i + 1).ToString(), "NA"));
             }
+            SampleItemsStatus = new ObservableCollection<string>();
+            for (int i = 0; i < 32; i++)
+            {
+                SampleItemsStatus.Add("NA");
+            }
+            FlexID = new ObservableCollection<string>();
+            for (int i = 0; i < 4; i++)
+            {
+                FlexID.Add(Inifile.INIGetStringValue(iniFilepath, "A", "id" + (i + 1).ToString(), "99999"));
+            }
+            IsSam = bool.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "IsSam", "True"));
+            IsClean = bool.Parse(Inifile.INIGetStringValue(iniParameterPath, "Clean", "IsClean", "True"));
+
+            LastSam1 = Convert.ToDateTime(Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSam1", "2019/1/1 00:00:00"));
+            LastClean1 = Convert.ToDateTime(Inifile.INIGetStringValue(iniParameterPath, "Clean", "LastClean1", "2019/1/1 00:00:00"));
+            NGItemCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemCount", "3"));
+            NGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99"));
+
             epsonRC90 = new EpsonRC90();
             epsonRC90.ModelPrint += ModelPrintEventProcess;
             #endregion
@@ -981,70 +1169,46 @@ namespace X1621LineUI.ViewModels
 
                 TestCycleAve = Math.Round((epsonRC90.YanmadeTester[0].TestCycle + epsonRC90.YanmadeTester[1].TestCycle + epsonRC90.YanmadeTester[2].TestCycle + epsonRC90.YanmadeTester[3].TestCycle) / 4, 1);
                 #endregion
-                //#region 样本
-                //SamDateBigin1 = lastSam1.AddHours(4);
-                //SamStartDatetime1 = lastSam1.AddHours(6);
-                //NextSam1.Text = SamStartDatetime1.ToString();
-                //SpanSam1.Text = (SamStartDatetime1 - DateTime.Now).ToString().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
-                //SampleGrid1.Visibility = (DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam.IsChecked.Value ? Visibility.Visible : Visibility.Collapsed;
-                //if ((DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam.IsChecked.Value)
-                //{
-                //    if (TUCHX1621UI.Model.Tester.IsInSampleMode)
-                //    {
-                //        SampleTextBlock1.Text = "样本测试中";
-                //    }
-                //    else
-                //    {
-                //        if ((DateTime.Now - SamStartDatetime1).TotalSeconds < 0)
-                //        {
-                //            SampleTextBlock1.Text = "请测样本";
-                //        }
-                //        else
-                //        {
-                //            SampleTextBlock1.Text = "强制样本";
-                //        }
-                //    }
-                //}
-                //SampleContentTextBlock1_1.Text = epsonRC90.sampleContent[0][0];
-                //SampleContentTextBlock1_2.Text = epsonRC90.sampleContent[0][1];
-                //SampleContentTextBlock1_3.Text = epsonRC90.sampleContent[0][2];
-                //SampleContentTextBlock1_4.Text = epsonRC90.sampleContent[0][3];
+                #region 样本
+                SamDateBigin1 = lastSam1.AddHours(4);
+                SamStartDatetime1 = lastSam1.AddHours(6);
+                NextSam1 = SamStartDatetime1;
+                var timeSpan = SamStartDatetime1 - DateTime.Now;
+                String fmt = (timeSpan < TimeSpan.Zero ? "\\-dd\\.hh\\:mm\\:ss" : "hh\\:mm\\:ss");
+                SpanSam1 = timeSpan.ToString(fmt);
 
-                //SampleContentTextBlock2_1.Text = epsonRC90.sampleContent[1][0];
-                //SampleContentTextBlock2_2.Text = epsonRC90.sampleContent[1][1];
-                //SampleContentTextBlock2_3.Text = epsonRC90.sampleContent[1][2];
-                //SampleContentTextBlock2_4.Text = epsonRC90.sampleContent[1][3];
+                SampleGridVisibility = (DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam ? "Visible" : "Collapsed";
+                if ((DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam)
+                {
+                    if (Tester.IsInSampleMode)
+                    {
+                        SampleText = "样本测试中";
+                    }
+                    else
+                    {
+                        if ((DateTime.Now - SamStartDatetime1).TotalSeconds < 0)
+                        {
+                            SampleText = "请测样本";
+                        }
+                        else
+                        {
+                            SampleText = "强制样本";
+                        }
+                    }
+                }
+                for (int i = 0; i < 32; i++)
+                {
+                    SampleItemsStatus[i] = epsonRC90.sampleContent[i % 8][i / 8];
+                }
 
-                //SampleContentTextBlock3_1.Text = epsonRC90.sampleContent[2][0];
-                //SampleContentTextBlock3_2.Text = epsonRC90.sampleContent[2][1];
-                //SampleContentTextBlock3_3.Text = epsonRC90.sampleContent[2][2];
-                //SampleContentTextBlock3_4.Text = epsonRC90.sampleContent[2][3];
-
-                //SampleContentTextBlock4_1.Text = epsonRC90.sampleContent[3][0];
-                //SampleContentTextBlock4_2.Text = epsonRC90.sampleContent[3][1];
-                //SampleContentTextBlock4_3.Text = epsonRC90.sampleContent[3][2];
-                //SampleContentTextBlock4_4.Text = epsonRC90.sampleContent[3][3];
-
-                //SampleContentTextBlock5_1.Text = epsonRC90.sampleContent[4][0];
-                //SampleContentTextBlock5_2.Text = epsonRC90.sampleContent[4][1];
-                //SampleContentTextBlock5_3.Text = epsonRC90.sampleContent[4][2];
-                //SampleContentTextBlock5_4.Text = epsonRC90.sampleContent[4][3];
-
-                //SampleContentTextBlock6_1.Text = epsonRC90.sampleContent[5][0];
-                //SampleContentTextBlock6_2.Text = epsonRC90.sampleContent[5][1];
-                //SampleContentTextBlock6_3.Text = epsonRC90.sampleContent[5][2];
-                //SampleContentTextBlock6_4.Text = epsonRC90.sampleContent[5][3];
-
-                //SampleContentTextBlock7_1.Text = epsonRC90.sampleContent[6][0];
-                //SampleContentTextBlock7_2.Text = epsonRC90.sampleContent[6][1];
-                //SampleContentTextBlock7_3.Text = epsonRC90.sampleContent[6][2];
-                //SampleContentTextBlock7_4.Text = epsonRC90.sampleContent[6][3];
-
-                //SampleContentTextBlock8_1.Text = epsonRC90.sampleContent[7][0];
-                //SampleContentTextBlock8_2.Text = epsonRC90.sampleContent[7][1];
-                //SampleContentTextBlock8_3.Text = epsonRC90.sampleContent[7][2];
-                //SampleContentTextBlock8_4.Text = epsonRC90.sampleContent[7][3];
-                //#endregion
+                #endregion
+                #region 清洁
+                NextClean1 = lastClean1.AddHours(2);
+                timeSpan = NextClean1 - DateTime.Now;
+                fmt = (timeSpan < TimeSpan.Zero ? "\\-dd\\.hh\\:mm\\:ss" : "hh\\:mm\\:ss");
+                SpanClean1 = timeSpan.ToString(fmt);
+                
+                #endregion
                 #region 刷卡
                 if (cardcount++ > 9)
                 {
