@@ -13,6 +13,7 @@ using SXJLibrary;
 using System.IO;
 using OfficeOpenXml;
 using System.Collections.ObjectModel;
+using BingLibrary.hjb;
 
 namespace X1621LineUI.ViewModels
 {
@@ -780,8 +781,105 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("SampleText");
             }
         }
+        private string pM;
 
+        public string PM
+        {
+            get { return pM; }
+            set
+            {
+                pM = value;
+                this.RaisePropertyChanged("PM");
+            }
+        }
+        private string gROUP1;
 
+        public string GROUP1
+        {
+            get { return gROUP1; }
+            set
+            {
+                gROUP1 = value;
+                this.RaisePropertyChanged("GROUP1");
+            }
+        }
+        private string tRACK;
+
+        public string TRACK
+        {
+            get { return tRACK; }
+            set
+            {
+                tRACK = value;
+                this.RaisePropertyChanged("TRACK");
+            }
+        }
+        private string mACID;
+
+        public string MACID
+        {
+            get { return mACID; }
+            set
+            {
+                mACID = value;
+                this.RaisePropertyChanged("MACID");
+            }
+        }
+        private string lIGHT_ID;
+
+        public string LIGHT_ID
+        {
+            get { return lIGHT_ID; }
+            set
+            {
+                lIGHT_ID = value;
+                this.RaisePropertyChanged("LIGHT_ID");
+            }
+        }
+        private string siteID;
+
+        public string SiteID
+        {
+            get { return siteID; }
+            set
+            {
+                siteID = value;
+                this.RaisePropertyChanged("SiteID");
+            }
+        }
+        private string projectCode;
+
+        public string ProjectCode
+        {
+            get { return projectCode; }
+            set
+            {
+                projectCode = value;
+                this.RaisePropertyChanged("ProjectCode");
+            }
+        }
+        private string testerID;
+
+        public string TesterID
+        {
+            get { return testerID; }
+            set
+            {
+                testerID = value;
+                this.RaisePropertyChanged("TesterID");
+            }
+        }
+        private string lotName;
+
+        public string LotName
+        {
+            get { return lotName; }
+            set
+            {
+                lotName = value;
+                this.RaisePropertyChanged("LotName");
+            }
+        }
 
 
         #endregion
@@ -792,6 +890,7 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand FuncTestCommand { get; set; }
         public DelegateCommand StartSampleCommand { get; set; }
         public DelegateCommand SaveSamParamCommand { get; set; }
+        public DelegateCommand SaveParameterCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
@@ -802,6 +901,10 @@ namespace X1621LineUI.ViewModels
         int CardStatus = 1;
         private EpsonRC90 epsonRC90;string LastBanci;
         DateTime SamStartDatetime1, SamDateBigin1;
+        int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M11000;
+        List<AlarmData> AlarmList = new List<AlarmData>(); string CurrentAlarm = "";
+        string alarmExcelPath = System.Environment.CurrentDirectory + "\\D4X报警.xlsx";
+        int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -812,6 +915,7 @@ namespace X1621LineUI.ViewModels
             this.FuncTestCommand = new DelegateCommand(new Action(this.FuncTestCommandExecute));
             this.StartSampleCommand = new DelegateCommand(new Action(this.StartSampleCommandExecute));
             this.SaveSamParamCommand = new DelegateCommand(new Action(this.SaveSamParamCommandExecute));
+            this.SaveParameterCommand = new DelegateCommand(new Action(this.SaveParameterCommandExecute));
         }
         #endregion
         #region 方法绑定执行函数
@@ -819,6 +923,8 @@ namespace X1621LineUI.ViewModels
         {
             Init();
             UIRun();
+            BigDataRun();
+            MachineLogRun();
             Task.Run(()=> { IORun(); });
             Task.Run(()=> { SystemRun(); });
             AddMessage("软件加载完成");
@@ -910,6 +1016,23 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemCount", NGItemCount.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
         }
+        private void SaveParameterCommandExecute()
+        {
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "PM", PM);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "GROUP1", GROUP1);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "TRACK", TRACK);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID", MACID);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID", LIGHT_ID);
+
+            Inifile.INIWriteValue(iniParameterPath, "System", "LineID1", LineID1);
+            Inifile.INIWriteValue(iniParameterPath, "System", "LineID2", LineID2);
+
+            Inifile.INIWriteValue(iniParameterPath, "MachineLog", "SiteID", SiteID);
+            Inifile.INIWriteValue(iniParameterPath, "MachineLog", "ProjectCode", ProjectCode);
+            Inifile.INIWriteValue(iniParameterPath, "MachineLog", "TesterID", TesterID);
+            Inifile.INIWriteValue(iniParameterPath, "MachineLog", "LotName", LotName);
+            AddMessage("参数保存完成");
+        }
         #endregion
         #region 自定义函数
         private void Init()
@@ -989,7 +1112,7 @@ namespace X1621LineUI.ViewModels
                 default:
                     break;
             }
-            TestCountInput = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Summary", "liaoinput", "0"));
+            TestCountInput = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Summary", "TestCountInput", "0"));
             LastBanci = Inifile.INIGetStringValue(iniParameterPath, "Summary", "LastBanci", "null");
             SampleNgitem = new ObservableCollection<string>();
             for (int i = 0; i < 8; i++)
@@ -1014,8 +1137,63 @@ namespace X1621LineUI.ViewModels
             NGItemCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemCount", "3"));
             NGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99"));
 
+            PM = Inifile.INIGetStringValue(iniParameterPath, "BigData", "PM", "X1621");
+            GROUP1 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "GROUP1", "NA");
+            TRACK = Inifile.INIGetStringValue(iniParameterPath, "BigData", "TRACK", "NA");
+            MACID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "NA");
+            LIGHT_ID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID", "NA");
+
+            LineID1 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID1", "Line1");
+            LineID2 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID2", "Line2");
+
+            SiteID = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "SiteID", "HA4F");
+            ProjectCode = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "ProjectCode", "X1621");
+            TesterID = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "TesterID", "NO1");
+            LotName = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "LotName", "MTAXMC18500513");
+
+            LampGreenElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampGreenElapse", "0"));
+            LampGreenFlickerElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampGreenFlickerElapse", "0"));
+            LampYellowElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampYellowElapse", "0"));
+            LampYellowFlickerElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampYellowFlickerElapse", "0"));
+            LampRedElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampRedElapse", "0"));
+
             epsonRC90 = new EpsonRC90();
             epsonRC90.ModelPrint += ModelPrintEventProcess;
+            #endregion
+            #region 报警文档
+            try
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                if (File.Exists(alarmExcelPath))
+                {
+                    
+                    FileInfo existingFile = new FileInfo(alarmExcelPath);
+                    using (ExcelPackage package = new ExcelPackage(existingFile))
+                    {
+                        // get the first worksheet in the workbook
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                        for (int i = 1; i <= worksheet.Dimension.End.Row; i++)
+                        {
+                            AlarmData ad = new AlarmData();
+                            ad.Code = worksheet.Cells["A" + i.ToString()].Value == null ? "Null" : worksheet.Cells["A" + i.ToString()].Value.ToString();
+                            ad.Content = worksheet.Cells["B" + i.ToString()].Value == null ? "Null" : worksheet.Cells["B" + i.ToString()].Value.ToString();
+                            ad.Start = DateTime.Now;
+                            ad.End = DateTime.Now;
+                            ad.State = false;
+                            AlarmList.Add(ad);
+                        }
+                        AddMessage("读取到" + worksheet.Dimension.End.Row.ToString() + "条报警");
+                    }
+                }
+                else
+                {
+                    AddMessage("D4X报警.xlsx 文件不存在");
+                }
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
             #endregion
         }
         private void AddMessage(string str)
@@ -1296,16 +1474,239 @@ namespace X1621LineUI.ViewModels
                 {
                     LastBanci = epsonRC90.GetBanci();
                     Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
+                    TestCountInput = 0;
+                    Inifile.INIWriteValue(iniParameterPath, "Summary", "TestCountInput", TestCountInput.ToString());
                     WriteMachineData();
                     for (int i = 0; i < 4; i++)
                     {
                         epsonRC90.YanmadeTester[i].Clean();
                     }
+
+                    await Task.Run(() =>
+                    {
+                        Mysql mysql = new Mysql();
+                        try
+                        {
+                            int _result = -999;                            
+                            if (mysql.Connect())
+                            {
+                                string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0')"
+                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("mmddss"), "NA");
+                                _result = mysql.executeQuery(stm);
+                            }
+                            AddMessage("插入数据库灯信号" + _result.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            AddMessage(ex.Message);
+                        }
+                        finally
+                        {
+                            mysql.DisConnect();
+                        }
+                    });
+
                     AddMessage(LastBanci + " 换班数据清零");
 
                 }
                 #endregion
             }
+        }
+        async void BigDataRun()
+        {
+            int _LampColor = LampColor;
+            int count1 = 0;
+            LampGreenSw.Start();
+            while (true)
+            {
+                await Task.Delay(1000);//每秒刷新               
+                #region 报警
+                if (M11000 != null && StatusMid)
+                {
+                    for (int i = 0; i < AlarmList.Count; i++)
+                    {
+                        if (M11000[i] != AlarmList[i].State && LampGreenSw.Elapsed.TotalMinutes > 3)
+                        {
+                            AlarmList[i].State = M11000[i];
+                            if (AlarmList[i].State)
+                            {
+                                CurrentAlarm = AlarmList[i].Content;
+
+                                AlarmList[i].Start = DateTime.Now;
+                                AlarmList[i].End = DateTime.Now;
+                                AddMessage(AlarmList[i].Code + AlarmList[i].Content + "发生");
+
+                                string result = await Task<string>.Run(() =>
+                                {
+                                    try
+                                    {
+                                        int _result = -999;
+                                        Mysql mysql = new Mysql();
+                                        if (mysql.Connect())
+                                        {
+                                            string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')"
+                                                , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("hhmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), "0", epsonRC90.GetBanci());
+                                            _result = mysql.executeQuery(stm);
+                                        }
+                                        mysql.DisConnect();
+                                        return _result.ToString();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        return ex.Message;
+                                    }
+                                });
+                                AddMessage("插入报警" + result);
+
+                                AlarmAction(i);//等待报警结束
+                            }
+
+                        }
+                    }
+
+                }
+                #endregion
+                #region 灯号更新
+                switch (LampColor)
+                {
+                    case 1:
+                        LampGreenElapse += 1;
+                        Inifile.INIWriteValue(iniParameterPath, "BigData", "LampGreenElapse", LampGreenElapse.ToString());
+                        break;
+                    case 2:
+                        LampGreenFlickerElapse += 1;
+                        Inifile.INIWriteValue(iniParameterPath, "BigData", "LampGreenFlickerElapse", LampGreenFlickerElapse.ToString());
+                        break;
+                    case 3:
+                        LampYellowElapse += 1;
+                        Inifile.INIWriteValue(iniParameterPath, "BigData", "LampYellowElapse", LampYellowElapse.ToString());
+                        break;
+                    case 4:
+                        LampYellowFlickerElapse += 1;
+                        Inifile.INIWriteValue(iniParameterPath, "BigData", "LampYellowFlickerElapse", LampYellowFlickerElapse.ToString());
+                        break;
+                    case 5:
+                        LampRedElapse += 1;
+                        Inifile.INIWriteValue(iniParameterPath, "BigData", "LampRedElapse", LampRedElapse.ToString());
+                        break;
+                    default:
+                        break;
+                }
+                count1++;
+                if (_LampColor != LampColor || count1 > 60)
+                {
+
+                    if (LampColor == 1 && _LampColor != LampColor)
+                    {
+                        LampGreenSw.Restart();
+                    }
+                    _LampColor = LampColor;
+                    count1 = 0;
+                    string result = await Task<string>.Run(() =>
+                    {
+                        try
+                        {
+                            int _result = -999;
+                            Mysql mysql = new Mysql();
+                            if (mysql.Connect())
+                            {
+                                string currentAlarm = LampColor == 4 ? CurrentAlarm : "NA";
+                                string stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}'"
+                                    , PM, LIGHT_ID, MACID, LampColor, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("mmddss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
+                                    , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"));
+                                _result = mysql.executeQuery(stm);
+                            }
+                            mysql.DisConnect();
+                            return _result.ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            return ex.Message;
+                        }
+                    });
+                    AddMessage("更新灯信号" + result);
+                }
+                if (LampColor != 1)
+                {
+                    LampGreenSw.Reset();
+                }
+                #endregion
+                #region 机台指标
+                //if (HD200 != null && plcstate)
+                //{
+                //    TimeSpan ts = DateTime.Now - GetBanStart();
+                //    //妥善率
+                //    double ProperlyRate = (ts.TotalMinutes - (double)LampYellowFlickerElapse - (double)LampRedElapse) / ts.TotalMinutes * 100;
+                //    //报警率
+                //    double AlarmRate = AlarmCount / HD200[6] * 100;
+                //    //达成率
+                //    double YieldRate = HD200[3] / ((ts.TotalMinutes - (double)LampGreenFlickerElapse - (double)LampYellowElapse) * (60 / HD200[7]) * 10) * 100;
+                //    //直通率
+                //    double PassRate = HD200[3] / HD200[6] * 100;
+
+                //    await Task.Run(() => { Xinjie.WriteW(410, (PassRate * 10).ToString("F0")); });//往D410写直通率，保留1位小数
+                //    await Task.Run(() => { Xinjie.WriteW(411, (AlarmRate * 10).ToString("F0")); });//往D410写报警率，保留1位小数
+                //    await Task.Run(() => { Xinjie.WriteW(412, (YieldRate * 10).ToString("F0")); });//往D411写达成率，保留1位小数
+                //    await Task.Run(() => { Xinjie.WriteW(413, (ProperlyRate * 10).ToString("F0")); });//往D413写妥善率，保留1位小数
+
+                //    await Task.Run(() => { Xinjie.WriteW(401, AlarmCount.ToString()); });//往D401写报警次数，保留1位小数
+                //}
+                #endregion
+            }
+
+        }
+        async void MachineLogRun()
+        {
+            string machineLogpath = @"D:\MachineLog" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            string machineSummarypath = @"D:\MachineSummary" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            while (true)
+            {
+                await Task.Delay(60000);
+                if (!File.Exists(machineLogpath))
+                {
+                    string[] heads = { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "STOP TIME", "RESTART TIME", "DOWN TIME", "KEYWORD", "STATUS", "ERROR CODE", "ERROR TYPE", "ERROR MESSAGE", "MESSAGE" };
+                    Csvfile.savetocsv(machineLogpath, heads);
+                }
+                if (!File.Exists(machineSummarypath))
+                {
+                    string[] heads = { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "INPUT", "PASS", "FAIL", "Error#", "Socket Usage" };
+                    Csvfile.savetocsv(machineSummarypath, heads);
+                }
+            }
+        }
+        async void AlarmAction(int i)
+        {
+            while (M11000[i])
+            {
+                await Task.Delay(100);
+            }
+            AlarmList[i].End = DateTime.Now;
+            AddMessage(AlarmList[i].Code + AlarmList[i].Content + "解除");
+            TimeSpan time = AlarmList[i].End - AlarmList[i].Start;
+            await Task.Run(() =>
+            {
+                Mysql mysql = new Mysql();
+                try
+                {
+                    int _result = -999;
+                    if (mysql.Connect())
+                    {
+                        string stm = string.Format("UPDATE HA_F4_DATA_ALARM SET SSTOPDATE = '{5}',SSTOPTIME = '{6}',TIME = '{7}' WHERE PM = '{0}' AND MACID = '{1}' AND NAME = '{2}' AND SSTARTDATE = '{3}' AND SSTARTTIME = '{4}'"
+                            , PM, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("hhmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), time.TotalMinutes.ToString("F2"));
+                        _result = mysql.executeQuery(stm);
+                    }
+                    AddMessage("更新报警到数据库" + _result);
+                }
+                catch (Exception ex)
+                {
+                    AddMessage(ex.Message);
+                }
+                finally
+                {
+                    mysql.DisConnect();
+                }
+            });
+            
         }
         private string[] PassStatusProcess(double f)
         {
@@ -1482,6 +1883,7 @@ namespace X1621LineUI.ViewModels
                         mysql.executeQuery(stm);
                         mysql.DisConnect();
                         Fx5u_mid.SetM("M2798", false);
+
                     }
                     //B轨道
                     if (Fx5u_mid.ReadM("M2803"))
@@ -2168,69 +2570,66 @@ namespace X1621LineUI.ViewModels
                 System.Threading.Thread.Sleep(100);
             }
         }
-        private void ModelPrintEventProcess(string str)
+        private async void ModelPrintEventProcess(string str)
         {
            
             AddMessage(str);
-            
-            //#region 清洁
-            //if (str.Contains("CheckClean"))
-            //{
-            //    this.Dispatcher.Invoke(new Action(async () => {
-            //        if ((DateTime.Now - lastClean1.AddHours(2)).TotalSeconds > 0 && IsClean.IsChecked.Value)
-            //        {
-            //            await epsonRC90.TestSentNet.SendAsync("StartClean");
-            //            lastClean1 = DateTime.Now;
-            //            LastClean1.Text = lastClean1.ToString();
-            //            Inifile.INIWriteValue(iniParameterPath, "Clean", "LastClean1", lastClean1.ToString());
-            //        }
-            //        else
-            //        {
-            //            await epsonRC90.TestSentNet.SendAsync("EndClean");
-            //        }
-            //    }));
-            //}
-            //#endregion
-            //#region 样本
-            //if (str.Contains("AskSample"))
-            //{
-            //    this.Dispatcher.Invoke(new Action(async () => {
-            //        if ((DateTime.Now - SamStartDatetime1).TotalSeconds > 0 && IsSam.IsChecked.Value)
-            //        {
-            //            await epsonRC90.TestSentNet.SendAsync("SampleTest;OK");
-            //            if (epsonRC90.TestSendStatus && IsSam.IsChecked.Value)
-            //            {
-            //                await epsonRC90.TestSentNet.SendAsync("StartSample");
-            //            }
-            //        }
-            //        else
-            //        {
-            //            await epsonRC90.TestSentNet.SendAsync("SampleTest;NG");
-            //        }
-            //    }));
-            //}
-            //if (str.Contains("StartSample"))
-            //{
-            //    epsonRC90.SamStart = DateTime.Now;
-            //    Tester.IsInSampleMode = true;
-            //    for (int i = 0; i < 8; i++)
-            //    {
-            //        for (int j = 0; j < 4; j++)
-            //        {
-            //            epsonRC90.sampleContent[i][j] = "Null";
-            //        }
-            //    }
-            //}
-            //if (str.Contains("EndSample"))
-            //{
-            //    lastSam1 = DateTime.Now;
-            //    Tester.IsInSampleMode = false;
-            //    Inifile.INIWriteValue(iniParameterPath, "Sample", "LastSam1", lastSam1.ToString());
-            //    this.Dispatcher.Invoke(new Action(() => {
-            //        LastSam1.Text = lastSam1.ToString();
-            //    }));
-            //}
-            //#endregion
+
+            #region 清洁
+            if (str.Contains("CheckClean"))
+            {
+                if ((DateTime.Now - lastClean1.AddHours(2)).TotalSeconds > 0 && IsClean)
+                {
+                    await epsonRC90.TestSentNet.SendAsync("StartClean");
+                    LastClean1 = DateTime.Now;
+                    Inifile.INIWriteValue(iniParameterPath, "Clean", "LastClean1", LastClean1.ToString());
+                }
+                else
+                {
+                    await epsonRC90.TestSentNet.SendAsync("EndClean");
+                }
+            }
+            #endregion
+            #region 样本
+            if (str.Contains("AskSample"))
+            {
+                if ((DateTime.Now - SamStartDatetime1).TotalSeconds > 0 && IsSam)
+                {
+                    await epsonRC90.TestSentNet.SendAsync("SampleTest;OK");
+                    if (epsonRC90.TestSendStatus && IsSam)
+                    {
+                        await epsonRC90.TestSentNet.SendAsync("StartSample");
+                    }
+                }
+                else
+                {
+                    await epsonRC90.TestSentNet.SendAsync("SampleTest;NG");
+                }
+            }
+            if (str.Contains("StartSample"))
+            {
+                epsonRC90.SamStart = DateTime.Now;
+                Tester.IsInSampleMode = true;
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        epsonRC90.sampleContent[i][j] = "Null";
+                    }
+                }
+            }
+            if (str.Contains("EndSample"))
+            {
+                LastSam1 = DateTime.Now;
+                Tester.IsInSampleMode = false;
+                Inifile.INIWriteValue(iniParameterPath, "Sample", "LastSam1", LastSam1.ToString());
+            }
+            if (str.Contains("PickNew"))
+            {
+                TestCountInput += 1;
+                Inifile.INIWriteValue(iniParameterPath, "Summary", "TestCountInput", TestCountInput.ToString());
+            }
+            #endregion
         }
         #endregion
     }

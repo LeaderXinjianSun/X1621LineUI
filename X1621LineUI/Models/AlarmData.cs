@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace X1621LineUI.Models
+namespace SXJLibrary
 {
     public class AlarmData
     {

@@ -7,6 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="631" d:DesignWidth="1024">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
         <GroupBox Header="机台参数">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal" Margin="1">
@@ -16,6 +24,54 @@
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <TextBlock Text="轨道2名称" VerticalAlignment="Center"></TextBlock>
                     <TextBox Width="100" Text="{Binding LineID2}"></TextBox>
+                </StackPanel>
+                <Button Width="60" Height="60" Margin="0,10,0,0" Content="保存" Command="{Binding SaveParameterCommand}"></Button>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="大数据" Grid.Column="1">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" Text="机种" Width="60"></TextBlock>
+                    <TextBox Width="100" Text="{Binding PM}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" Text="组别" Width="60"></TextBlock>
+                    <TextBox Width="100" Text="{Binding GROUP1}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" Text="轨道" Width="60"></TextBlock>
+                    <TextBox Width="100" Text="{Binding TRACK}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" Text="机台编号" Width="60"></TextBlock>
+                    <TextBox Width="100" Text="{Binding MACID}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" Text="三色灯编号" Width="60"></TextBlock>
+                    <TextBox Width="100" Text="{Binding LIGHT_ID}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Button Content="Alarm" Width="60" Height="30" IsEnabled="{Binding AlarmButtonIsEnabled}" Command="{Binding BigDataAlarmGetCommand}"></Button>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="Machine Log">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock Text="SiteID" Width="80" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding SiteID}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock Text="ProjectCode" Width="80" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding ProjectCode}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock Text="TesterID" Width="80" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding TesterID}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock Text="LOT NAME" Width="80" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding LotName}"></TextBox>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
