@@ -10,6 +10,7 @@ namespace SXJLibrary
     {
         public string Code { set; get; }
         public string Content { set; get; }
+        public string Type { set; get; }
         public DateTime Start { set; get; }
         public DateTime End { set; get; }
         public bool State { set; get; }

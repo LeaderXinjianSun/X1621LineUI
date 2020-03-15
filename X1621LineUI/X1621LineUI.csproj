@@ -161,6 +161,7 @@
     <Compile Include="Models\Scan.cs" />
     <Compile Include="Models\TCP.cs" />
     <Compile Include="Models\Tester.cs" />
+    <Compile Include="Models\UDP.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>

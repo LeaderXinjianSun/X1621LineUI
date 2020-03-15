@@ -8,6 +8,7 @@ using BingLibrary.hjb.file;
 using System.IO;
 using BingLibrary.hjb;
 using System.Data;
+using BingLibrary.Net.net;
 
 namespace SXJLibrary
 {
@@ -46,6 +47,7 @@ namespace SXJLibrary
                 uploadSoftwareStatus[i].RecordPrint += RecordPrintOperate;
             }
             Ip = Inifile.INIGetStringValue(iniParameterPath, "EpsonRC90", "Ip", "192.168.1.2");
+
             for (int i = 0; i < 2; i++)
             {
                 for (int j = 0; j < 15; j++)
@@ -441,8 +443,8 @@ namespace SXJLibrary
                 Mysql mysql = new Mysql();
                 if (mysql.Connect())
                 {
-                    string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SCBARCODE = '" + BarInfo[_index][index].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index].BordBarcode
-                        + "' AND SDATE = '" + BarInfo[_index][index].TDate + "' AND STIME = '" + BarInfo[_index][index].TTime + "' AND PCSSER = '" + (index + 1).ToString() + "'";
+                    string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
+                        + "' AND SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND PCSSER = '" + (index + 1).ToString() + "'";
                     mysql.executeQuery(stm); 
                 }
                 mysql.DisConnect();

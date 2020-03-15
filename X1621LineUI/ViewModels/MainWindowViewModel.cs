@@ -901,10 +901,11 @@ namespace X1621LineUI.ViewModels
         int CardStatus = 1;
         private EpsonRC90 epsonRC90;string LastBanci;
         DateTime SamStartDatetime1, SamDateBigin1;
-        int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M11000;
+        int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000;
         List<AlarmData> AlarmList = new List<AlarmData>(); string CurrentAlarm = "";
-        string alarmExcelPath = System.Environment.CurrentDirectory + "\\D4X报警.xlsx";
+        string alarmExcelPath = System.Environment.CurrentDirectory + "\\X1621串线上料机报警.xlsx";
         int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
+        int ErrorCount = 0;
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -993,7 +994,10 @@ namespace X1621LineUI.ViewModels
             //Inifile.INIWriteValue(iniParameterPath, "System", "Station", "1");
             //Inifile.INIWriteValue(iniParameterPath, "读卡器", "COM", "COM21");
             //Inifile.INIWriteValue(iniParameterPath, "读卡器", "MODE", "3");
-            StatusL1 = !StatusL1;
+            //StatusL1 = !StatusL1;
+            //int _time = 3599;
+            //string downtime = string.Format("{0}:{1}:{2}", (_time / 3600).ToString(), (_time / 60).ToString(), (_time % 60).ToString());
+            //AddMessage(downtime);
             AddMessage("功能执行完成");
         }
         private async void StartSampleCommandExecute()
@@ -1015,6 +1019,8 @@ namespace X1621LineUI.ViewModels
             }
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemCount", NGItemCount.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "IsSam", IsSam.ToString());
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "IsClean", IsClean.ToString());
         }
         private void SaveParameterCommandExecute()
         {
@@ -1150,6 +1156,7 @@ namespace X1621LineUI.ViewModels
             ProjectCode = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "ProjectCode", "X1621");
             TesterID = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "TesterID", "NO1");
             LotName = Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "LotName", "MTAXMC18500513");
+            ErrorCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "MachineLog", "ErrorCount", "0"));
 
             LampGreenElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampGreenElapse", "0"));
             LampGreenFlickerElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampGreenFlickerElapse", "0"));
@@ -1177,6 +1184,7 @@ namespace X1621LineUI.ViewModels
                             AlarmData ad = new AlarmData();
                             ad.Code = worksheet.Cells["A" + i.ToString()].Value == null ? "Null" : worksheet.Cells["A" + i.ToString()].Value.ToString();
                             ad.Content = worksheet.Cells["B" + i.ToString()].Value == null ? "Null" : worksheet.Cells["B" + i.ToString()].Value.ToString();
+                            ad.Type = worksheet.Cells["C" + i.ToString()].Value == null ? "Null" : worksheet.Cells["C" + i.ToString()].Value.ToString();
                             ad.Start = DateTime.Now;
                             ad.End = DateTime.Now;
                             ad.State = false;
@@ -1187,7 +1195,7 @@ namespace X1621LineUI.ViewModels
                 }
                 else
                 {
-                    AddMessage("D4X报警.xlsx 文件不存在");
+                    AddMessage("X1621串线上料机报警.xlsx 文件不存在");
                 }
             }
             catch (Exception ex)
@@ -1490,8 +1498,8 @@ namespace X1621LineUI.ViewModels
                             int _result = -999;                            
                             if (mysql.Connect())
                             {
-                                string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0')"
-                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("mmddss"), "NA");
+                                string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}')"
+                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA",GROUP1,TRACK);
                                 _result = mysql.executeQuery(stm);
                             }
                             AddMessage("插入数据库灯信号" + _result.ToString());
@@ -1521,13 +1529,13 @@ namespace X1621LineUI.ViewModels
             {
                 await Task.Delay(1000);//每秒刷新               
                 #region 报警
-                if (M11000 != null && StatusMid)
+                if (M300 != null && StatusMid)
                 {
                     for (int i = 0; i < AlarmList.Count; i++)
                     {
-                        if (M11000[i] != AlarmList[i].State && LampGreenSw.Elapsed.TotalMinutes > 3)
+                        if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && LampGreenSw.Elapsed.TotalMinutes > 3)
                         {
-                            AlarmList[i].State = M11000[i];
+                            AlarmList[i].State = M300[i];
                             if (AlarmList[i].State)
                             {
                                 CurrentAlarm = AlarmList[i].Content;
@@ -1545,7 +1553,7 @@ namespace X1621LineUI.ViewModels
                                         if (mysql.Connect())
                                         {
                                             string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')"
-                                                , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("hhmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), "0", epsonRC90.GetBanci());
+                                                , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), "0", epsonRC90.GetBanci());
                                             _result = mysql.executeQuery(stm);
                                         }
                                         mysql.DisConnect();
@@ -1612,7 +1620,7 @@ namespace X1621LineUI.ViewModels
                             {
                                 string currentAlarm = LampColor == 4 ? CurrentAlarm : "NA";
                                 string stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}'"
-                                    , PM, LIGHT_ID, MACID, LampColor, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("mmddss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
+                                    , PM, LIGHT_ID, MACID, LampColor, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
                                     , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"));
                                 _result = mysql.executeQuery(stm);
                             }
@@ -1624,7 +1632,7 @@ namespace X1621LineUI.ViewModels
                             return ex.Message;
                         }
                     });
-                    AddMessage("更新灯信号" + result);
+                    //AddMessage("更新灯信号" + result);
                 }
                 if (LampColor != 1)
                 {
@@ -1657,26 +1665,122 @@ namespace X1621LineUI.ViewModels
         }
         async void MachineLogRun()
         {
-            string machineLogpath = @"D:\MachineLog" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
-            string machineSummarypath = @"D:\MachineSummary" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            var mInput = TestCountInput;
+            var mPass = TestCountOutput;
+            var FailCount = epsonRC90.YanmadeTester[0].FailCount + epsonRC90.YanmadeTester[1].FailCount + epsonRC90.YanmadeTester[2].FailCount + epsonRC90.YanmadeTester[3].FailCount;
+            var mFail = FailCount;
+            var mError = ErrorCount;
+            int tickcount1 = 0;
+            bool MInit = false, MStart = false, MEnd = false;
+            bool first = true;
             while (true)
             {
-                await Task.Delay(60000);
-                if (!File.Exists(machineLogpath))
+                await Task.Delay(1000);
+                try
                 {
-                    string[] heads = { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "STOP TIME", "RESTART TIME", "DOWN TIME", "KEYWORD", "STATUS", "ERROR CODE", "ERROR TYPE", "ERROR MESSAGE", "MESSAGE" };
-                    Csvfile.savetocsv(machineLogpath, heads);
+                    string machineLogpath = @"D:\MachineLog" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+                    string machineSummarypath = @"D:\MachineSummary" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+                    if (!File.Exists(machineLogpath))
+                    {
+                        ErrorCount = 0;
+                        Inifile.INIWriteValue(iniParameterPath, "MachineLog", "ErrorCount", ErrorCount.ToString());
+                        string[] heads = new string[] { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "STOP TIME", "RESTART TIME", "DOWN TIME", "KEYWORD", "STATUS", "ERROR CODE", "ERROR TYPE", "ERROR MESSAGE", "MESSAGE" };
+                        Csvfile.savetocsv(machineLogpath, heads);
+                    }
+                    if (!File.Exists(machineSummarypath))
+                    {
+                        string[] heads = new string[] { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "INPUT", "PASS", "FAIL", "Error#", "Socket Usage" };
+                        Csvfile.savetocsv(machineSummarypath, heads);
+                    }
+                    //MachineLog
+                    if (tickcount1++ > 60)
+                    {
+                        tickcount1 = 0;
+                        FailCount = epsonRC90.YanmadeTester[0].FailCount + epsonRC90.YanmadeTester[1].FailCount + epsonRC90.YanmadeTester[2].FailCount + epsonRC90.YanmadeTester[3].FailCount;
+                        string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", (TestCountInput - mInput).ToString(), (TestCountOutput - mPass).ToString(), (FailCount - mFail).ToString(), (ErrorCount - mError).ToString(), "1111" };
+                        mInput = TestCountInput;
+                        mFail = FailCount;
+                        mError = ErrorCount;
+                        Csvfile.savetocsv(machineSummarypath, contents);
+                    }
+
+                    if (M2000 != null && StatusMid)
+                    {
+                        if (first)
+                        {
+                            MInit = M2000[0];
+                            MStart = M2000[1];
+                            MEnd = M2000[2];
+                        }
+                        if (MInit != M2000[0])
+                        {
+                            MInit = M2000[0];
+                            if (M2000[0])
+                            {
+                                string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "INITIALIZE END", "", "", "", "", "" };
+                                Csvfile.savetocsv(machineLogpath, contents);
+                            }
+                            else
+                            {
+                                string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "INITIALIZE START", "", "", "", "", "" };
+                                Csvfile.savetocsv(machineLogpath, contents);
+                            }
+                        }
+                        if (MStart != M2000[1])
+                        {
+                            MStart = M2000[1];
+                            if (M2000[1])
+                            {
+                                string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "START", "", "", "", "", "" };
+                                Csvfile.savetocsv(machineLogpath, contents);
+                            }
+                        }
+                        if (MEnd != M2000[2])
+                        {
+                            MEnd = M2000[2];
+                            if (M2000[2])
+                            {
+                                string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "END", "", "", "", "", "" };
+                                Csvfile.savetocsv(machineLogpath, contents);
+                                MachineLogAction();
+                            }
+                        }
+                    }
+                    if (DateTime.Now.Minute == 59 && DateTime.Now.Second == 59)
+                    {
+                        MachineLogAction();
+                    }
+
                 }
-                if (!File.Exists(machineSummarypath))
-                {
-                    string[] heads = { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "INPUT", "PASS", "FAIL", "Error#", "Socket Usage" };
-                    Csvfile.savetocsv(machineSummarypath, heads);
-                }
+                catch { }
             }
+        }
+        private void MachineLogAction()
+        {
+            string machineLogpath = @"D:\MachineLog" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "PASS", TestCountOutput.ToString(), "", "", "", "" };
+            Csvfile.savetocsv(machineLogpath, contents);
+            var FailCount = epsonRC90.YanmadeTester[0].FailCount + epsonRC90.YanmadeTester[1].FailCount + epsonRC90.YanmadeTester[2].FailCount + epsonRC90.YanmadeTester[3].FailCount;
+            contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "FAIL", FailCount.ToString(), "", "", "", "" };
+            Csvfile.savetocsv(machineLogpath, contents);
+            contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "RATE", ((double)TestCountOutput/(TestCountOutput + FailCount) * 100).ToString("F1"), "", "", "", "" };
+            Csvfile.savetocsv(machineLogpath, contents);
+            int _time = LampYellowFlickerElapse + LampRedElapse;
+            string downtime = string.Format("{0}:{1}:{2}",(_time / 3600).ToString(), (_time / 60).ToString(), (_time % 60).ToString());
+            contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "DOWN TIME", downtime, "", "", "", "" };
+            Csvfile.savetocsv(machineLogpath, contents);
+            _time = LampGreenElapse;
+            downtime = string.Format("{0}:{1}:{2}", (_time / 3600).ToString(), (_time / 60).ToString(), (_time % 60).ToString());
+            contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "PRODUCTION TIME", downtime, "", "", "", "" };
+            Csvfile.savetocsv(machineLogpath, contents);
+            _time = LampGreenFlickerElapse + LampYellowElapse;
+            downtime = string.Format("{0}:{1}:{2}", (_time / 3600).ToString(), (_time / 60).ToString(), (_time % 60).ToString());
+            contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", "", "", "", "IDLE TIME", downtime, "", "", "", "" };
+            Csvfile.savetocsv(machineLogpath, contents);
         }
         async void AlarmAction(int i)
         {
-            while (M11000[i])
+            while (M300[i])
             {
                 await Task.Delay(100);
             }
@@ -1692,7 +1796,7 @@ namespace X1621LineUI.ViewModels
                     if (mysql.Connect())
                     {
                         string stm = string.Format("UPDATE HA_F4_DATA_ALARM SET SSTOPDATE = '{5}',SSTOPTIME = '{6}',TIME = '{7}' WHERE PM = '{0}' AND MACID = '{1}' AND NAME = '{2}' AND SSTARTDATE = '{3}' AND SSTARTTIME = '{4}'"
-                            , PM, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("hhmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), time.TotalMinutes.ToString("F2"));
+                            , PM, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("HHmmss"), time.TotalMinutes.ToString("F2"));
                         _result = mysql.executeQuery(stm);
                     }
                     AddMessage("更新报警到数据库" + _result);
@@ -1706,7 +1810,17 @@ namespace X1621LineUI.ViewModels
                     mysql.DisConnect();
                 }
             });
-            
+            ErrorCount++;
+            Inifile.INIWriteValue(iniParameterPath, "MachineLog", "ErrorCount", ErrorCount.ToString());
+
+            string machineLogpath = @"D:\MachineLog" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            if (!File.Exists(machineLogpath))
+            {
+                string[] heads = new string[] { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "STOP TIME", "RESTART TIME", "DOWN TIME", "KEYWORD", "STATUS", "ERROR CODE", "ERROR TYPE", "ERROR MESSAGE", "MESSAGE" };
+                Csvfile.savetocsv(machineLogpath, heads);
+            }
+            string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", AlarmList[i].Start.ToString("HH:mm:ss"), AlarmList[i].End.ToString("HH:mm:ss"), time.ToString("HH:mm:ss"), "WARNING" ,"", AlarmList[i].Code,"", AlarmList[i].Type, AlarmList[i].Content };
+            Csvfile.savetocsv(machineLogpath, contents);
         }
         private string[] PassStatusProcess(double f)
         {
@@ -1861,16 +1975,16 @@ namespace X1621LineUI.ViewModels
                             switch (Station)
                             {
                                 case 1:
-                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE LineID = '" + LineID1 + "'";
                                     break;
                                 case 2:
                                 case 3:
                                 case 4:
                                 case 5:
-                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE LineID = '" + LineID1 + "'";
                                     break;
                                 case 6:
-                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE LineID = '" + LineID1 + "'";
                                     break;
                                 default:
                                     break;
@@ -1895,16 +2009,16 @@ namespace X1621LineUI.ViewModels
                             switch (Station)
                             {
                                 case 1:
-                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE LineID = '" + LineID2 + "'";
                                     break;
                                 case 2:
                                 case 3:
                                 case 4:
                                 case 5:
-                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE LineID = '" + LineID2 + "'";
                                     break;
                                 case 6:
-                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE LineID = '" + LineID2 + "'";
                                     break;
                                 default:
                                     break;
@@ -1932,7 +2046,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE WHERE LineID = '" + LineID1 + "'";
+                            stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                         }
                         mysql.DisConnect();
@@ -1945,7 +2059,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE WHERE LineID = '" + LineID2 + "'";
+                            stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                         }
                         mysql.DisConnect();
@@ -1955,7 +2069,15 @@ namespace X1621LineUI.ViewModels
                 }
                 catch
                 { }
-                
+
+                #endregion
+                #region 读写PLC信号
+                //读报警
+                M300 = Fx5u_mid.ReadMultiM("M300", 64);
+                //读三色灯状态
+                LampColor = Fx5u_mid.ReadW("D200");
+                //读机台状态
+                M2000 = Fx5u_mid.ReadMultiM("M2000", 16);
                 #endregion
                 UICycle = sw.ElapsedMilliseconds;
             }
@@ -2353,7 +2475,7 @@ namespace X1621LineUI.ViewModels
                             {
                                 Fx5u_mid.SetM("M2796", false);
                                 Fx5u_mid.SetM("M2596", false);
-                                stm = "UPDATE BODLINE SET Station9 = 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                                stm = "UPDATE BODLINE SET Station9 = 1 WHERE LineID = '" + LineID1 + "'";
                                 mysql.executeQuery(stm);
                                 AddMessage("线A进入1块板");
                             }
@@ -2376,7 +2498,7 @@ namespace X1621LineUI.ViewModels
                             {
                                 Fx5u_mid.SetM("M2801", false);
                                 Fx5u_mid.SetM("M2601", false);
-                                stm = "UPDATE BODLINE SET Station9 = Station9 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                                stm = "UPDATE BODLINE SET Station9 = Station9 + 1 WHERE LineID = '" + LineID2 + "'";
                                 mysql.executeQuery(stm);
                                 AddMessage("线B进入1块板");
                             }
@@ -2448,7 +2570,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
@@ -2460,7 +2582,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块新板");
                         }
@@ -2472,7 +2594,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块存储板");
                         }
@@ -2526,7 +2648,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
@@ -2538,7 +2660,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块新板");
                         }
@@ -2550,7 +2672,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块存储板");
                         }
