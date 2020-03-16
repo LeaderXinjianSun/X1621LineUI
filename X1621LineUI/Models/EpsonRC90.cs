@@ -100,7 +100,7 @@ namespace SXJLibrary
                     await Task.Delay(1000);
                     if (!TestSentNet.tcpConnected)
                     {
-                        bool r1 = await TestSentNet.Connect(Ip, 2001);
+                        bool r1 = await TestSentNet.Connect(Ip, 2002);
                         if (r1)
                         {
                             TestSendStatus = true;
@@ -129,7 +129,7 @@ namespace SXJLibrary
                     await Task.Delay(1000);
                     if (!TestReceiveNet.tcpConnected)
                     {
-                        bool r1 = await TestReceiveNet.Connect(Ip, 2002);
+                        bool r1 = await TestReceiveNet.Connect(Ip, 2001);
                         if (r1)
                         {
                             TestReceiveStatus = true;
@@ -444,7 +444,7 @@ namespace SXJLibrary
                 if (mysql.Connect())
                 {
                     string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
-                        + "' AND SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND PCSSER = '" + (index + 1).ToString() + "'";
+                        + "' AND SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND PCSSER = '" + index.ToString() + "'";
                     mysql.executeQuery(stm); 
                 }
                 mysql.DisConnect();

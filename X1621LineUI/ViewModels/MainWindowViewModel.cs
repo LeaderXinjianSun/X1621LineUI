@@ -998,6 +998,7 @@ namespace X1621LineUI.ViewModels
             //int _time = 3599;
             //string downtime = string.Format("{0}:{1}:{2}", (_time / 3600).ToString(), (_time / 60).ToString(), (_time % 60).ToString());
             //AddMessage(downtime);
+            epsonRC90.TestSentNet.SendAsync("sgrfgsaerfawef");
             AddMessage("功能执行完成");
         }
         private async void StartSampleCommandExecute()
