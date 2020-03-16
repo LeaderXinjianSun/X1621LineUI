@@ -281,7 +281,7 @@ namespace SXJLibrary
             {
                 int ngItemCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemCount", "3"));
                 int nGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99")); 
-                string MNO = Inifile.INIGetStringValue(iniParameterPath, "System", "MachineID", "X1621_1");
+                string MNO = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
                 Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                 if (oraDB.isConnect())
                 {
@@ -423,7 +423,7 @@ namespace SXJLibrary
                 BarInfo[index][i].Status = 0;
                 BarInfo[index][i].TDate = DateTime.Now.ToString("yyyyMMdd");
                 BarInfo[index][i].TTime = DateTime.Now.ToString("HHmmss");
-                string machinestr = Inifile.INIGetStringValue(iniParameterPath, "System", "MachineID", "X1621_1");
+                string machinestr = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
                 Mysql mysql = new Mysql();
                 if (mysql.Connect())
                 {

@@ -1253,11 +1253,12 @@ namespace X1621LineUI.ViewModels
                         StatusR2 = Fx5u_right2.Connect;
                         break;
                     case 3:
-                    case 4:
                     case 5:
                         StatusL2 = Fx5u_left2.Connect;
+                        StatusR2 = Fx5u_right2.Connect;
                         break;
                     case 2:
+                    case 4:
                     case 6:
                         StatusL1 = Fx5u_left1.Connect;
                         StatusL2 = Fx5u_left2.Connect;
