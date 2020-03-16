@@ -1204,6 +1204,22 @@ namespace X1621LineUI.ViewModels
                 AddMessage(ex.Message);
             }
             #endregion
+            #region 更新本地时间
+            try
+            {
+                SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                if (oraDB.isConnect())
+                {
+                    string oracleTime = oraDB.OraclDateTime();
+                    AddMessage("更新数据库时间到本地" + oracleTime);
+                }
+                oraDB.disconnect();
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
+            #endregion
         }
         private void AddMessage(string str)
         {
@@ -2073,12 +2089,16 @@ namespace X1621LineUI.ViewModels
 
                 #endregion
                 #region 读写PLC信号
-                //读报警
-                M300 = Fx5u_mid.ReadMultiM("M300", 64);
-                //读三色灯状态
-                LampColor = Fx5u_mid.ReadW("D200");
-                //读机台状态
-                M2000 = Fx5u_mid.ReadMultiM("M2000", 16);
+                try
+                {
+                    //读报警
+                    M300 = Fx5u_mid.ReadMultiM("M300", 64);
+                    //读三色灯状态
+                    LampColor = Fx5u_mid.ReadW("D200");
+                    //读机台状态
+                    M2000 = Fx5u_mid.ReadMultiM("M2000", 16);
+                }
+                catch { }
                 #endregion
                 UICycle = sw.ElapsedMilliseconds;
             }
