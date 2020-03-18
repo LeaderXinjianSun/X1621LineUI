@@ -248,6 +248,20 @@ namespace SXJLibrary
                                 case "CheckSample":
                                     CheckSam();
                                     break;
+                                case "PickNew":
+                                    break;
+                                case "CheckUploadStatus":
+                                    string uploadrst = "OK";
+                                    for (int i = 0; i < 4; i++)
+                                    {
+                                        if (!uploadSoftwareStatus[i].status)
+                                        {
+                                            uploadrst = "NG";
+                                            break;
+                                        }
+                                    }
+                                    await TestSentNet.SendAsync("UploadStatus;" + uploadrst);
+                                    break;
                                 default:
                                     ModelPrint("无效指令： " + s);
                                     break;
@@ -525,17 +539,17 @@ namespace SXJLibrary
             string rs = "";
             if (DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20)
             {
-                rs += DateTime.Now.ToString("yyyyMMdd") + "D";
+                rs += DateTime.Now.ToString("yyyyMMdd") + "_D";
             }
             else
             {
                 if (DateTime.Now.Hour >= 0 && DateTime.Now.Hour < 8)
                 {
-                    rs += DateTime.Now.AddDays(-1).ToString("yyyyMMdd") + "N";
+                    rs += DateTime.Now.AddDays(-1).ToString("yyyyMMdd") + "_N";
                 }
                 else
                 {
-                    rs += DateTime.Now.ToString("yyyyMMdd") + "D";
+                    rs += DateTime.Now.ToString("yyyyMMdd") + "_N";
                 }
             }
             return rs;
