@@ -998,7 +998,12 @@ namespace X1621LineUI.ViewModels
             //int _time = 3599;
             //string downtime = string.Format("{0}:{1}:{2}", (_time / 3600).ToString(), (_time / 60).ToString(), (_time % 60).ToString());
             //AddMessage(downtime);
-            epsonRC90.TestSentNet.SendAsync("sgrfgsaerfawef");
+            //epsonRC90.TestSentNet.SendAsync("sgrfgsaerfawef");
+            //string machineLogpath = @"D:\MachineLog" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+            //int i = 0;
+            //TimeSpan time = AlarmList[i].End - AlarmList[i].Start;
+            //string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", AlarmList[i].Start.ToString("HH:mm:ss"), AlarmList[i].End.ToString("HH:mm:ss"), time.ToString(), "WARNING", "", AlarmList[i].Code, "", AlarmList[i].Type, AlarmList[i].Content };
+            //Csvfile.savetocsv(machineLogpath, contents);
             AddMessage("功能执行完成");
         }
         private async void StartSampleCommandExecute()
@@ -1561,8 +1566,9 @@ namespace X1621LineUI.ViewModels
                 {
                     for (int i = 0; i < AlarmList.Count; i++)
                     {
-                        if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && LampGreenSw.Elapsed.TotalMinutes > 3)
-                        {
+                        //if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && LampGreenSw.Elapsed.TotalMinutes > 3)
+                            if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null")
+                            {
                             AlarmList[i].State = M300[i];
                             if (AlarmList[i].State)
                             {
@@ -1808,9 +1814,20 @@ namespace X1621LineUI.ViewModels
         }
         async void AlarmAction(int i)
         {
-            while (M300[i])
+            while (true)
             {
                 await Task.Delay(100);
+                try
+                {
+                    if (!M300[i])
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddMessage("AlarmAction " + ex.Message);
+                }
             }
             AlarmList[i].End = DateTime.Now;
             AddMessage(AlarmList[i].Code + AlarmList[i].Content + "解除");
@@ -1827,7 +1844,7 @@ namespace X1621LineUI.ViewModels
                             , PM, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("HHmmss"), time.TotalMinutes.ToString("F2"));
                         _result = mysql.executeQuery(stm);
                     }
-                    AddMessage("更新报警到数据库" + _result);
+                    AddMessage("更新报警到数据库" + _result.ToString());
                 }
                 catch (Exception ex)
                 {
@@ -1847,7 +1864,7 @@ namespace X1621LineUI.ViewModels
                 string[] heads = new string[] { "SiteID", "ProjectCode", "TesterID", "DATE", "TIME", "LOT NAME", "LOGIN MODE", "STOP TIME", "RESTART TIME", "DOWN TIME", "KEYWORD", "STATUS", "ERROR CODE", "ERROR TYPE", "ERROR MESSAGE", "MESSAGE" };
                 Csvfile.savetocsv(machineLogpath, heads);
             }
-            string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", AlarmList[i].Start.ToString("HH:mm:ss"), AlarmList[i].End.ToString("HH:mm:ss"), time.ToString("HH:mm:ss"), "WARNING" ,"", AlarmList[i].Code,"", AlarmList[i].Type, AlarmList[i].Content };
+            string[] contents = new string[] { SiteID, ProjectCode, TesterID, DateTime.Now.ToString("dd/MM/yyyy"), DateTime.Now.ToString("HH:mm:ss"), LotName, "OPERATOR", AlarmList[i].Start.ToString("HH:mm:ss"), AlarmList[i].End.ToString("HH:mm:ss"), time.ToString(), "WARNING" ,"", AlarmList[i].Code,"", AlarmList[i].Type, AlarmList[i].Content };
             Csvfile.savetocsv(machineLogpath, contents);
         }
         private string[] PassStatusProcess(double f)
@@ -2021,8 +2038,8 @@ namespace X1621LineUI.ViewModels
                         }
                         epsonRC90.BordBarcode[0] = epsonRC90.TemporaryBordBarcode[0];
                         epsonRC90.ResetBord(0);
-                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
-                        mysql.executeQuery(stm);
+                        //stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
+                        //mysql.executeQuery(stm);
                         mysql.DisConnect();
                         Fx5u_mid.SetM("M2798", false);
 
@@ -2055,8 +2072,8 @@ namespace X1621LineUI.ViewModels
                         }
                         epsonRC90.BordBarcode[1] = epsonRC90.TemporaryBordBarcode[1];
                         epsonRC90.ResetBord(1);
-                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
-                        mysql.executeQuery(stm);
+                        //stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
+                        //mysql.executeQuery(stm);
                         mysql.DisConnect();
                         Fx5u_mid.SetM("M2803", false);
                     }
@@ -2076,6 +2093,8 @@ namespace X1621LineUI.ViewModels
                         {
                             stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
+                            stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
+                            mysql.executeQuery(stm);
                         }
                         mysql.DisConnect();
                         Fx5u_mid.SetM("M2799", false);
@@ -2088,6 +2107,8 @@ namespace X1621LineUI.ViewModels
                         if (mysql.Connect())
                         {
                             stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
                             mysql.executeQuery(stm);
                         }
                         mysql.DisConnect();
@@ -2719,9 +2740,157 @@ namespace X1621LineUI.ViewModels
         }
         private void DockStation2Run()
         {
+            int cycle1 = 0, cycle2 = 0;
             while (true)
             {
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(500);
+                try
+                {
+                    //A轨道
+                    cycle1++;
+
+                    if (cycle1 > 20)
+                    {
+                        cycle1 = 0;
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID1 + "' ORDER BY SIDATE DESC";
+                            DataSet ds = mysql.Select(stm);
+                            DataTable dt = ds.Tables["table0"];
+                            if (dt.Rows.Count > 0)
+                            {
+                                int station8count = (int)dt.Rows[0]["Station8"];
+                                if (station8count > 0)
+                                {
+                                    int bordcount = (int)dt.Rows[0]["Station11"] + (int)dt.Rows[0]["Station6"];
+                                    if (bordcount < 1)//轨道+测试机板数量 < 1 不存储，放板
+                                    {
+                                        Fx5u_left2.SetM("M2610", true);
+                                        AddMessage("线A内接驳台2后板数:" + bordcount.ToString() + " < 1,下1块板");
+                                    }
+                                }
+                                else
+                                {
+                                    ;//没有存储板，无动作
+                                }
+
+                            }
+                        }
+                        mysql.DisConnect();
+                    }
+                    
+                    if (Fx5u_left2.ReadM("M2798"))//存储响应【A轨道】
+                    {
+                        Fx5u_left2.SetM("M2798", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station8 = Station8 + 1 WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台2存储1块板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2799"))//放新板响应【A轨道】
+                    {
+                        Fx5u_left2.SetM("M2799", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台2放1块新板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2800"))//放存储板响应【A轨道】
+                    {
+                        Fx5u_left2.SetM("M2800", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID1 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台2放1块存储板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    //B轨道
+                    cycle2++;
+
+                    if (cycle2 > 20)
+                    {
+                        cycle2 = 0;
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID2 + "' ORDER BY SIDATE DESC";
+                            DataSet ds = mysql.Select(stm);
+                            DataTable dt = ds.Tables["table0"];
+                            if (dt.Rows.Count > 0)
+                            {
+                                int station8count = (int)dt.Rows[0]["Station7"];
+                                if (station8count > 0)
+                                {
+                                    int bordcount = (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station11"];
+                                    if (bordcount < 1)//轨道+测试机板数量 < 1 不存储，放板
+                                    {
+                                        Fx5u_left2.SetM("M2611", true);
+                                        AddMessage("线B内接驳台2后板数:" + bordcount.ToString() + " < 1,下1块板");
+                                    }
+                                }
+                                else
+                                {
+                                    ;//没有存储板，无动作
+                                }
+
+                            }
+                        }
+                        mysql.DisConnect();
+                    }
+                    
+                    if (Fx5u_left2.ReadM("M2804"))//存储响应【B轨道】
+                    {
+                        Fx5u_left2.SetM("M2804", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station8 = Station8 + 1 WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台2存储1块板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2805"))//放新板响应【B轨道】
+                    {
+                        Fx5u_left2.SetM("M2805", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台2放1块新板");
+                        }
+                        mysql.DisConnect();
+                    }
+                    if (Fx5u_left2.ReadM("M2806"))//放存储板响应【B轨道】
+                    {
+                        Fx5u_left2.SetM("M2806", false);
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID2 + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("线A接驳台2放1块存储板");
+                        }
+                        mysql.DisConnect();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddMessage(ex.Message);
+                }
             }
         }
         private async void ModelPrintEventProcess(string str)
