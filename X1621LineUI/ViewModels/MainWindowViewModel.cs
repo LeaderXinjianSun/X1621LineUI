@@ -1461,44 +1461,47 @@ namespace X1621LineUI.ViewModels
                     cardcount = 0;
                     if (CardLockFlag)
                     {
-                        try
-                        {
-                            SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                            if (oraDB.isConnect())
+                        await Task.Run(()=> {
+                            try
                             {
-                                string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' ORDER BY TESTDATE DESC,TESTTIME DESC",
-                                    MACID_M);
-                                DataSet ds = oraDB.executeQuery(stm);
-                                DataTable dt = ds.Tables[0];
-                                if (dt.Rows.Count > 0)
+                                SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                                if (oraDB.isConnect())
                                 {
-                                    DataRow dr = dt.Rows[0];
-                                    string datestr = (string)dr["TESTDATE"];
-                                    string timestr = (string)dr["TESTTIME"];
-                                    if (datestr.Length == 8 && (timestr.Length == 5 || timestr.Length == 6))
+                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' ORDER BY TESTDATE DESC,TESTTIME DESC",
+                                        MACID_M);
+                                    DataSet ds = oraDB.executeQuery(stm);
+                                    DataTable dt = ds.Tables[0];
+                                    if (dt.Rows.Count > 0)
                                     {
-                                        if (timestr.Length == 5)
+                                        DataRow dr = dt.Rows[0];
+                                        string datestr = (string)dr["TESTDATE"];
+                                        string timestr = (string)dr["TESTTIME"];
+                                        if (datestr.Length == 8 && (timestr.Length == 5 || timestr.Length == 6))
                                         {
-                                            timestr = "0" + timestr;
-                                        }
-                                        string datetimestr = string.Empty;
-                                        datetimestr = string.Format("{0}/{1}/{2} {3}:{4}:{5}", datestr.Substring(0, 4), datestr.Substring(4, 2), datestr.Substring(6, 2), timestr.Substring(0, 2), timestr.Substring(2, 2), timestr.Substring(4, 2));
-                                        DateTime updatetime = Convert.ToDateTime(datetimestr);
-                                        if ((updatetime - CardLockTime).TotalMilliseconds > 0)
-                                        {
-                                            Fx5u_mid.SetM("M2606", false);
-                                            CardLockFlag = false;
-                                            AddMessage("刷卡成功，解锁");
+                                            if (timestr.Length == 5)
+                                            {
+                                                timestr = "0" + timestr;
+                                            }
+                                            string datetimestr = string.Empty;
+                                            datetimestr = string.Format("{0}/{1}/{2} {3}:{4}:{5}", datestr.Substring(0, 4), datestr.Substring(4, 2), datestr.Substring(6, 2), timestr.Substring(0, 2), timestr.Substring(2, 2), timestr.Substring(4, 2));
+                                            DateTime updatetime = Convert.ToDateTime(datetimestr);
+                                            if ((updatetime - CardLockTime).TotalMilliseconds > 0)
+                                            {
+                                                Fx5u_mid.SetM("M2606", false);
+                                                CardLockFlag = false;
+                                                AddMessage("刷卡成功，解锁");
+                                            }
                                         }
                                     }
                                 }
+                                oraDB.disconnect();
                             }
-                            oraDB.disconnect();
-                        }
-                        catch (Exception ex)
-                        {
-                            AddMessage(ex.Message);
-                        }
+                            catch (Exception ex)
+                            {
+                                AddMessage(ex.Message);
+                            }
+                        });
+                        
                     }
                 }
                 #region 锁机
@@ -1597,6 +1600,7 @@ namespace X1621LineUI.ViewModels
             int _LampColor = LampColor;
             int count1 = 0;
             LampGreenSw.Start();
+            bool first = true;
             while (true)
             {
                 await Task.Delay(1000);//每秒刷新               
@@ -1605,9 +1609,10 @@ namespace X1621LineUI.ViewModels
                 {
                     for (int i = 0; i < AlarmList.Count; i++)
                     {
-                        //if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && LampGreenSw.Elapsed.TotalMinutes > 3)
-                            if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null")
-                            {
+                        if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && (LampGreenSw.Elapsed.TotalMinutes > 3 || first))
+                        //if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null")
+                        {
+                            first = false;
                             AlarmList[i].State = M300[i];
                             if (AlarmList[i].State)
                             {
@@ -1617,27 +1622,7 @@ namespace X1621LineUI.ViewModels
                                 AlarmList[i].End = DateTime.Now;
                                 AddMessage(AlarmList[i].Code + AlarmList[i].Content + "发生");
 
-                                string result = await Task<string>.Run(() =>
-                                {
-                                    try
-                                    {
-                                        int _result = -999;
-                                        Mysql mysql = new Mysql();
-                                        if (mysql.Connect())
-                                        {
-                                            string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')"
-                                                , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), "0", epsonRC90.GetBanci());
-                                            _result = mysql.executeQuery(stm);
-                                        }
-                                        mysql.DisConnect();
-                                        return _result.ToString();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        return ex.Message;
-                                    }
-                                });
-                                AddMessage("插入报警" + result);
+
 
                                 AlarmAction(i);//等待报警结束
                             }
@@ -1858,7 +1843,7 @@ namespace X1621LineUI.ViewModels
                 await Task.Delay(100);
                 try
                 {
-                    if (!M300[i])
+                    if (LampGreenSw.Elapsed.TotalMinutes > 3)
                     {
                         break;
                     }
@@ -1870,30 +1855,28 @@ namespace X1621LineUI.ViewModels
             }
             AlarmList[i].End = DateTime.Now;
             AddMessage(AlarmList[i].Code + AlarmList[i].Content + "解除");
-            TimeSpan time = AlarmList[i].End - AlarmList[i].Start;
-            await Task.Run(() =>
+            TimeSpan time = AlarmList[i].End - AlarmList[i].Start - LampGreenSw.Elapsed;
+            string result = await Task<string>.Run(() =>
             {
-                Mysql mysql = new Mysql();
                 try
                 {
                     int _result = -999;
+                    Mysql mysql = new Mysql();
                     if (mysql.Connect())
                     {
-                        string stm = string.Format("UPDATE HA_F4_DATA_ALARM SET SSTOPDATE = '{5}',SSTOPTIME = '{6}',TIME = '{7}' WHERE PM = '{0}' AND MACID = '{1}' AND NAME = '{2}' AND SSTARTDATE = '{3}' AND SSTARTTIME = '{4}'"
-                            , PM, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("HHmmss"), time.TotalMinutes.ToString("F2"));
+                        string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')"
+                            , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), time.TotalMinutes.ToString("F1"), epsonRC90.GetBanci());
                         _result = mysql.executeQuery(stm);
                     }
-                    AddMessage("更新报警到数据库" + _result.ToString());
+                    mysql.DisConnect();
+                    return _result.ToString();
                 }
                 catch (Exception ex)
                 {
-                    AddMessage(ex.Message);
-                }
-                finally
-                {
-                    mysql.DisConnect();
+                    return ex.Message;
                 }
             });
+            AddMessage("插入报警" + result);
             ErrorCount++;
             Inifile.INIWriteValue(iniParameterPath, "MachineLog", "ErrorCount", ErrorCount.ToString());
 
