@@ -891,6 +891,28 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("MACID_M");
             }
         }
+        private string alarmGridVisibility;
+
+        public string AlarmGridVisibility
+        {
+            get { return alarmGridVisibility; }
+            set
+            {
+                alarmGridVisibility = value;
+                this.RaisePropertyChanged("AlarmGridVisibility");
+            }
+        }
+        private string alarmText;
+
+        public string AlarmText
+        {
+            get { return alarmText; }
+            set
+            {
+                alarmText = value;
+                this.RaisePropertyChanged("AlarmText");
+            }
+        }
 
         #endregion
         #region 方法绑定
@@ -911,7 +933,7 @@ namespace X1621LineUI.ViewModels
         int CardStatus = 1;
         private EpsonRC90 epsonRC90;string LastBanci;
         DateTime SamStartDatetime1, SamDateBigin1;
-        int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000;
+        int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000; bool[] X40;
         List<AlarmData> AlarmList = new List<AlarmData>(); string CurrentAlarm = "";
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\X1621串线上料机报警.xlsx";
         int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
@@ -1061,7 +1083,8 @@ namespace X1621LineUI.ViewModels
         private void Init()
         {
             #region 初始化
-            MessageStr = "";            
+            MessageStr = "";
+            AlarmGridVisibility = "Collapsed";
             HomePageVisibility = "Visible";
             ParameterPageVisibility = "Collapsed";
             SamplePageVisibility = "Collapsed";
@@ -1285,7 +1308,7 @@ namespace X1621LineUI.ViewModels
                     default:
                         break;
                 }
-                StatusRobot = epsonRC90.IOReceiveStatus && epsonRC90.TestSendStatus && epsonRC90.TestReceiveStatus;
+                StatusRobot = epsonRC90.IOReceiveStatus && epsonRC90.TestSendStatus && epsonRC90.TestReceiveStatus && epsonRC90.TestReceive1Status;
                 #endregion
                 #region 良率面板显示
                 //良率界面显示
@@ -1503,7 +1526,16 @@ namespace X1621LineUI.ViewModels
                 }
                 #endregion
                 #endregion
-
+                #region 界面后台操作
+                if (X40 != null)
+                {
+                    if (X40[2])
+                    {
+                        AlarmText = "";
+                        AlarmGridVisibility = "Collapsed";
+                    }
+                }
+                #endregion
                 #region 换班
                 if (LastBanci != epsonRC90.GetBanci())
                 {
@@ -2003,7 +2035,7 @@ namespace X1621LineUI.ViewModels
                             case 5:
                             case 1:
                                 Fx5u_right1.SetM("M2602", false);
-                                Fx5u_right1.SetM("M2602", false);
+                                Fx5u_right1.SetM("M2603", false);
                                 break;
                             default:
                                 break;
@@ -2136,6 +2168,7 @@ namespace X1621LineUI.ViewModels
                     LampColor = Fx5u_mid.ReadW("D200");
                     //读机台状态
                     M2000 = Fx5u_mid.ReadMultiM("M2000", 16);
+                    X40 = Fx5u_mid.ReadMultiM("X20", 16);
                 }
                 catch { }
                 #endregion
@@ -2959,6 +2992,15 @@ namespace X1621LineUI.ViewModels
                 TestCountInput += 1;
                 Inifile.INIWriteValue(iniParameterPath, "Summary", "TestCountInput", TestCountInput.ToString());
             }
+            #endregion
+            #region 信息显示
+            if (str.Contains("LinkNG"))
+            {
+                AlarmText = "上传软体异常";
+                AlarmGridVisibility = "Visible";
+                AddMessage("上传软体异常");
+            }
+
             #endregion
         }
         #endregion

@@ -51,7 +51,19 @@
                 <Grid Visibility="{Binding SampleGridVisibility}" Grid.Row="1" Grid.ColumnSpan="6" Background="GreenYellow">
                     <TextBlock Text="{Binding SampleText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="26"></TextBlock>
                 </Grid>
+                
             </Grid>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1" Background="Red" Visibility="{Binding AlarmGridVisibility}">
+                    <TextBlock Text="{Binding AlarmText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="26"></TextBlock>
+                </Grid>
+            </Grid>
+
         </Grid>
         <TextBox Grid.Row="1" VerticalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" Margin="1" x:Name="MsgTextBox" IsReadOnly="True" TextChanged="MsgTextBox_TextChanged"  FontSize="14" Background="Black" FontFamily="宋体" Foreground="White" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="{Binding MessageStr}"></TextBox>
         <Grid Grid.Column="1" Grid.RowSpan="2">
@@ -70,7 +82,7 @@
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button Margin="5" FontSize="20" Grid.Row="1" Grid.Column="2"  Content="Func" Command="{Binding FuncTestCommand}"></Button>
+                <Button Visibility="Collapsed" Margin="5" FontSize="20" Grid.Row="1" Grid.Column="2"  Content="Func" Command="{Binding FuncTestCommand}"></Button>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>

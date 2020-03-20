@@ -20,8 +20,9 @@ namespace SXJLibrary
         public TcpIpClient IOReceiveNet = new TcpIpClient();
         public TcpIpClient TestSentNet = new TcpIpClient();
         public TcpIpClient TestReceiveNet = new TcpIpClient();
+        public TcpIpClient TestReceiveNet1 = new TcpIpClient();
         string Ip = "192.168.1.2";
-        public bool IOReceiveStatus = false, TestSendStatus = false, TestReceiveStatus = false;
+        public bool IOReceiveStatus = false, TestSendStatus = false, TestReceiveStatus = false, TestReceive1Status = false;
         string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
         string iniFilepath = @"d:\test.ini";
         public string[] BordBarcode = new string[2] { "Null", "Null" };
@@ -143,6 +144,30 @@ namespace SXJLibrary
                 { await Task.Delay(15000); }
             }
         }
+        public async void checkTestReceiveNet1()
+        {
+            while (true)
+            {
+                await Task.Delay(400);
+                if (!TestReceiveNet1.tcpConnected)
+                {
+                    await Task.Delay(1000);
+                    if (!TestReceiveNet1.tcpConnected)
+                    {
+                        bool r1 = await TestReceiveNet1.Connect(Ip, 2003);
+                        if (r1)
+                        {
+                            TestReceive1Status = true;
+                            ModelPrint("机械手TestReceiveNet1连接");
+                        }
+                        else
+                            TestReceive1Status = false;
+                    }
+                }
+                else
+                { await Task.Delay(15000); }
+            }
+        }
         private async void IORevAnalysis()
         {
             while (true)
@@ -250,6 +275,8 @@ namespace SXJLibrary
                                     break;
                                 case "PickNew":
                                     break;
+                                case "LinkNG":
+                                    break;
                                 case "CheckUploadStatus":
                                     string uploadrst = "OK";
                                     for (int i = 0; i < 4; i++)
@@ -279,6 +306,62 @@ namespace SXJLibrary
                 }
             }
         }
+        private async void TestRev1Analysis()
+        {
+            while (true)
+            {
+                if (TestReceive1Status == true)
+                {
+                    string s = await TestReceiveNet1.ReceiveAsync();
+
+                    string[] ss = s.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    try
+                    {
+                        s = ss[0];
+                    }
+                    catch
+                    {
+                        s = "error";
+                    }
+
+                    if (s == "error")
+                    {
+                        TestReceiveNet1.tcpConnected = false;
+                        TestReceive1Status = false;
+                        ModelPrint("机械手TestReceiveNet1断开");
+                    }
+                    else
+                    {
+                        ModelPrint("TestRev1: " + s);
+                        try
+                        {
+                            string[] strs = s.Split(';');
+                            switch (strs[0])
+                            {
+                                case "Start":
+                                    YanmadeTester[int.Parse(strs[1]) - 1].Start(TestFinishOperate);
+                                    break;
+                                case "Finish":
+                                    YanmadeTester[int.Parse(strs[1]) - 1].TestResult = strs[2] == "1" ? TestResult.Pass : TestResult.Ng;
+                                    YanmadeTester[int.Parse(strs[1]) - 1].TestStatus = TestStatus.Tested;
+                                    break;
+                                default:
+                                    ModelPrint("无效指令： " + s);
+                                    break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ModelPrint(ex.Message);
+                        }
+                    }
+                }
+                else
+                {
+                    await Task.Delay(100);
+                }
+            }
+        }
         #endregion
         #region 功能函数
         void Run()
@@ -286,8 +369,10 @@ namespace SXJLibrary
             checkIOReceiveNet();
             checkTestSentNet();
             checkTestReceiveNet();
+            checkTestReceiveNet1();
             IORevAnalysis();
             TestRevAnalysis();
+            TestRev1Analysis();
         }
         async void CheckSam()
         {
@@ -539,17 +624,17 @@ namespace SXJLibrary
             string rs = "";
             if (DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20)
             {
-                rs += DateTime.Now.ToString("yyyyMMdd") + "_D";
+                rs += DateTime.Now.ToString("yyyyMMdd") + "D";
             }
             else
             {
                 if (DateTime.Now.Hour >= 0 && DateTime.Now.Hour < 8)
                 {
-                    rs += DateTime.Now.AddDays(-1).ToString("yyyyMMdd") + "_N";
+                    rs += DateTime.Now.AddDays(-1).ToString("yyyyMMdd") + "N";
                 }
                 else
                 {
-                    rs += DateTime.Now.ToString("yyyyMMdd") + "_N";
+                    rs += DateTime.Now.ToString("yyyyMMdd") + "N";
                 }
             }
             return rs;
