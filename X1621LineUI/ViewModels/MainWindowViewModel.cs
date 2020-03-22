@@ -913,6 +913,61 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("AlarmText");
             }
         }
+        private string testerID1;
+
+        public string TesterID1
+        {
+            get { return testerID1; }
+            set
+            {
+                testerID1 = value;
+                this.RaisePropertyChanged("TesterID1");
+            }
+        }
+        private string testerID2;
+
+        public string TesterID2
+        {
+            get { return testerID2; }
+            set
+            {
+                testerID2 = value;
+                this.RaisePropertyChanged("TesterID2");
+            }
+        }
+        private string testerID3;
+
+        public string TesterID3
+        {
+            get { return testerID3; }
+            set
+            {
+                testerID3 = value;
+                this.RaisePropertyChanged("TesterID3");
+            }
+        }
+        private string testerID4;
+
+        public string TesterID4
+        {
+            get { return testerID4; }
+            set
+            {
+                testerID4 = value;
+                this.RaisePropertyChanged("TesterID4");
+            }
+        }
+        private string operaterID;
+
+        public string OperaterID
+        {
+            get { return operaterID; }
+            set
+            {
+                operaterID = value;
+                this.RaisePropertyChanged("OperaterID");
+            }
+        }
 
         #endregion
         #region 方法绑定
@@ -931,13 +986,13 @@ namespace X1621LineUI.ViewModels
         Fx5u Fx5u_left1, Fx5u_left2, Fx5u_mid, Fx5u_right1, Fx5u_right2;
         Scan scan1, scan2;
         int CardStatus = 1;
-        private EpsonRC90 epsonRC90;string LastBanci;
+        private EpsonRC90 epsonRC90; string LastBanci;
         DateTime SamStartDatetime1, SamDateBigin1;
         int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000; bool[] X40;
         List<AlarmData> AlarmList = new List<AlarmData>(); string CurrentAlarm = "";
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\X1621串线上料机报警.xlsx";
         int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
-        int ErrorCount = 0;bool CardLockFlag;DateTime CardLockTime;
+        int ErrorCount = 0; bool CardLockFlag; DateTime CardLockTime;
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -958,8 +1013,8 @@ namespace X1621LineUI.ViewModels
             UIRun();
             BigDataRun();
             MachineLogRun();
-            Task.Run(()=> { IORun(); });
-            Task.Run(()=> { SystemRun(); });
+            Task.Run(() => { IORun(); });
+            Task.Run(() => { SystemRun(); });
             AddMessage("软件加载完成");
         }
         private void MenuActionCommandExecute(object p)
@@ -1055,6 +1110,10 @@ namespace X1621LineUI.ViewModels
             {
                 FlexID[i] = Inifile.INIGetStringValue(iniFilepath, "A", "id1", "99999");
             }
+            TesterID1 = Inifile.INIGetStringValue(iniFilepath, "A", "id1", "99999");
+            TesterID2 = Inifile.INIGetStringValue(iniFilepath, "A", "id2", "99999");
+            TesterID3 = Inifile.INIGetStringValue(iniFilepath, "A", "id3", "99999");
+            TesterID4 = Inifile.INIGetStringValue(iniFilepath, "A", "id4", "99999");
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemCount", NGItemCount.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "IsSam", IsSam.ToString());
@@ -1112,7 +1171,7 @@ namespace X1621LineUI.ViewModels
                     plc_ip = Inifile.INIGetStringValue(iniParameterPath, "System", "PLC5IP", "192.168.10.2");
                     plc_port = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "System", "PLC5PORT", "8000"));
                     Fx5u_right2 = new Fx5u(plc_ip, plc_port);
-                    Task.Run(() => { StationEnterRun(); });
+                    //Task.Run(() => { StationEnterRun(); });
                     AddMessage("机台站:" + Station.ToString() + ";轨道入口功能开启");
                     break;
                 case 2:
@@ -1205,6 +1264,13 @@ namespace X1621LineUI.ViewModels
             LampYellowFlickerElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampYellowFlickerElapse", "0"));
             LampRedElapse = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "BigData", "LampRedElapse", "0"));
 
+            TesterID1 = Inifile.INIGetStringValue(iniFilepath, "A", "id1", "99999");
+            TesterID2 = Inifile.INIGetStringValue(iniFilepath, "A", "id2", "99999");
+            TesterID3 = Inifile.INIGetStringValue(iniFilepath, "A", "id3", "99999");
+            TesterID4 = Inifile.INIGetStringValue(iniFilepath, "A", "id4", "99999");
+
+            OperaterID = Inifile.INIGetStringValue(iniFilepath, "A", "id", "99999");
+
             epsonRC90 = new EpsonRC90();
             epsonRC90.ModelPrint += ModelPrintEventProcess;
             #endregion
@@ -1214,7 +1280,7 @@ namespace X1621LineUI.ViewModels
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 if (File.Exists(alarmExcelPath))
                 {
-                    
+
                     FileInfo existingFile = new FileInfo(alarmExcelPath);
                     using (ExcelPackage package = new ExcelPackage(existingFile))
                     {
@@ -1276,15 +1342,15 @@ namespace X1621LineUI.ViewModels
         }
         private async void UIRun()
         {
-           
-            int cardcount = 0,timetick = 0;
+
+            int cardcount = 0, timetick = 0;
             Fx5u_mid.SetM("M2606", true);
             CardLockFlag = true;
             CardLockTime = DateTime.Now;
             AddMessage("机台锁定!");
             while (true)
             {
-                
+
                 await Task.Delay(100);
                 #region 界面刷新
                 StatusMid = Fx5u_mid.Connect;
@@ -1381,13 +1447,13 @@ namespace X1621LineUI.ViewModels
                 PassCount2 = epsonRC90.YanmadeTester[2].PassCount_Nomal;
                 TestCount3 = epsonRC90.YanmadeTester[3].TestCount_Nomal;
                 PassCount3 = epsonRC90.YanmadeTester[3].PassCount_Nomal;
-                
+
                 TestCountOutput = epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount;
                 if (TestCountInput > 0)
                 {
                     if ((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) < TestCountInput)
                     {
-                        YieldTotal = Math.Round((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) / TestCountInput * 100,2);
+                        YieldTotal = Math.Round((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) / TestCountInput * 100, 2);
                     }
                     else
                     {
@@ -1461,7 +1527,8 @@ namespace X1621LineUI.ViewModels
                     cardcount = 0;
                     if (CardLockFlag)
                     {
-                        await Task.Run(()=> {
+                        await Task.Run(() =>
+                        {
                             try
                             {
                                 SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
@@ -1489,6 +1556,8 @@ namespace X1621LineUI.ViewModels
                                             {
                                                 Fx5u_mid.SetM("M2606", false);
                                                 CardLockFlag = false;
+                                                OperaterID = (string)dr["OPERTOR"];
+                                                Inifile.INIWriteValue(iniFilepath, "A", "id", OperaterID);
                                                 AddMessage("刷卡成功，解锁");
                                             }
                                         }
@@ -1501,7 +1570,7 @@ namespace X1621LineUI.ViewModels
                                 AddMessage(ex.Message);
                             }
                         });
-                        
+
                     }
                 }
                 #region 锁机
@@ -1509,7 +1578,7 @@ namespace X1621LineUI.ViewModels
                 {
                     if (LampColor != 1)
                     {
-                        if (timetick++ > 15 * 60)
+                        if (timetick++ > 15 * 600)
                         {
                             Fx5u_mid.SetM("M2606", true);
                             CardLockFlag = true;
@@ -1567,11 +1636,11 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         try
                         {
-                            int _result = -999;                            
+                            int _result = -999;
                             if (mysql.Connect())
                             {
                                 string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}')"
-                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA",GROUP1,TRACK);
+                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK);
                                 _result = mysql.executeQuery(stm);
                             }
                             AddMessage("插入数据库灯信号" + _result.ToString());
@@ -1599,8 +1668,8 @@ namespace X1621LineUI.ViewModels
         {
             int _LampColor = LampColor;
             int count1 = 0;
-            LampGreenSw.Start();
             bool first = true;
+            LampGreenSw.Start();
             while (true)
             {
                 await Task.Delay(1000);//每秒刷新               
@@ -1610,7 +1679,6 @@ namespace X1621LineUI.ViewModels
                     for (int i = 0; i < AlarmList.Count; i++)
                     {
                         if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && (LampGreenSw.Elapsed.TotalMinutes > 3 || first))
-                        //if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null")
                         {
                             first = false;
                             AlarmList[i].State = M300[i];
@@ -1621,8 +1689,6 @@ namespace X1621LineUI.ViewModels
                                 AlarmList[i].Start = DateTime.Now;
                                 AlarmList[i].End = DateTime.Now;
                                 AddMessage(AlarmList[i].Code + AlarmList[i].Content + "发生");
-
-
 
                                 AlarmAction(i);//等待报警结束
                             }
@@ -1697,27 +1763,7 @@ namespace X1621LineUI.ViewModels
                     LampGreenSw.Reset();
                 }
                 #endregion
-                #region 机台指标
-                //if (HD200 != null && plcstate)
-                //{
-                //    TimeSpan ts = DateTime.Now - GetBanStart();
-                //    //妥善率
-                //    double ProperlyRate = (ts.TotalMinutes - (double)LampYellowFlickerElapse - (double)LampRedElapse) / ts.TotalMinutes * 100;
-                //    //报警率
-                //    double AlarmRate = AlarmCount / HD200[6] * 100;
-                //    //达成率
-                //    double YieldRate = HD200[3] / ((ts.TotalMinutes - (double)LampGreenFlickerElapse - (double)LampYellowElapse) * (60 / HD200[7]) * 10) * 100;
-                //    //直通率
-                //    double PassRate = HD200[3] / HD200[6] * 100;
 
-                //    await Task.Run(() => { Xinjie.WriteW(410, (PassRate * 10).ToString("F0")); });//往D410写直通率，保留1位小数
-                //    await Task.Run(() => { Xinjie.WriteW(411, (AlarmRate * 10).ToString("F0")); });//往D410写报警率，保留1位小数
-                //    await Task.Run(() => { Xinjie.WriteW(412, (YieldRate * 10).ToString("F0")); });//往D411写达成率，保留1位小数
-                //    await Task.Run(() => { Xinjie.WriteW(413, (ProperlyRate * 10).ToString("F0")); });//往D413写妥善率，保留1位小数
-
-                //    await Task.Run(() => { Xinjie.WriteW(401, AlarmCount.ToString()); });//往D401写报警次数，保留1位小数
-                //}
-                #endregion
             }
 
         }
@@ -1856,6 +1902,7 @@ namespace X1621LineUI.ViewModels
             AlarmList[i].End = DateTime.Now;
             AddMessage(AlarmList[i].Code + AlarmList[i].Content + "解除");
             TimeSpan time = AlarmList[i].End - AlarmList[i].Start - LampGreenSw.Elapsed;
+
             string result = await Task<string>.Run(() =>
             {
                 try
@@ -1865,7 +1912,7 @@ namespace X1621LineUI.ViewModels
                     if (mysql.Connect())
                     {
                         string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')"
-                            , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("hhmmss"), time.TotalMinutes.ToString("F1"), epsonRC90.GetBanci());
+                            , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("HHmmss"), time.TotalMinutes.ToString("F1"), epsonRC90.GetBanci());
                         _result = mysql.executeQuery(stm);
                     }
                     mysql.DisConnect();
@@ -1877,6 +1924,8 @@ namespace X1621LineUI.ViewModels
                 }
             });
             AddMessage("插入报警" + result);
+
+
             ErrorCount++;
             Inifile.INIWriteValue(iniParameterPath, "MachineLog", "ErrorCount", ErrorCount.ToString());
 
@@ -2342,39 +2391,16 @@ namespace X1621LineUI.ViewModels
                         }
                         else
                         {
-                            int station8count = (int)dt.Rows[0]["Station8"];
-                            if (station8count < 5)//轨道+测试机板数量 >= 5 存储，接驳台2#数量<5，不存储，放板
+                            if (lineIndex == 0)
                             {
-                                if (lineIndex == 0)
-                                {
-                                    Fx5u_right1.SetM("M2596", true);
-                                    AddMessage("线A内接驳台2板数:" + station8count.ToString() + " < 5,直接放板");
-                                }
-                                else
-                                {
-                                    //B轨道
-                                    Fx5u_right1.SetM("M2602", true);
-                                    AddMessage("线B内接驳台1后板数:" + bordcount.ToString() + " < 5,直接放板");
-                                }
-
+                                Fx5u_right1.SetM("M2597", true);
+                                AddMessage("线A内接驳台1,存储板");
                             }
                             else
                             {
-                                int station7count = (int)dt.Rows[0]["Station7"];
-                                if (station7count < 10) //轨道 + 测试机板数量 >= 5 存储，接驳台2#数量>=5，本身已存板数<10，存储
-                                {
-                                    if (lineIndex == 0)
-                                    {
-                                        Fx5u_right1.SetM("M2597", true);
-                                        AddMessage("线A内接驳台1板数:" + station7count.ToString() + " < 10,存储板");
-                                    }
-                                    else
-                                    {
-                                        //B轨道
-                                        Fx5u_right1.SetM("M2603", true);
-                                        AddMessage("线B内接驳台1板数:" + station7count.ToString() + " < 10,存储板");
-                                    }
-                                }
+                                //B轨道
+                                Fx5u_right1.SetM("M2603", true);
+                                AddMessage("线B内接驳台1,存储板");
                             }
                         }
                     }
@@ -2405,7 +2431,7 @@ namespace X1621LineUI.ViewModels
                             if (lineIndex == 0)
                             {
                                 Fx5u_right1.SetM("M2596", true);
-                                AddMessage("线A内接驳台2后板数:" + bordcount.ToString() + " < 5,直接放板");
+                                AddMessage("线A内接驳台2后板数:" + bordcount.ToString() + " < 1,直接放板");
                             }
                             else
                             {
@@ -2416,21 +2442,16 @@ namespace X1621LineUI.ViewModels
                         }
                         else
                         {
-                            int station8count = (int)dt.Rows[0]["Station8"];
-                            if (station8count < 5)//轨道+测试机板数量 >= 1 存储，本身已存板数<5，存储
+                            if (lineIndex == 0)
                             {
-                                if (lineIndex == 0)
-                                {
-                                    Fx5u_right1.SetM("M2597", true);
-                                    AddMessage("线A内接驳台2板数:" + station8count.ToString() + " < 5,存储板");
-                                }
-                                else
-                                {
-                                    //B轨道
-                                    Fx5u_right1.SetM("M2603", true);
-                                    AddMessage("线B内接驳台2板数:" + station8count.ToString() + " < 5,存储板");
-                                }
-
+                                Fx5u_right1.SetM("M2597", true);
+                                AddMessage("线A内接驳台2,存储板");
+                            }
+                            else
+                            {
+                                //B轨道
+                                Fx5u_right1.SetM("M2603", true);
+                                AddMessage("线B内接驳台2,存储板");
                             }
                         }
                     }
@@ -2589,7 +2610,7 @@ namespace X1621LineUI.ViewModels
 
             }
         }
-        void DockStation1Run()
+        private void DockStation1Run()
         {
             int cycle1 = 0, cycle2 = 0;
             while (true)
@@ -2611,23 +2632,14 @@ namespace X1621LineUI.ViewModels
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
-                                int station7count = (int)dt.Rows[0]["Station7"];
-                                if (station7count > 0)
+                                //int station7count = (int)dt.Rows[0]["Station7"];
+                                if (Fx5u_left2.ReadM("M2810"))//A轨道有料
                                 {
                                     int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
                                     if (bordcount < 5)//轨道+测试机板数量 < 5 ，下1块板
                                     {
                                         Fx5u_left2.SetM("M2610", true);
                                         AddMessage("线A内接驳台1后板数:" + bordcount.ToString() + " < 5,下1块板");
-                                    }
-                                    else
-                                    {
-                                        int station8count = (int)dt.Rows[0]["Station8"];
-                                        if (station8count < 5)//轨道 + 测试机板数量 >= 5 ，接驳台2#数量<5，下1块板
-                                        {
-                                            Fx5u_left2.SetM("M2610", true);
-                                            AddMessage("线A内接驳台2板数:" + station8count.ToString() + " < 5,下1块板");
-                                        }
                                     }
                                 }
                                 else
@@ -2689,23 +2701,14 @@ namespace X1621LineUI.ViewModels
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
-                                int station7count = (int)dt.Rows[0]["Station7"];
-                                if (station7count > 0)
+                                //int station7count = (int)dt.Rows[0]["Station7"];
+                                if (Fx5u_left2.ReadM("M2811"))//B轨道有料
                                 {
                                     int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
                                     if (bordcount < 5)//轨道+测试机板数量 < 5 ，下1块板
                                     {
                                         Fx5u_left2.SetM("M2611", true);
                                         AddMessage("线B内接驳台1后板数:" + bordcount.ToString() + " < 5,下1块板");
-                                    }
-                                    else
-                                    {
-                                        int station8count = (int)dt.Rows[0]["Station8"];
-                                        if (station8count < 5)//轨道 + 测试机板数量 >= 5 ，接驳台2#数量<5，下1块板
-                                        {
-                                            Fx5u_left2.SetM("M2611", true);
-                                            AddMessage("线B内接驳台2板数:" + station8count.ToString() + " < 5,下1块板");
-                                        }
                                     }
                                 }
                                 else
@@ -2783,8 +2786,8 @@ namespace X1621LineUI.ViewModels
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
-                                int station8count = (int)dt.Rows[0]["Station8"];
-                                if (station8count > 0)
+                                //int station8count = (int)dt.Rows[0]["Station8"];
+                                if (Fx5u_left2.ReadM("M2810"))//A轨道有料
                                 {
                                     int bordcount = (int)dt.Rows[0]["Station11"] + (int)dt.Rows[0]["Station6"];
                                     if (bordcount < 1)//轨道+测试机板数量 < 1 不存储，放板
@@ -2853,8 +2856,8 @@ namespace X1621LineUI.ViewModels
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
-                                int station8count = (int)dt.Rows[0]["Station7"];
-                                if (station8count > 0)
+                                //int station8count = (int)dt.Rows[0]["Station7"];
+                                if (Fx5u_left2.ReadM("M2811"))//B轨道有料
                                 {
                                     int bordcount = (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station11"];
                                     if (bordcount < 1)//轨道+测试机板数量 < 1 不存储，放板

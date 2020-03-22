@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:X1621LineUI"
         xmlns:views="clr-namespace:X1621LineUI.Views"
         mc:Ignorable="d"
-        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 2020032002}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 2020032201}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Icon="AVARY01.ico" Closing="Window_Closing">
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
@@ -32,7 +32,7 @@
             <MenuItem Header="{DynamicResource MenuHomeProperty}" Command="{Binding MenuActionCommand}" CommandParameter="0"></MenuItem>
             <MenuItem Header="{DynamicResource MenuParameterProperty}" Command="{Binding MenuActionCommand}" CommandParameter="1"></MenuItem>
             <MenuItem Header="{DynamicResource MenuSampleProperty}" Command="{Binding MenuActionCommand}" CommandParameter="2"></MenuItem>
-            <MenuItem Header="{DynamicResource MenuMaterialProperty}" Command="{Binding MenuActionCommand}" CommandParameter="3"></MenuItem>
+            <!--<MenuItem Header="{DynamicResource MenuMaterialProperty}" Command="{Binding MenuActionCommand}" CommandParameter="3"></MenuItem>-->
             <MenuItem Header="{DynamicResource MenuLanguageProperty}">
                 <MenuItem Header="简体" Command="{Binding LanguageChangeCommand}" CommandParameter="0"></MenuItem>
                 <MenuItem Header="English" Command="{Binding LanguageChangeCommand}" CommandParameter="1"></MenuItem>
