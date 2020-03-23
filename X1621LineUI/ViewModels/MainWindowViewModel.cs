@@ -968,6 +968,18 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("OperaterID");
             }
         }
+        private double greenElapse;
+
+        public double GreenElapse
+        {
+            get { return greenElapse; }
+            set
+            {
+                greenElapse = value;
+                this.RaisePropertyChanged("GreenElapse");
+            }
+        }
+
 
         #endregion
         #region 方法绑定
@@ -993,6 +1005,7 @@ namespace X1621LineUI.ViewModels
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\X1621串线上料机报警.xlsx";
         int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
         int ErrorCount = 0; bool CardLockFlag; DateTime CardLockTime;
+        bool isSendSamCMD = false, isSendCleanCMD = false;
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -1098,6 +1111,7 @@ namespace X1621LineUI.ViewModels
             if (epsonRC90.TestSendStatus && !Tester.IsInSampleMode && IsSam)
             {
                 await epsonRC90.TestSentNet.SendAsync("StartSample");
+                AddMessage("StartSample");
             }
         }
         private void SaveSamParamCommandExecute()
@@ -1108,7 +1122,7 @@ namespace X1621LineUI.ViewModels
             }
             for (int i = 0; i < 4; i++)
             {
-                FlexID[i] = Inifile.INIGetStringValue(iniFilepath, "A", "id1", "99999");
+                FlexID[i] = Inifile.INIGetStringValue(iniFilepath, "A", "id" + (i + 1).ToString(), "99999");
             }
             TesterID1 = Inifile.INIGetStringValue(iniFilepath, "A", "id1", "99999");
             TesterID2 = Inifile.INIGetStringValue(iniFilepath, "A", "id2", "99999");
@@ -1117,7 +1131,7 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemCount", NGItemCount.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "IsSam", IsSam.ToString());
-            Inifile.INIWriteValue(iniParameterPath, "Sample", "IsClean", IsClean.ToString());
+            Inifile.INIWriteValue(iniParameterPath, "Clean", "IsClean", IsClean.ToString());
         }
         private void SaveParameterCommandExecute()
         {
@@ -1222,7 +1236,7 @@ namespace X1621LineUI.ViewModels
             SampleNgitem = new ObservableCollection<string>();
             for (int i = 0; i < 8; i++)
             {
-                SampleNgitem.Add(Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleNgitem" + (i + 1).ToString(), "NA"));
+                SampleNgitem.Add(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItem" + i.ToString(), "NA"));
             }
             SampleItemsStatus = new ObservableCollection<string>();
             for (int i = 0; i < 32; i++)
@@ -1269,7 +1283,7 @@ namespace X1621LineUI.ViewModels
             TesterID3 = Inifile.INIGetStringValue(iniFilepath, "A", "id3", "99999");
             TesterID4 = Inifile.INIGetStringValue(iniFilepath, "A", "id4", "99999");
 
-            OperaterID = Inifile.INIGetStringValue(iniFilepath, "A", "id", "99999");
+            OperaterID = Inifile.INIGetStringValue(iniFilepath, "A", "op", "99999");
 
             epsonRC90 = new EpsonRC90();
             epsonRC90.ModelPrint += ModelPrintEventProcess;
@@ -1504,6 +1518,12 @@ namespace X1621LineUI.ViewModels
                         }
                         else
                         {
+                            if (epsonRC90.TestSendStatus && !isSendSamCMD && IsSam)
+                            {
+                                isSendSamCMD = true;
+                                await epsonRC90.TestSentNet.SendAsync("StartSample");
+                                AddMessage("StartSample");
+                            }                            
                             SampleText = "强制样本";
                         }
                     }
@@ -1519,7 +1539,15 @@ namespace X1621LineUI.ViewModels
                 timeSpan = NextClean1 - DateTime.Now;
                 fmt = (timeSpan < TimeSpan.Zero ? "\\-dd\\.hh\\:mm\\:ss" : "hh\\:mm\\:ss");
                 SpanClean1 = timeSpan.ToString(fmt);
-
+                if (timeSpan < TimeSpan.Zero)
+                {
+                    if (IsClean && !isSendCleanCMD && epsonRC90.TestSendStatus)
+                    {
+                        isSendCleanCMD = true;
+                        await epsonRC90.TestSentNet.SendAsync("StartClean");
+                        AddMessage("StartClean");
+                    }
+                }
                 #endregion
                 #region 刷卡恢复
                 if (cardcount++ > 10)
@@ -1557,7 +1585,7 @@ namespace X1621LineUI.ViewModels
                                                 Fx5u_mid.SetM("M2606", false);
                                                 CardLockFlag = false;
                                                 OperaterID = (string)dr["OPERTOR"];
-                                                Inifile.INIWriteValue(iniFilepath, "A", "id", OperaterID);
+                                                Inifile.INIWriteValue(iniFilepath, "A", "op", OperaterID);
                                                 AddMessage("刷卡成功，解锁");
                                             }
                                         }
@@ -1681,6 +1709,7 @@ namespace X1621LineUI.ViewModels
                         if (M300[i] != AlarmList[i].State && AlarmList[i].Content != "Null" && (LampGreenSw.Elapsed.TotalMinutes > 3 || first))
                         {
                             first = false;
+                            LampGreenSw.Reset();
                             AlarmList[i].State = M300[i];
                             if (AlarmList[i].State)
                             {
@@ -1762,8 +1791,12 @@ namespace X1621LineUI.ViewModels
                 {
                     LampGreenSw.Reset();
                 }
+                if (LampColor == 1 && LampGreenSw.Elapsed == TimeSpan.Zero)
+                {
+                    LampGreenSw.Restart();
+                }
                 #endregion
-
+                GreenElapse = Math.Round(LampGreenSw.Elapsed.TotalMinutes,1);
             }
 
         }
@@ -2919,42 +2952,12 @@ namespace X1621LineUI.ViewModels
                 }
             }
         }
-        private async void ModelPrintEventProcess(string str)
+        private void ModelPrintEventProcess(string str)
         {
            
             AddMessage(str);
 
-            #region 清洁
-            if (str.Contains("CheckClean"))
-            {
-                if ((DateTime.Now - lastClean1.AddHours(2)).TotalSeconds > 0 && IsClean)
-                {
-                    await epsonRC90.TestSentNet.SendAsync("StartClean");
-                    LastClean1 = DateTime.Now;
-                    Inifile.INIWriteValue(iniParameterPath, "Clean", "LastClean1", LastClean1.ToString());
-                }
-                else
-                {
-                    await epsonRC90.TestSentNet.SendAsync("EndClean");
-                }
-            }
-            #endregion
             #region 样本
-            if (str.Contains("AskSample"))
-            {
-                if ((DateTime.Now - SamStartDatetime1).TotalSeconds > 0 && IsSam)
-                {
-                    await epsonRC90.TestSentNet.SendAsync("SampleTest;OK");
-                    if (epsonRC90.TestSendStatus && IsSam)
-                    {
-                        await epsonRC90.TestSentNet.SendAsync("StartSample");
-                    }
-                }
-                else
-                {
-                    await epsonRC90.TestSentNet.SendAsync("SampleTest;NG");
-                }
-            }
             if (str.Contains("StartSample"))
             {
                 epsonRC90.SamStart = DateTime.Now;
@@ -2971,7 +2974,14 @@ namespace X1621LineUI.ViewModels
             {
                 LastSam1 = DateTime.Now;
                 Tester.IsInSampleMode = false;
+                isSendSamCMD = false;
                 Inifile.INIWriteValue(iniParameterPath, "Sample", "LastSam1", LastSam1.ToString());
+            }
+            if (str.Contains("EndClean"))
+            {
+                LastClean1 = DateTime.Now;
+                isSendCleanCMD = false;
+                Inifile.INIWriteValue(iniParameterPath, "Clean", "LastClean1", LastClean1.ToString());
             }
             if (str.Contains("PickNew"))
             {

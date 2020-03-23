@@ -277,6 +277,10 @@ namespace SXJLibrary
                                     break;
                                 case "LinkNG":
                                     break;
+                                case "StartSample":
+                                    break;
+                                case "EndClean":
+                                    break;
                                 case "CheckUploadStatus":
                                     string uploadrst = "OK";
                                     for (int i = 0; i < 4; i++)
@@ -419,8 +423,8 @@ namespace SXJLibrary
                                                 //插入样本记录
                                                 string parnum = Inifile.INIGetStringValue(iniFilepath, "Other", "pn", "FHAPHS9");
                                                 string tres = ngitem.Length > 20 ? ngitem.Substring(0, 20) : ngitem;
-                                                stm = String.Format("INSERT INTO BARSAMREC (PARTNUM,SITEM,BARCODE,NGITEM,TRES,MNO,CDATE,CTIME,SR01) VALUES ('{0}','FLUKE','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", parnum, (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid);
-                                                oraDB.executeNonQuery(stm);
+                                                stm = String.Format("INSERT INTO BARSAMREC (PARTNUM,SITEM,BARCODE,NGITEM,TRES,MNO,CDATE,CTIME,SR01) VALUES ('{0}','FLUKE','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", parnum, (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid);                                                
+                                                await Task.Run(()=> { oraDB.executeNonQuery(stm); });
                                                 string filepath = "D:\\样本记录\\样本记录" + GetBanci() + ".csv";
                                                 if (!Directory.Exists("D:\\样本记录"))
                                                 {
@@ -434,7 +438,7 @@ namespace SXJLibrary
                                                 string[] conte = { System.DateTime.Now.ToString(), parnum, "FLUKE", (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid };
                                                 Csvfile.savetocsv(filepath, conte);
                                                 stm = String.Format("Select * from BARSAMREC WHERE BARCODE = '{0}'", (string)dt.Rows[0]["BARCODE"]);
-                                                DataSet samtimesds = oraDB.executeQuery(stm);
+                                                DataSet samtimesds = await Task.Run<DataSet>(()=> { return oraDB.executeQuery(stm); }); 
                                                 ModelPrint("插入样本记录 " + (string)dt.Rows[0]["BARCODE"] + " " + samtimesds.Tables[0].Rows.Count.ToString());
                                                 if (samtimesds.Tables[0].Rows.Count > nGItemLimit)
                                                 {
@@ -448,7 +452,7 @@ namespace SXJLibrary
                                             }
                                             if (((string)dt1.Rows[0]["NGITEM"]).ToUpper() == ngitem.ToUpper())
                                             {
-                                                sampleContent[i][j] = "OK";
+                                                sampleContent[i][j] = "ok";
                                             }
                                             else
                                             {
@@ -479,17 +483,18 @@ namespace SXJLibrary
 
                     }
                     //回复样本结果
-                    ModelPrint("UpdateCheckSam");
+                    
                     bool resut = true;
                     for (int i = 0; i < ngItemCount; i++)
                     {
                         for (int j = 0; j < 4; j++)
                         {
-                            if (sampleContent[i][j] != "OK")
+                            if (sampleContent[i][j] != "ok")
                             {
                                 string resultString = "RestartSample;" + j.ToString() + ";" + i.ToString();
                                 if (TestSendStatus)
                                 {
+                                    ModelPrint(resultString);
                                     await TestSentNet.SendAsync(resultString);
                                 }
                                 resut = false;
