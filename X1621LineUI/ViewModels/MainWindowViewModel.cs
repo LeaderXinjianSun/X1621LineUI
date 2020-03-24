@@ -1670,8 +1670,13 @@ namespace X1621LineUI.ViewModels
                                 string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}')"
                                     , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK);
                                 _result = mysql.executeQuery(stm);
+                                AddMessage("插入数据库灯信号" + _result.ToString());
+                                stm = string.Format("INSERT INTO HA_F4_DATA_FPY (PM,MACID,CLASS,INPUT,OUTPUT,FAIL,FPY) VALUES ('{0}','{1}','{2}','0','0','0','0')"
+                                    , PM, MACID, epsonRC90.GetBanci());
+                                _result = mysql.executeQuery(stm);
+                                AddMessage("插入数据库良率" + _result.ToString());
                             }
-                            AddMessage("插入数据库灯信号" + _result.ToString());
+                            
                         }
                         catch (Exception ex)
                         {
@@ -1695,7 +1700,7 @@ namespace X1621LineUI.ViewModels
         async void BigDataRun()
         {
             int _LampColor = LampColor;
-            int count1 = 0;
+            int count1 = 0,count2 = 0;
             bool first = true;
             LampGreenSw.Start();
             while (true)
@@ -1763,6 +1768,7 @@ namespace X1621LineUI.ViewModels
                     }
                     _LampColor = LampColor;
                     count1 = 0;
+
                     string result = await Task<string>.Run(() =>
                     {
                         try
@@ -1786,6 +1792,7 @@ namespace X1621LineUI.ViewModels
                         }
                     });
                     //AddMessage("更新灯信号" + result);
+
                 }
                 if (LampColor != 1)
                 {
@@ -1795,6 +1802,36 @@ namespace X1621LineUI.ViewModels
                 {
                     LampGreenSw.Restart();
                 }
+                #endregion
+                #region 插入良率
+                count2++;
+                if (count2 > 60)
+                {
+                    count2 = 0;
+                    string result = await Task<string>.Run(() =>
+                    {
+                        try
+                        {
+                            int _result = -999;
+                            Mysql mysql = new Mysql();
+                            if (mysql.Connect())
+                            {
+                                double fpy = TestCountInput > 0 ? (double)TestCountOutput / TestCountInput * 100 : 0;
+                                string stm = string.Format("UPDATE HA_F4_DATA_FPY SET INPUT = '{3}',OUTPUT = '{4}',FAIL = '{5}',FPY = '{6}' WHERE PM = '{0}' AND MACID = '{1}' AND CLASS = '{2}'"
+                                    , PM, MACID, epsonRC90.GetBanci(), TestCountInput.ToString(), TestCountOutput.ToString(), (TestCountInput - TestCountOutput).ToString(), fpy.ToString("F1"));
+                                _result = mysql.executeQuery(stm);
+                            }
+                            mysql.DisConnect();
+                            return _result.ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            return ex.Message;
+                        }
+                    });
+                    //AddMessage("上传良率" + result);
+                }
+
                 #endregion
                 GreenElapse = Math.Round(LampGreenSw.Elapsed.TotalMinutes,1);
             }
