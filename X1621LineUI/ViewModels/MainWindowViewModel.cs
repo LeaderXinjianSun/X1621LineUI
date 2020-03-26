@@ -1283,7 +1283,7 @@ namespace X1621LineUI.ViewModels
             TesterID3 = Inifile.INIGetStringValue(iniFilepath, "A", "id3", "99999");
             TesterID4 = Inifile.INIGetStringValue(iniFilepath, "A", "id4", "99999");
 
-            OperaterID = Inifile.INIGetStringValue(iniFilepath, "A", "op", "99999");
+            OperaterID = Inifile.INIGetStringValue(iniFilepath, "Other", "op", "99999");
 
             epsonRC90 = new EpsonRC90();
             epsonRC90.ModelPrint += ModelPrintEventProcess;
@@ -1562,7 +1562,7 @@ namespace X1621LineUI.ViewModels
                                 SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                                 if (oraDB.isConnect())
                                 {
-                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' ORDER BY TESTDATE DESC,TESTTIME DESC",
+                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' AND TRESULT = 'PASS' ORDER BY TESTDATE DESC,TESTTIME DESC",
                                         MACID_M);
                                     DataSet ds = oraDB.executeQuery(stm);
                                     DataTable dt = ds.Tables[0];
@@ -1585,7 +1585,7 @@ namespace X1621LineUI.ViewModels
                                                 Fx5u_mid.SetM("M2606", false);
                                                 CardLockFlag = false;
                                                 OperaterID = (string)dr["OPERTOR"];
-                                                Inifile.INIWriteValue(iniFilepath, "A", "op", OperaterID);
+                                                Inifile.INIWriteValue(iniFilepath, "Other", "op", OperaterID);
                                                 AddMessage("刷卡成功，解锁");
                                             }
                                         }

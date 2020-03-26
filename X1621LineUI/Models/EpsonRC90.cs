@@ -534,6 +534,7 @@ namespace SXJLibrary
                     string stm = "INSERT INTO BARBIND (MACHINE,SCBARCODE,SCBODBAR,SDATE,STIME,PCSSER,RESULT) VALUES ('" + machinestr + "','" + BarInfo[index][i].Barcode + "','"
                                     + BordBarcode[index] + "','" + BarInfo[index][i].TDate + "','" + BarInfo[index][i].TTime + "','" + (i + 1).ToString() + "','" + BarInfo[index][i].Status.ToString() + "')";
                     mysql.executeQuery(stm);
+                    mysql.executeQuery("COMMIT");
                 }
                 mysql.DisConnect();
             }
