@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="X1621LineUI.Views.MaterialPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:X1621LineUI.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="631" d:DesignWidth="1024">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Touch 耗材壽命管控表">
+            <DataGrid GridLinesVisibility="All" ItemsSource="{Binding MaterialItemsSource}" IsReadOnly="True"></DataGrid>
+        </GroupBox>
+        <GroupBox  Grid.Column="1" Header="操作">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Canvas>
+                    <ComboBox Name="comboBox" Canvas.Top="10" Canvas.Left="10" Width="150" ItemsSource="{Binding MaterialChangeItemsSource}" IsEditable="True" IsReadOnly="True"></ComboBox>
+                    <Button Canvas.Top="50" Canvas.Left="130" Style="{StaticResource AccentedSquareButtonStyle}" Content="更换" Command="{Binding ChangeMaterialOperateCommand}" CommandParameter="{Binding ElementName=comboBox,Path=SelectedIndex}"></Button>
+                </Canvas>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

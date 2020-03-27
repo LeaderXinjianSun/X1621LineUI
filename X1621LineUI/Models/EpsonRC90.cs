@@ -9,6 +9,7 @@ using System.IO;
 using BingLibrary.hjb;
 using System.Data;
 using BingLibrary.Net.net;
+using OfficeOpenXml;
 
 namespace SXJLibrary
 {
@@ -32,6 +33,9 @@ namespace SXJLibrary
         public string[] TemporaryBordBarcode = new string[2] { "Null", "Null" };
         public string[][] sampleContent = new string[8][] { new string[4], new string[4], new string[4], new string[4], new string[4], new string[4], new string[4], new string[4] };
         public DateTime SamStart;
+        public ExcelPackage Package;
+        public ExcelWorksheet Worksheet;
+        public bool MaterialFileStatus = false;
         #endregion
         #region 事件
         public delegate void PrintEventHandler(string ModelMessageStr);
@@ -269,11 +273,38 @@ namespace SXJLibrary
                                 case "Finish":
                                     YanmadeTester[int.Parse(strs[1]) - 1].TestResult = strs[2] == "1" ? TestResult.Pass : TestResult.Ng;
                                     YanmadeTester[int.Parse(strs[1]) - 1].TestStatus = TestStatus.Tested;
+                                    if (MaterialFileStatus)
+                                    {
+                                        try
+                                        {
+                                            int index = int.Parse(strs[1]) - 1;
+                                            Worksheet.Cells[index * 2 + 3, 6].Value = Convert.ToInt32(Worksheet.Cells[index * 2 + 3, 6].Value) + 1;
+                                            Worksheet.Cells[index * 2 + 1 + 3, 6].Value = Convert.ToInt32(Worksheet.Cells[index * 2 + 1 + 3, 6].Value) + 1;
+                                            Package.Save();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ModelPrint(ex.Message);
+                                        }
+                                    }
                                     break;
                                 case "CheckSample":
                                     CheckSam();
                                     break;
                                 case "PickNew":
+                                    if (MaterialFileStatus)
+                                    {
+                                        try
+                                        {
+                                            Worksheet.Cells[11, 6].Value = Convert.ToInt32(Worksheet.Cells[11, 6].Value) + 1;
+                                            Worksheet.Cells[12, 6].Value = Convert.ToInt32(Worksheet.Cells[12, 6].Value) + 1;
+                                            Package.Save();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ModelPrint(ex.Message);
+                                        }
+                                    }
                                     break;
                                 case "LinkNG":
                                     break;
@@ -292,6 +323,43 @@ namespace SXJLibrary
                                         }
                                     }
                                     await TestSentNet.SendAsync("UploadStatus;" + uploadrst);
+                                    break;
+                                case "CheckMaterial":
+                                    if (MaterialFileStatus)
+                                    {
+                                        string material = "OK";
+                                        for (int i = 3; i <= Worksheet.Dimension.End.Row; i++)
+                                        {
+                                            try
+                                            {
+                                                if (Convert.ToInt32(Worksheet.Cells[i, 6].Value) > Convert.ToInt32(Worksheet.Cells[i, 4].Value))
+                                                {
+                                                    ModelPrint((string)Worksheet.Cells[i, 1].Value + "," + (string)Worksheet.Cells[i, 3].Value + " 使用寿命到达上限");
+                                                    material = "NG";
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    if (Convert.ToInt32(Worksheet.Cells[i, 6].Value) > Convert.ToInt32(Worksheet.Cells[i, 5].Value))
+                                                    {
+                                                        ModelPrint((string)Worksheet.Cells[i, 1].Value + "," + (string)Worksheet.Cells[i, 3].Value + " 使用寿命预警");
+                                                    }
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                ModelPrint(ex.Message);
+                                            }
+
+                                        }
+                                        await TestSentNet.SendAsync("CheckMaterial;" + material);
+                                        ModelPrint("CheckMaterial;" + material);
+                                    }
+                                    else
+                                    {
+                                        await TestSentNet.SendAsync("CheckMaterial;NG");
+                                        ModelPrint("CheckMaterial;NG");
+                                    }
                                     break;
                                 default:
                                     ModelPrint("无效指令： " + s);
@@ -593,15 +661,6 @@ namespace SXJLibrary
                     ModelPrint(bar + " 测试次数大于3次，不纳入良率统计");
                 }
             }
-            //try
-            //{
-            //    GlobalVar.Worksheet.Cells[(index - 1) * 2 + 3, 6].Value = Convert.ToInt32(GlobalVar.Worksheet.Cells[(index - 1) * 2 + 3, 6].Value) + 1;
-            //    GlobalVar.Worksheet.Cells[(index - 1) * 2 + 1 + 3, 6].Value = Convert.ToInt32(GlobalVar.Worksheet.Cells[(index - 1) * 2 + 1 + 3, 6].Value) + 1;
-            //}
-            //catch (Exception ex)
-            //{
-            //    MsgText = AddMessage(ex.Message);
-            //}
         }
         private void SaveCSVfileRecord(string TestTime, string Barcode, string TestResult, string TestCycleTime, string Index)
         {

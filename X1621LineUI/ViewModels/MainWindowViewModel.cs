@@ -14,6 +14,7 @@ using System.IO;
 using OfficeOpenXml;
 using System.Collections.ObjectModel;
 using BingLibrary.hjb;
+using BingLibrary.hjb.Metro;
 
 namespace X1621LineUI.ViewModels
 {
@@ -217,6 +218,17 @@ namespace X1621LineUI.ViewModels
             {
                 samplePageVisibility = value;
                 this.RaisePropertyChanged("SamplePageVisibility");
+            }
+        }
+        private string materialPageVisibility;
+
+        public string MaterialPageVisibility
+        {
+            get { return materialPageVisibility; }
+            set
+            {
+                materialPageVisibility = value;
+                this.RaisePropertyChanged("MaterialPageVisibility");
             }
         }
 
@@ -979,6 +991,28 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("GreenElapse");
             }
         }
+        private DataTable materialItemsSource;
+
+        public DataTable MaterialItemsSource
+        {
+            get { return materialItemsSource; }
+            set
+            {
+                materialItemsSource = value;
+                this.RaisePropertyChanged("MaterialItemsSource");
+            }
+        }
+        private ObservableCollection<string> materialChangeItemsSource;
+
+        public ObservableCollection<string> MaterialChangeItemsSource
+        {
+            get { return materialChangeItemsSource; }
+            set
+            {
+                materialChangeItemsSource = value;
+                this.RaisePropertyChanged("MaterialChangeItemsSource");
+            }
+        }
 
 
         #endregion
@@ -986,6 +1020,7 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand AppLoadedEventCommand { get; set; }
         public DelegateCommand<object> MenuActionCommand { get; set; }
         public DelegateCommand<object> LanguageChangeCommand { get; set; }
+        public DelegateCommand<object> ChangeMaterialOperateCommand { get; set; }
         public DelegateCommand FuncTestCommand { get; set; }
         public DelegateCommand StartSampleCommand { get; set; }
         public DelegateCommand SaveSamParamCommand { get; set; }
@@ -997,7 +1032,7 @@ namespace X1621LineUI.ViewModels
         private 读写器530SDK.CReader reader = new 读写器530SDK.CReader();
         Fx5u Fx5u_left1, Fx5u_left2, Fx5u_mid, Fx5u_right1, Fx5u_right2;
         Scan scan1, scan2;
-        int CardStatus = 1;
+        //int CardStatus = 1;
         private EpsonRC90 epsonRC90; string LastBanci;
         DateTime SamStartDatetime1, SamDateBigin1;
         int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000; bool[] X40;
@@ -1006,6 +1041,7 @@ namespace X1621LineUI.ViewModels
         int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
         int ErrorCount = 0; bool CardLockFlag; DateTime CardLockTime;
         bool isSendSamCMD = false, isSendCleanCMD = false;
+        Metro metro = new Metro();
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -1017,6 +1053,24 @@ namespace X1621LineUI.ViewModels
             this.StartSampleCommand = new DelegateCommand(new Action(this.StartSampleCommandExecute));
             this.SaveSamParamCommand = new DelegateCommand(new Action(this.SaveSamParamCommandExecute));
             this.SaveParameterCommand = new DelegateCommand(new Action(this.SaveParameterCommandExecute));
+            this.ChangeMaterialOperateCommand = new DelegateCommand<object>(new Action<object>(this.ChangeMaterialOperateCommandExecute));
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            //if (System.Environment.CurrentDirectory != @"C:\Debug")
+            if (false)
+            {
+                System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
+                System.Windows.Application.Current.Shutdown();
+            }
+            else
+            {
+
+                System.Diagnostics.Process[] myProcesses = System.Diagnostics.Process.GetProcessesByName("X1621LineUI");//获取指定的进程名   
+                if (myProcesses.Length > 1) //如果可以获取到知道的进程名则说明已经启动
+                {
+                    System.Windows.MessageBox.Show("不允许重复打开软件");
+                    System.Windows.Application.Current.Shutdown();
+                }
+            }
         }
         #endregion
         #region 方法绑定执行函数
@@ -1030,7 +1084,7 @@ namespace X1621LineUI.ViewModels
             Task.Run(() => { SystemRun(); });
             AddMessage("软件加载完成");
         }
-        private void MenuActionCommandExecute(object p)
+        private async void MenuActionCommandExecute(object p)
         {
             switch (p.ToString())
             {
@@ -1038,16 +1092,35 @@ namespace X1621LineUI.ViewModels
                     HomePageVisibility = "Visible";
                     ParameterPageVisibility = "Collapsed";
                     SamplePageVisibility = "Collapsed";
+                    MaterialPageVisibility = "Collapsed";
                     break;
                 case "1":
-                    HomePageVisibility = "Collapsed";
-                    ParameterPageVisibility = "Visible";
-                    SamplePageVisibility = "Collapsed";
+                    metro.ChangeAccent("Orange");
+                    var password = await metro.ShowLoginOnlyPassword("密码");
+                    if (password == GetPassWord())
+                    {
+                        HomePageVisibility = "Collapsed";
+                        ParameterPageVisibility = "Visible";
+                        SamplePageVisibility = "Collapsed";
+                        MaterialPageVisibility = "Collapsed";
+                    }
+                    else
+                    {
+                        AddMessage("密码输入错误");
+                    }
+                    metro.ChangeAccent("Blue");
                     break;
                 case "2":
                     HomePageVisibility = "Collapsed";
                     ParameterPageVisibility = "Collapsed";
                     SamplePageVisibility = "Visible";
+                    MaterialPageVisibility = "Collapsed";
+                    break;
+                case "3":
+                    HomePageVisibility = "Collapsed";
+                    ParameterPageVisibility = "Collapsed";
+                    SamplePageVisibility = "Collapsed";
+                    MaterialPageVisibility = "Visible";
                     break;
                 default:
                     break;
@@ -1151,6 +1224,31 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "MachineLog", "LotName", LotName);
             AddMessage("参数保存完成");
         }
+        private async void ChangeMaterialOperateCommandExecute(object p)
+        {
+            if ((int)p >= 0)
+            {
+                metro.ChangeAccent("Orange");
+                string rr = await metro.ShowLoginOnlyPassword("确认将 " + MaterialChangeItemsSource[(int)p] + " 更换？");
+                if (rr == GetPassWord())
+                {
+                    try
+                    {
+                        epsonRC90.Worksheet.Cells[(int)p + 3, 9].Value = Convert.ToInt32(epsonRC90.Worksheet.Cells[(int)p + 3, 9].Value) + 1;
+                        epsonRC90.Worksheet.Cells[(int)p + 3, 7].Value = epsonRC90.Worksheet.Cells[(int)p + 3, 8].Value;
+                        epsonRC90.Worksheet.Cells[(int)p + 3, 8].Value = System.DateTime.Now.ToString();
+                        epsonRC90.Worksheet.Cells[(int)p + 3, 6].Value = 0;
+                        epsonRC90.Package.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        AddMessage(ex.Message);
+                    }
+                }
+                metro.ChangeAccent("Blue");
+            }
+            
+        }
         #endregion
         #region 自定义函数
         private void Init()
@@ -1161,6 +1259,9 @@ namespace X1621LineUI.ViewModels
             HomePageVisibility = "Visible";
             ParameterPageVisibility = "Collapsed";
             SamplePageVisibility = "Collapsed";
+
+            MaterialItemsSource = new DataTable();
+            MaterialChangeItemsSource = new ObservableCollection<string>();
             Station = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "System", "Station", "1"));
             string plc_ip = Inifile.INIGetStringValue(iniParameterPath, "System", "PLC2IP", "192.168.10.2");
             int plc_port = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "System", "PLC2PORT", "8000"));
@@ -1357,7 +1458,8 @@ namespace X1621LineUI.ViewModels
         private async void UIRun()
         {
 
-            int cardcount = 0, timetick = 0;
+            int cardcount = 0, timetick = 0, timetick1 = 0;
+            bool first = true;
             Fx5u_mid.SetM("M2606", true);
             CardLockFlag = true;
             CardLockTime = DateTime.Now;
@@ -1389,6 +1491,67 @@ namespace X1621LineUI.ViewModels
                         break;
                 }
                 StatusRobot = epsonRC90.IOReceiveStatus && epsonRC90.TestSendStatus && epsonRC90.TestReceiveStatus && epsonRC90.TestReceive1Status;
+
+                if (first)
+                {
+                    FileInfo existingFile = new FileInfo("C:\\耗材.xlsx");
+                    try
+                    {
+                        epsonRC90.Package = new ExcelPackage(existingFile);
+                        epsonRC90.Worksheet = epsonRC90.Package.Workbook.Worksheets[0];
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            epsonRC90.Worksheet.Cells[i * 2 + 3, 3].Value = FlexID[i];
+                            epsonRC90.Worksheet.Cells[i * 2 + 1 + 3, 3].Value = FlexID[i];
+                            epsonRC90.Worksheet.Cells[i * 2 + 3, 2].Value = MACID;
+                            epsonRC90.Worksheet.Cells[i * 2 + 1 + 3, 2].Value = MACID;
+                            MaterialChangeItemsSource.Add((string)epsonRC90.Worksheet.Cells[i * 2 + 3, 1].Value + "," + FlexID[i]);
+                            MaterialChangeItemsSource.Add((string)epsonRC90.Worksheet.Cells[i * 2 + 3 + 1, 1].Value + "," + FlexID[i]);
+                        }
+                        for (int i = 0; i < 2; i++)
+                        {
+                            epsonRC90.Worksheet.Cells[i + 11, 3].Value = "NA";
+                            epsonRC90.Worksheet.Cells[i + 11, 2].Value = MACID;
+                            MaterialChangeItemsSource.Add((string)epsonRC90.Worksheet.Cells[i + 11, 1].Value + "," + "NA");
+                        }
+
+                        for (int i = 1; i <= epsonRC90.Worksheet.Dimension.End.Column; i++)
+                        {
+                            MaterialItemsSource.Columns.Add((string)epsonRC90.Worksheet.Cells[2, i].Value);
+                        }
+                        try
+                        {
+                            epsonRC90.Package.Save();
+                        }
+                        catch (Exception ex)
+                        {
+                            AddMessage(ex.Message);
+                        }
+                        first = false;
+                        epsonRC90.MaterialFileStatus = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        AddMessage(ex.Message);
+                    }
+                }
+
+                if (!first && timetick1++ > 10)
+                {
+                    timetick1 = 0;
+                    MaterialItemsSource.Clear();
+                    for (int i = 3; i <= epsonRC90.Worksheet.Dimension.End.Row; i++)
+                    {
+                        DataRow dr = MaterialItemsSource.NewRow();
+                        for (int j = 1; j <= epsonRC90.Worksheet.Dimension.End.Column; j++)
+                        {
+                            dr[j - 1] = epsonRC90.Worksheet.Cells[i, j].Value;
+                        }
+                        MaterialItemsSource.Rows.Add(dr);
+                    }
+
+                }
                 #endregion
                 #region 良率面板显示
                 //良率界面显示
@@ -3033,8 +3196,25 @@ namespace X1621LineUI.ViewModels
                 AlarmGridVisibility = "Visible";
                 AddMessage("上传软体异常");
             }
-
-            #endregion
+            if (str.Contains("寿命"))
+            {
+                AlarmText = str;
+                AlarmGridVisibility = "Visible";
+            }
+            #endregion           
+        }
+        private string GetPassWord()
+        {
+            int day = System.DateTime.Now.Day;
+            int month = System.DateTime.Now.Month;
+            string ss = (day + month).ToString();
+            string passwordstr = "";
+            for (int i = 0; i < 4 - ss.Length; i++)
+            {
+                passwordstr += "0";
+            }
+            passwordstr += ss;
+            return passwordstr;
         }
         #endregion
     }

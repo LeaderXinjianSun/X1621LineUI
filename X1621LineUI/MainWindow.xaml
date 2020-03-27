@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:X1621LineUI"
         xmlns:views="clr-namespace:X1621LineUI.Views"
         mc:Ignorable="d"
-        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 2020032601}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 2020032701}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Icon="AVARY01.ico" Closing="Window_Closing">
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
@@ -32,7 +32,7 @@
             <MenuItem Header="{DynamicResource MenuHomeProperty}" Command="{Binding MenuActionCommand}" CommandParameter="0"></MenuItem>
             <MenuItem Header="{DynamicResource MenuParameterProperty}" Command="{Binding MenuActionCommand}" CommandParameter="1"></MenuItem>
             <MenuItem Header="{DynamicResource MenuSampleProperty}" Command="{Binding MenuActionCommand}" CommandParameter="2"></MenuItem>
-            <!--<MenuItem Header="{DynamicResource MenuMaterialProperty}" Command="{Binding MenuActionCommand}" CommandParameter="3"></MenuItem>-->
+            <MenuItem Header="{DynamicResource MenuMaterialProperty}" Command="{Binding MenuActionCommand}" CommandParameter="3"></MenuItem>
             <MenuItem Header="{DynamicResource MenuLanguageProperty}">
                 <MenuItem Header="简体" Command="{Binding LanguageChangeCommand}" CommandParameter="0"></MenuItem>
                 <MenuItem Header="English" Command="{Binding LanguageChangeCommand}" CommandParameter="1"></MenuItem>
@@ -41,6 +41,7 @@
         <views:HomePage Grid.Row="1" Visibility="{Binding HomePageVisibility}"></views:HomePage>
         <views:ParameterPage Grid.Row="1" Visibility="{Binding ParameterPageVisibility,FallbackValue=Collapsed}"></views:ParameterPage>
         <views:SamplePage Grid.Row="1" Visibility="{Binding SamplePageVisibility,FallbackValue=Collapsed}"></views:SamplePage>
+        <views:MaterialPage Grid.Row="1" Visibility="{Binding MaterialPageVisibility,FallbackValue=Collapsed}"></views:MaterialPage>
         <StatusBar Grid.Row="2">
             <StatusBarItem Visibility="{Binding ItemVisibility0}">
                 <StackPanel Orientation="Horizontal">
