@@ -288,7 +288,7 @@ namespace SXJLibrary
                         timed = 1000;
                     }
 
-                    if (sw.Elapsed.TotalSeconds > 10 && start)
+                    if (sw.Elapsed.TotalSeconds > 15 && start)
                     {                        
                         if (++ngnum > 1)
                         {

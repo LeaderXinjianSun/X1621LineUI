@@ -627,7 +627,7 @@ namespace SXJLibrary
         {
             uploadSoftwareStatus[index - 1].testerCycle = YanmadeTester[index - 1].TestSpan.ToString();
             uploadSoftwareStatus[index - 1].result = YanmadeTester[index - 1].TestResult == TestResult.Pass ? "PASS" : "FAIL";
-            if (YanmadeTester[index - 1].TestSpan > 11)
+            if (YanmadeTester[index - 1].TestSpan > 11 && uploadSoftwareStatus[index - 1].result == "PASS")
             {
                 uploadSoftwareStatus[index - 1].StartCommand();
             }
