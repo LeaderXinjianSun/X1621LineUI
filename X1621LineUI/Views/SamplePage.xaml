@@ -255,9 +255,9 @@
                         <TextBlock Text=" 个" VerticalAlignment="Center"></TextBlock>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="样本次数 " VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Text="样本管控 " VerticalAlignment="Center"></TextBlock>
                         <TextBox Text="{Binding NGItemLimit}" Width="40" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"></TextBox>
-                        <TextBlock Text=" 次" VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Text=" 天" VerticalAlignment="Center"></TextBlock>
                     </StackPanel>
                     <Button Width="60" Height="60" Margin="0,10,0,0" Content="保存" Command="{Binding SaveSamParamCommand}"></Button>
                 </StackPanel>

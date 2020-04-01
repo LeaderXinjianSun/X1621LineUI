@@ -1013,6 +1013,17 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("MaterialChangeItemsSource");
             }
         }
+        private bool alarmButtonIsEnabled;
+
+        public bool AlarmButtonIsEnabled
+        {
+            get { return alarmButtonIsEnabled; }
+            set
+            {
+                alarmButtonIsEnabled = value;
+                this.RaisePropertyChanged("AlarmButtonIsEnabled");
+            }
+        }
 
 
         #endregion
@@ -1025,6 +1036,8 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand StartSampleCommand { get; set; }
         public DelegateCommand SaveSamParamCommand { get; set; }
         public DelegateCommand SaveParameterCommand { get; set; }
+        public DelegateCommand BigDataAlarmGetCommand { get; set; }
+        public DelegateCommand<object> TrackInitCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
@@ -1053,11 +1066,13 @@ namespace X1621LineUI.ViewModels
             this.StartSampleCommand = new DelegateCommand(new Action(this.StartSampleCommandExecute));
             this.SaveSamParamCommand = new DelegateCommand(new Action(this.SaveSamParamCommandExecute));
             this.SaveParameterCommand = new DelegateCommand(new Action(this.SaveParameterCommandExecute));
+            this.BigDataAlarmGetCommand = new DelegateCommand(new Action(this.BigDataAlarmGetCommandExecute));
             this.ChangeMaterialOperateCommand = new DelegateCommand<object>(new Action<object>(this.ChangeMaterialOperateCommandExecute));
+            this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            if (System.Environment.CurrentDirectory != @"C:\Debug")
-            //if (false)
-            {
+            //if (System.Environment.CurrentDirectory != @"C:\Debug")
+                if (false)
+                {
                 System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
                 System.Windows.Application.Current.Shutdown();
             }
@@ -1249,6 +1264,97 @@ namespace X1621LineUI.ViewModels
             }
             
         }
+        private async void BigDataAlarmGetCommandExecute()
+        {
+            AlarmButtonIsEnabled = false;
+
+            var rst = await Task<string>.Run(() =>
+            {
+                try
+                {
+                    if (!Directory.Exists(Path.Combine(System.Environment.CurrentDirectory, DateTime.Now.ToString("yyyyMMdd"))))
+                    {
+                        Directory.CreateDirectory(Path.Combine(System.Environment.CurrentDirectory, DateTime.Now.ToString("yyyyMMdd")));
+                    }
+                    string path = Path.Combine(System.Environment.CurrentDirectory, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("yyyyMMddHHmmss") + "AlarmTotal.csv");
+
+                    Mysql mysql = new Mysql();
+                    if (mysql.Connect())
+                    {
+                        string stm = string.Format("SELECT * FROM HA_F4_DATA_ALARM WHERE PM = '{0}' AND MACID = '{1}' AND CLASS = '{2}'", PM, MACID, epsonRC90.GetBanci());
+                        DataSet ds = mysql.Select(stm);
+
+                        DataTable dt = ds.Tables["table0"];
+                        if (dt.Rows.Count > 0)
+                        {
+
+                            string strHead = DateTime.Now.ToString("yyyyMMddHHmmss") + "AlarmTotal";
+                            string strColumns = "";
+                            for (int i = 0; i < dt.Columns.Count; i++)
+                            {
+                                strColumns += dt.Columns[i].ColumnName + ",";
+                            }
+                            strColumns = strColumns.Substring(0, strColumns.Length - 1);
+                            Csvfile.dt2csv(dt, path, strHead, strColumns);
+
+                            Process process1 = new Process();
+                            process1.StartInfo.FileName = path;
+                            process1.StartInfo.Arguments = "";
+                            process1.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                            process1.Start();
+                        }
+
+                    }
+                    mysql.DisConnect();
+                }
+                catch (Exception ex)
+                {
+                    return ex.Message;
+                }
+                return "查询报警结束";
+            });
+
+            AddMessage(rst);
+            AlarmButtonIsEnabled = true;
+        }
+        private async void TrackInitCommandExecute(object p)
+        {
+            metro.ChangeAccent("Red");
+            var password = await metro.ShowLoginOnlyPassword("专业人员密码");
+            if (password == "543337")
+            {
+                await Task.Run(()=> {
+                    try
+                    {
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            string lineid = "";
+                            switch (p.ToString())
+                            {
+                                case "0":
+                                    lineid = LineID1;
+                                    break;
+                                case "1":
+                                    lineid = LineID2;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            string stm = "UPDATE BODLINE SET Station9 = 0, Station8 = 0, Station7 = 0,Station10 = 0,Station11 = 0 WHERE LineID = '" + lineid + "'";
+                            mysql.executeQuery(stm);
+                            AddMessage("清空轨道" + lineid);
+                        }
+                        mysql.DisConnect();
+                    }
+                    catch (Exception ex)
+                    {
+                        AddMessage(ex.Message);
+                    }
+                });
+            }
+            metro.ChangeAccent("Blue");
+        }
         #endregion
         #region 自定义函数
         private void Init()
@@ -1259,7 +1365,7 @@ namespace X1621LineUI.ViewModels
             HomePageVisibility = "Visible";
             ParameterPageVisibility = "Collapsed";
             SamplePageVisibility = "Collapsed";
-
+            AlarmButtonIsEnabled = true;
             MaterialItemsSource = new DataTable();
             MaterialChangeItemsSource = new ObservableCollection<string>();
             Station = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "System", "Station", "1"));
@@ -2283,6 +2389,7 @@ namespace X1621LineUI.ViewModels
                             case 1:
                                 Fx5u_right1.SetM("M2596", false);
                                 Fx5u_right1.SetM("M2597", false);
+                                Fx5u_right1.SetM("M2600", false);
                                 break;
                             default:
                                 break;
@@ -2301,6 +2408,7 @@ namespace X1621LineUI.ViewModels
                             case 1:
                                 Fx5u_right1.SetM("M2602", false);
                                 Fx5u_right1.SetM("M2603", false);
+                                Fx5u_right1.SetM("M2606", false);
                                 break;
                             default:
                                 break;
@@ -2324,16 +2432,16 @@ namespace X1621LineUI.ViewModels
                             switch (Station)
                             {
                                 case 1:
-                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE LineID = '" + LineID1 + "'";
+                                    stm = "UPDATE BODLINE SET Station1 = 1, Station9 = 0 WHERE LineID = '" + LineID1 + "'";
                                     break;
                                 case 2:
                                 case 3:
                                 case 4:
                                 case 5:
-                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE LineID = '" + LineID1 + "'";
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 1, Station10 = Station10 - 1 WHERE LineID = '" + LineID1 + "'";
                                     break;
                                 case 6:
-                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE LineID = '" + LineID1 + "'";
+                                    stm = "UPDATE BODLINE SET Station6 = 1, Station11 = 0 WHERE LineID = '" + LineID1 + "'";
                                     break;
                                 default:
                                     break;
@@ -2358,16 +2466,16 @@ namespace X1621LineUI.ViewModels
                             switch (Station)
                             {
                                 case 1:
-                                    stm = "UPDATE BODLINE SET Station1 = 0, Station9 = Station9 - 1 WHERE LineID = '" + LineID2 + "'";
+                                    stm = "UPDATE BODLINE SET Station1 = 1, Station9 = 0 WHERE LineID = '" + LineID2 + "'";
                                     break;
                                 case 2:
                                 case 3:
                                 case 4:
                                 case 5:
-                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0, Station10 = Station10 - 1 WHERE LineID = '" + LineID2 + "'";
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 1, Station10 = Station10 - 1 WHERE LineID = '" + LineID2 + "'";
                                     break;
                                 case 6:
-                                    stm = "UPDATE BODLINE SET Station6 = 0, Station11 = Station11 - 1 WHERE LineID = '" + LineID2 + "'";
+                                    stm = "UPDATE BODLINE SET Station6 = 1, Station11 = 0 WHERE LineID = '" + LineID2 + "'";
                                     break;
                                 default:
                                     break;
@@ -2382,7 +2490,7 @@ namespace X1621LineUI.ViewModels
                         Fx5u_mid.SetM("M2803", false);
                     }
                 }
-                catch 
+                catch
                 { }
 
                 #endregion
@@ -2422,6 +2530,111 @@ namespace X1621LineUI.ViewModels
                 }
                 catch
                 { }
+
+                #endregion
+                #region 测试机屏蔽
+                try
+                {
+                    //A轨道
+                    if (Fx5u_mid.ReadM("M2810"))
+                    {
+                        AddMessage("测试机A屏蔽");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            switch (Station)
+                            {
+                                case 1:
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                case 6:
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 1 WHERE LineID = '" + LineID1 + "'";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            mysql.executeQuery(stm);
+                        }
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2810", false);
+                    }
+                    if (Fx5u_mid.ReadM("M2812"))
+                    {
+                        AddMessage("测试机A取消屏蔽");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            switch (Station)
+                            {
+                                case 1:
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                case 6:
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID1 + "'";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            mysql.executeQuery(stm);
+                        }
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2812", false);
+                    }
+                    //B轨道
+                    if (Fx5u_mid.ReadM("M2811"))
+                    {
+                        AddMessage("测试机B屏蔽");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            switch (Station)
+                            {
+                                case 1:
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                case 6:
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 1 WHERE LineID = '" + LineID2 + "'";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            mysql.executeQuery(stm);
+                        }
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2811", false);
+                    }
+                    if (Fx5u_mid.ReadM("M2813"))
+                    {
+                        AddMessage("测试机B取消屏蔽");
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
+                        {
+                            switch (Station)
+                            {
+                                case 1:
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                case 6:
+                                    stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID2 + "'";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            mysql.executeQuery(stm);
+                        }
+                        mysql.DisConnect();
+                        Fx5u_mid.SetM("M2813", false);
+                    }
+                }
+                catch { }                
 
                 #endregion
                 #region 读写PLC信号
@@ -2562,6 +2775,15 @@ namespace X1621LineUI.ViewModels
                             {
                                 AddMessage("板 " + barcode + " 已测过");
                                 Fx5u_mid.SetM("M2599", true);
+                                switch (Station)
+                                {
+                                    case 1:
+                                    case 5:
+                                        Fx5u_right1.SetM("M2600", true);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     }
@@ -2607,7 +2829,7 @@ namespace X1621LineUI.ViewModels
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
                     {
-                        int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                        int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"];
                         if (bordcount < 5)//轨道+测试机板数量 < 5 不存储，放板
                         {
                             if (lineIndex == 0)
@@ -2746,6 +2968,15 @@ namespace X1621LineUI.ViewModels
                             {
                                 AddMessage("板 " + barcode + " 已测过");
                                 Fx5u_mid.SetM("M2604", true);
+                                switch (Station)
+                                {
+                                    case 1:
+                                    case 5:
+                                        Fx5u_right1.SetM("M2606", true);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     }
@@ -2891,7 +3122,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = 0, Station7 = Station7 + 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
@@ -2903,7 +3134,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = 0, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块新板");
                         }
@@ -2960,7 +3191,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station7 = Station7 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = 0, Station7 = Station7 + 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
@@ -2972,7 +3203,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = Station9 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = 0, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块新板");
                         }
@@ -3057,7 +3288,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块新板");
                         }
@@ -3069,7 +3300,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块存储板");
                         }
@@ -3127,7 +3358,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块新板");
                         }
@@ -3139,7 +3370,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = Station11 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块存储板");
                         }

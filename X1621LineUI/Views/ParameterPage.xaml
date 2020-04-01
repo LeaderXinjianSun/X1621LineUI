@@ -97,5 +97,14 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
+        <GroupBox Grid.Column="1" Grid.Row="1" Header="操作">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="初始化轨道" VerticalAlignment="Center"></Label>
+                    <Button Width="60" Height="30" Content="A轨道" Command="{Binding TrackInitCommand}" CommandParameter="0" Margin="1"></Button>
+                    <Button Width="60" Height="30" Content="B轨道" Command="{Binding TrackInitCommand}" CommandParameter="1" Margin="1"></Button>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </UserControl>

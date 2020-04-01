@@ -481,37 +481,50 @@ namespace SXJLibrary
                                     TimeSpan sp = updatetime - SamStart;
                                     if (sp.TotalSeconds > 0)
                                     {
-                                        stm = String.Format("Select * from barsaminfo WHERE BARCODE = '{0}'", (string)dt.Rows[0]["BARCODE"]);
+                                        stm = String.Format("Select * from barsaminfo WHERE BARCODE = '{0}' ORDER BY CDATE DESC,CTIME DESC", (string)dt.Rows[0]["BARCODE"]);
                                         DataSet s1 = oraDB.executeQuery(stm);
                                         DataTable dt1 = s1.Tables[0];
                                         if (dt1.Rows.Count > 0)
                                         {
                                             try
                                             {
-                                                //插入样本记录
-                                                string parnum = Inifile.INIGetStringValue(iniFilepath, "Other", "pn", "FHAPHS9");
-                                                string tres = ngitem.Length > 20 ? ngitem.Substring(0, 20) : ngitem;
-                                                stm = String.Format("INSERT INTO BARSAMREC (PARTNUM,SITEM,BARCODE,NGITEM,TRES,MNO,CDATE,CTIME,SR01) VALUES ('{0}','FLUKE','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", parnum, (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid);                                                
-                                                await Task.Run(()=> { oraDB.executeNonQuery(stm); });
-                                                string filepath = "D:\\样本记录\\样本记录" + GetBanci() + ".csv";
-                                                if (!Directory.Exists("D:\\样本记录"))
+                                                datestr = (string)dt1.Rows[0]["CDATE"];
+                                                timestr = (string)dt1.Rows[0]["CTIME"];
+                                                if (datestr.Length == 8 && (timestr.Length == 5 || timestr.Length == 6))
                                                 {
-                                                    Directory.CreateDirectory("D:\\样本记录");
-                                                }
-                                                if (!File.Exists(filepath))
-                                                {
-                                                    string[] heads = { "DateTime", "PARTNUM", "SITEM", "BARCODE", "NGITEM", "TRES", "MNO", "CDATE", "CTIME", "SR01" };
-                                                    Csvfile.savetocsv(filepath, heads);
-                                                }
-                                                string[] conte = { System.DateTime.Now.ToString(), parnum, "FLUKE", (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid };
-                                                Csvfile.savetocsv(filepath, conte);
-                                                stm = String.Format("Select * from BARSAMREC WHERE BARCODE = '{0}'", (string)dt.Rows[0]["BARCODE"]);
-                                                DataSet samtimesds = await Task.Run<DataSet>(()=> { return oraDB.executeQuery(stm); }); 
-                                                ModelPrint("插入样本记录 " + (string)dt.Rows[0]["BARCODE"] + " " + samtimesds.Tables[0].Rows.Count.ToString());
-                                                if (samtimesds.Tables[0].Rows.Count > nGItemLimit)
-                                                {
-                                                    ModelPrint((string)dt.Rows[0]["BARCODE"] + "样本记录" + samtimesds.Tables[0].Rows.Count.ToString() + " > " + nGItemLimit.ToString());
-                                                    sampleContent[i][j] = "Limit";
+                                                    if (timestr.Length == 5)
+                                                    {
+                                                        timestr = "0" + timestr;
+                                                    }
+                                                    datetimestr = string.Empty;
+                                                    datetimestr = string.Format("{0}/{1}/{2} {3}:{4}:{5}", datestr.Substring(0, 4), datestr.Substring(4, 2), datestr.Substring(6, 2), timestr.Substring(0, 2), timestr.Substring(2, 2), timestr.Substring(4, 2));
+                                                    updatetime = Convert.ToDateTime(datetimestr);
+                                                    if ((DateTime.Now - updatetime).TotalDays <= nGItemLimit)
+                                                    {
+                                                        //插入样本记录
+                                                        string parnum = Inifile.INIGetStringValue(iniFilepath, "Other", "pn", "FHAPHS9");
+                                                        string tres = ngitem.Length > 20 ? ngitem.Substring(0, 20) : ngitem;
+                                                        stm = String.Format("INSERT INTO BARSAMREC (PARTNUM,SITEM,BARCODE,NGITEM,TRES,MNO,CDATE,CTIME,SR01) VALUES ('{0}','FLUKE','{1}','{2}','{3}','{4}','{5}','{6}','{7}')", parnum, (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid);
+                                                        await Task.Run(() => { oraDB.executeNonQuery(stm); });
+                                                        string filepath = "D:\\样本记录\\样本记录" + GetBanci() + ".csv";
+                                                        if (!Directory.Exists("D:\\样本记录"))
+                                                        {
+                                                            Directory.CreateDirectory("D:\\样本记录");
+                                                        }
+                                                        if (!File.Exists(filepath))
+                                                        {
+                                                            string[] heads = { "DateTime", "PARTNUM", "SITEM", "BARCODE", "NGITEM", "TRES", "MNO", "CDATE", "CTIME", "SR01" };
+                                                            Csvfile.savetocsv(filepath, heads);
+                                                        }
+                                                        string[] conte = { System.DateTime.Now.ToString(), parnum, "FLUKE", (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid };
+                                                        Csvfile.savetocsv(filepath, conte);
+                                                        ModelPrint("插入样本记录 " + (string)dt.Rows[0]["BARCODE"] + " " +  updatetime.ToString());
+                                                    }
+                                                    else
+                                                    {
+                                                        ModelPrint((string)dt.Rows[0]["BARCODE"] + "样本时间" + updatetime.ToString() + " > " + nGItemLimit.ToString() + "天");
+                                                        sampleContent[i][j] = "Limit";
+                                                    }
                                                 }
                                             }
                                             catch (Exception ex)
