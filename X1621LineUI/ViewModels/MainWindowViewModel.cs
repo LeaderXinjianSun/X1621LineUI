@@ -2426,6 +2426,17 @@ namespace X1621LineUI.ViewModels
                     if (Fx5u_mid.ReadM("M2798"))
                     {
                         AddMessage("轨道A上顶");
+                        switch (Station)
+                        {
+                            case 5:
+                            case 1:
+                                Fx5u_right1.SetM("M2596", false);
+                                Fx5u_right1.SetM("M2597", false);
+                                Fx5u_right1.SetM("M2600", false);
+                                break;
+                            default:
+                                break;
+                        }
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
@@ -2460,6 +2471,17 @@ namespace X1621LineUI.ViewModels
                     if (Fx5u_mid.ReadM("M2803"))
                     {
                         AddMessage("轨道B上顶");
+                        switch (Station)
+                        {
+                            case 5:
+                            case 1:
+                                Fx5u_right1.SetM("M2602", false);
+                                Fx5u_right1.SetM("M2603", false);
+                                Fx5u_right1.SetM("M2606", false);
+                                break;
+                            default:
+                                break;
+                        }
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
@@ -2500,6 +2522,17 @@ namespace X1621LineUI.ViewModels
                     if (Fx5u_mid.ReadM("M2799"))
                     {
                         AddMessage("轨道A测完下放");
+                        switch (Station)
+                        {
+                            case 5:
+                            case 1:
+                                Fx5u_right1.SetM("M2596", false);
+                                Fx5u_right1.SetM("M2597", false);
+                                Fx5u_right1.SetM("M2600", true);
+                                break;
+                            default:
+                                break;
+                        }
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
@@ -2515,6 +2548,17 @@ namespace X1621LineUI.ViewModels
                     if (Fx5u_mid.ReadM("M2804"))
                     {
                         AddMessage("轨道B测完下放");
+                        switch (Station)
+                        {
+                            case 5:
+                            case 1:
+                                Fx5u_right1.SetM("M2602", false);
+                                Fx5u_right1.SetM("M2603", false);
+                                Fx5u_right1.SetM("M2606", true);
+                                break;
+                            default:
+                                break;
+                        }
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
