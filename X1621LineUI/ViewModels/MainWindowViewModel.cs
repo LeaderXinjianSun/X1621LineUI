@@ -661,17 +661,6 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("LastSam1");
             }
         }
-        private DateTime nextSam1;
-
-        public DateTime NextSam1
-        {
-            get { return nextSam1; }
-            set
-            {
-                nextSam1 = value;
-                this.RaisePropertyChanged("NextSam1");
-            }
-        }
         private string spanSam1;
 
         public string SpanSam1
@@ -1024,7 +1013,61 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("AlarmButtonIsEnabled");
             }
         }
+        private string sampleDStartTimeAM;
 
+        public string SampleDStartTimeAM
+        {
+            get { return sampleDStartTimeAM; }
+            set
+            {
+                sampleDStartTimeAM = value;
+                this.RaisePropertyChanged("SampleDStartTimeAM");
+            }
+        }
+        private string sampleDStartTimePM;
+
+        public string SampleDStartTimePM
+        {
+            get { return sampleDStartTimePM; }
+            set
+            {
+                sampleDStartTimePM = value;
+                this.RaisePropertyChanged("SampleDStartTimePM");
+            }
+        }
+        private string sampleNStartTimeAM;
+
+        public string SampleNStartTimeAM
+        {
+            get { return sampleNStartTimeAM; }
+            set
+            {
+                sampleNStartTimeAM = value;
+                this.RaisePropertyChanged("SampleNStartTimeAM");
+            }
+        }
+        private string sampleNStartTimePM;
+
+        public string SampleNStartTimePM
+        {
+            get { return sampleNStartTimePM; }
+            set
+            {
+                sampleNStartTimePM = value;
+                this.RaisePropertyChanged("SampleNStartTimePM");
+            }
+        }
+        private string wORKSTATION;
+
+        public string WORKSTATION
+        {
+            get { return wORKSTATION; }
+            set
+            {
+                wORKSTATION = value;
+                this.RaisePropertyChanged("WORKSTATION");
+            }
+        }
 
         #endregion
         #region 方法绑定
@@ -1070,9 +1113,9 @@ namespace X1621LineUI.ViewModels
             this.ChangeMaterialOperateCommand = new DelegateCommand<object>(new Action<object>(this.ChangeMaterialOperateCommandExecute));
             this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            //if (System.Environment.CurrentDirectory != @"C:\Debug")
-                if (false)
-                {
+            if (System.Environment.CurrentDirectory != @"C:\Debug")
+            //if (false)
+            {
                 System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
                 System.Windows.Application.Current.Shutdown();
             }
@@ -1220,6 +1263,10 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "IsSam", IsSam.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Clean", "IsClean", IsClean.ToString());
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "SampleDStartTimeAM", GetSampleTimeString(SampleDStartTimeAM, "06:00:00"));
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "SampleDStartTimePM", GetSampleTimeString(SampleDStartTimePM, "12:00:00"));
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "SampleNStartTimeAM", GetSampleTimeString(SampleNStartTimeAM, "18:00:00"));
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "SampleNStartTimePM", GetSampleTimeString(SampleNStartTimePM, "00:00:00"));
         }
         private void SaveParameterCommandExecute()
         {
@@ -1229,6 +1276,7 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID", MACID);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID_M", MACID_M);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID", LIGHT_ID);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "WORKSTATION", WORKSTATION);
 
             Inifile.INIWriteValue(iniParameterPath, "System", "LineID1", LineID1);
             Inifile.INIWriteValue(iniParameterPath, "System", "LineID2", LineID2);
@@ -1455,19 +1503,27 @@ namespace X1621LineUI.ViewModels
             {
                 FlexID.Add(Inifile.INIGetStringValue(iniFilepath, "A", "id" + (i + 1).ToString(), "99999"));
             }
-            IsSam = bool.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "IsSam", "True"));
-            IsClean = bool.Parse(Inifile.INIGetStringValue(iniParameterPath, "Clean", "IsClean", "True"));
+            //IsSam = bool.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "IsSam", "True"));
+            IsSam = true;
+            //IsClean = bool.Parse(Inifile.INIGetStringValue(iniParameterPath, "Clean", "IsClean", "True"));
+            IsClean = true;
 
             LastSam1 = Convert.ToDateTime(Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSam1", "2019/1/1 00:00:00"));
             LastClean1 = Convert.ToDateTime(Inifile.INIGetStringValue(iniParameterPath, "Clean", "LastClean1", "2019/1/1 00:00:00"));
             NGItemCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemCount", "3"));
             NGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99"));
 
+            SampleDStartTimeAM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleDStartTimeAM", "06:00:00");
+            SampleDStartTimePM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleDStartTimePM", "12:00:00");
+            SampleNStartTimeAM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleNStartTimeAM", "18:00:00");
+            SampleNStartTimePM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleNStartTimePM", "00:00:00");
+
             PM = Inifile.INIGetStringValue(iniParameterPath, "BigData", "PM", "X1621");
             GROUP1 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "GROUP1", "NA");
             TRACK = Inifile.INIGetStringValue(iniParameterPath, "BigData", "TRACK", "NA");
             MACID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "NA");
             MACID_M = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID_M", "NA");
+            WORKSTATION = Inifile.INIGetStringValue(iniParameterPath, "BigData", "WORKSTATION", "X1621");
             LIGHT_ID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID", "NA");
 
             LineID1 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID1", "Line1");
@@ -1765,9 +1821,62 @@ namespace X1621LineUI.ViewModels
                 TestCycleAve = Math.Round((epsonRC90.YanmadeTester[0].TestCycle + epsonRC90.YanmadeTester[1].TestCycle + epsonRC90.YanmadeTester[2].TestCycle + epsonRC90.YanmadeTester[3].TestCycle) / 4, 1);
                 #endregion
                 #region 样本
-                SamDateBigin1 = lastSam1.AddHours(4);
-                SamStartDatetime1 = lastSam1.AddHours(6);
-                NextSam1 = SamStartDatetime1;
+
+                if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
+                {
+                    try
+                    {
+                        SamStartDatetime1 = Convert.ToDateTime(SampleDStartTimeAM);
+                    }
+                    catch
+                    {
+                        SamStartDatetime1 = Convert.ToDateTime("06:00:00");
+                    }
+                }
+                else
+                {
+                    if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
+                    {
+                        try
+                        {
+                            SamStartDatetime1 = Convert.ToDateTime(SampleDStartTimePM);
+                        }
+                        catch
+                        {
+                            SamStartDatetime1 = Convert.ToDateTime("12:00:00");
+                        }
+                    }
+                    else
+                    {
+                        if (DateTime.Now.Hour >= 18)
+                        {
+                            try
+                            {
+                                SamStartDatetime1 = Convert.ToDateTime(SampleNStartTimeAM);
+                            }
+                            catch
+                            {
+                                SamStartDatetime1 = Convert.ToDateTime("18:00:00");
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                SamStartDatetime1 = Convert.ToDateTime(SampleNStartTimePM);
+                            }
+                            catch
+                            {
+                                SamStartDatetime1 = Convert.ToDateTime("00:00:00");
+                            }
+                        }
+                    }
+
+                }
+
+
+                SamDateBigin1 = SamStartDatetime1.AddHours(-2);
+
                 var timeSpan = SamStartDatetime1 - DateTime.Now;
                 String fmt = (timeSpan < TimeSpan.Zero ? "\\-dd\\.hh\\:mm\\:ss" : "hh\\:mm\\:ss");
                 SpanSam1 = timeSpan.ToString(fmt);
@@ -1831,8 +1940,8 @@ namespace X1621LineUI.ViewModels
                                 SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                                 if (oraDB.isConnect())
                                 {
-                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' AND TRESULT = 'PASS' ORDER BY TESTDATE DESC,TESTTIME DESC",
-                                        MACID_M);
+                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' AND TRESULT = 'PASS' AND PARTNUM = '{1}' ORDER BY TESTDATE DESC,TESTTIME DESC",
+                                        MACID_M, PM);
                                     DataSet ds = oraDB.executeQuery(stm);
                                     DataTable dt = ds.Tables[0];
                                     if (dt.Rows.Count > 0)
@@ -1936,12 +2045,12 @@ namespace X1621LineUI.ViewModels
                             int _result = -999;
                             if (mysql.Connect())
                             {
-                                string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}')"
-                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK);
+                                string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK,WORKSTATION) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}','{10}')"
+                                    , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK, WORKSTATION);
                                 _result = mysql.executeQuery(stm);
                                 AddMessage("插入数据库灯信号" + _result.ToString());
-                                stm = string.Format("INSERT INTO HA_F4_DATA_FPY (PM,MACID,CLASS,INPUT,OUTPUT,FAIL,FPY) VALUES ('{0}','{1}','{2}','0','0','0','0')"
-                                    , PM, MACID, epsonRC90.GetBanci());
+                                stm = string.Format("INSERT INTO HA_F4_DATA_FPY (PM,MACID,CLASS,INPUT,OUTPUT,FAIL,FPY,WORKSTATION) VALUES ('{0}','{1}','{2}','0','0','0','0','{3}')"
+                                    , PM, MACID, epsonRC90.GetBanci(), WORKSTATION);
                                 _result = mysql.executeQuery(stm);
                                 AddMessage("插入数据库良率" + _result.ToString());
                             }
@@ -2250,8 +2359,8 @@ namespace X1621LineUI.ViewModels
                     Mysql mysql = new Mysql();
                     if (mysql.Connect())
                     {
-                        string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}')"
-                            , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("HHmmss"), time.TotalMinutes.ToString("F1"), epsonRC90.GetBanci());
+                        string stm = string.Format("INSERT INTO HA_F4_DATA_ALARM (PM, GROUP1,TRACK,MACID,NAME,SSTARTDATE,SSTARTTIME,SSTOPDATE,SSTOPTIME,TIME,CLASS,WORKSTATION) VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}')"
+                            , PM, GROUP1, TRACK, MACID, AlarmList[i].Content, AlarmList[i].Start.ToString("yyyyMMdd"), AlarmList[i].Start.ToString("HHmmss"), AlarmList[i].End.ToString("yyyyMMdd"), AlarmList[i].End.ToString("HHmmss"), time.TotalMinutes.ToString("F1"), epsonRC90.GetBanci(), WORKSTATION);
                         _result = mysql.executeQuery(stm);
                     }
                     mysql.DisConnect();
@@ -3490,6 +3599,19 @@ namespace X1621LineUI.ViewModels
             }
             passwordstr += ss;
             return passwordstr;
+        }
+        private string GetSampleTimeString(string string1,string defaultstring)
+        {
+            try
+            {
+                Convert.ToDateTime(string1);
+                return string1;
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+                return defaultstring;
+            }
         }
         #endregion
     }

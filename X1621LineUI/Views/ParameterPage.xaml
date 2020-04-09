@@ -69,6 +69,10 @@
                     <TextBox Width="100" Text="{Binding MACID_M}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" Text="工站" Width="60"></TextBlock>
+                    <TextBox Width="100" Text="{Binding WORKSTATION}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="1">
                     <TextBlock VerticalAlignment="Center" Text="三色灯编号" Width="60"></TextBlock>
                     <TextBox Width="100" Text="{Binding LIGHT_ID}"></TextBox>
                 </StackPanel>

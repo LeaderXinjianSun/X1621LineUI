@@ -36,6 +36,7 @@ namespace SXJLibrary
         public ExcelPackage Package;
         public ExcelWorksheet Worksheet;
         public bool MaterialFileStatus = false;
+        int[] AdminAddNum = new int[] { 0, 0, 0, 0 };
         #endregion
         #region 事件
         public delegate void PrintEventHandler(string ModelMessageStr);
@@ -361,6 +362,9 @@ namespace SXJLibrary
                                         ModelPrint("CheckMaterial;NG");
                                     }
                                     break;
+                                case "StatusOfYield":
+                                    AnswerStatusOfYield();
+                                    break;
                                 default:
                                     ModelPrint("无效指令： " + s);
                                     break;
@@ -658,13 +662,13 @@ namespace SXJLibrary
             SaveCSVfileRecord(DateTime.Now.ToString(), bar, rst, cyc + " s", index.ToString());
             if (isRecord && !Tester.IsInSampleMode && !Tester.IsInGRRMode)
             {
-                if (YanmadeTester[index - 1].TestSpan > 5)
+                if (YanmadeTester[index - 1].TestSpan > 15)
                 {
                     YanmadeTester[index - 1].UpdateNormalWithTestTimes(rst);
                 }
                 else
                 {
-                        ModelPrint(bar + " 测试时间小于5秒，不纳入良率统计");
+                        ModelPrint(bar + " 测试时间小于15秒，不纳入良率统计");
                 }
             }
             else
@@ -716,6 +720,27 @@ namespace SXJLibrary
                 }
             }
             return rs;
+        }
+        private async void AnswerStatusOfYield()
+        {
+            string str = "StatusOfYield";
+            for (int i = 0; i < 4; i++)
+            {
+                if (YanmadeTester[i].Yield_Nomal >= 95 || YanmadeTester[i].TestCount_Nomal < 100 + AdminAddNum[i])
+                {
+                    str += ";1";
+                }
+                else
+                {
+                    str += ";0";
+                    AdminAddNum[i] = YanmadeTester[i].TestCount_Nomal - 100 + (int)(YanmadeTester[i].TestCount_Nomal * 0.1);
+                }
+            }
+
+            if (TestSendStatus)
+            {
+                await TestSentNet.SendAsync(str);
+            }
         }
         #endregion
     }

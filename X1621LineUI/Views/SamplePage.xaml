@@ -183,9 +183,25 @@
                     <TextBlock Text="上一次测样本时刻"></TextBlock>
                     <TextBlock Text="{Binding LastSam1}"></TextBlock>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <!--<StackPanel Orientation="Horizontal">
                     <TextBlock Text="下一次测样本时刻"></TextBlock>
                     <TextBlock Text="{Binding NextSam1}"></TextBlock>
+                </StackPanel>-->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="上午样本时刻" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding SampleDStartTimeAM}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="下午样本时刻" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding SampleDStartTimePM}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="前夜样本时刻" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding SampleNStartTimeAM}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="后夜样本时刻" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Width="100" Text="{Binding SampleNStartTimePM}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="样本倒计时"></TextBlock>
@@ -203,11 +219,18 @@
                     <TextBlock Text="清洁倒计时"></TextBlock>
                     <TextBlock Text="{Binding SpanClean1}" Foreground="Purple" FontSize="20"></TextBlock>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10">
-                    <CheckBox IsChecked="{Binding IsSam}"  Content="样本"></CheckBox>
-                    <CheckBox IsChecked="{Binding IsClean}" Content="清洁"></CheckBox>
-                    <Button Width="60" Height="60" Margin="0,10,0,0" Content="样本开始" Command="{Binding StartSampleCommand}"></Button>
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <CheckBox IsChecked="{Binding IsSam}"  Content="样本" IsEnabled="False"></CheckBox>
+                        <CheckBox IsChecked="{Binding IsClean}" Content="清洁" IsEnabled="False"></CheckBox>
+                    </StackPanel>
+                    <Button Grid.Column="1" Width="60" Height="60" Margin="10" Content="样本开始" Command="{Binding StartSampleCommand}"></Button>
+                </Grid>
+
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="NG项目1 " VerticalAlignment="Center"></TextBlock>
