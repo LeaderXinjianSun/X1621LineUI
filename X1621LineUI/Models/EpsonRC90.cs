@@ -628,17 +628,24 @@ namespace SXJLibrary
         async void SaveRelease(int _index,string[] rststr)
         {
             int index = int.Parse(rststr[1]);
+            int resultnum = 0;
             await Task.Run(() =>
             {
                 Mysql mysql = new Mysql();
+                
                 if (mysql.Connect())
                 {
                     string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
                         + "' AND SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND PCSSER = '" + index.ToString() + "'";
-                    mysql.executeQuery(stm); 
+                    resultnum = mysql.executeQuery(stm);
+                    mysql.executeQuery("COMMIT");
                 }
+                
                 mysql.DisConnect();
+
             });
+            string resultStr = "Release;" + (resultnum > 0 ? "OK" : "NG");
+            await TestSentNet.SendAsync(resultStr);
         }
         private void TestFinishOperate(int index)
         {

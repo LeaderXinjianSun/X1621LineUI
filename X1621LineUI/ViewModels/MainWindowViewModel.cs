@@ -1239,11 +1239,17 @@ namespace X1621LineUI.ViewModels
         }
         private async void StartSampleCommandExecute()
         {
-            if (epsonRC90.TestSendStatus && !Tester.IsInSampleMode && IsSam)
+            metro.ChangeAccent("Orange");
+            var r = await metro.ShowConfirm("确认","请确认手动测样本吗?");
+            if (r)
             {
-                await epsonRC90.TestSentNet.SendAsync("StartSample");
-                AddMessage("StartSample");
+                if (epsonRC90.TestSendStatus && !Tester.IsInSampleMode && IsSam)
+                {
+                    await epsonRC90.TestSentNet.SendAsync("StartSample");
+                    AddMessage("StartSample");
+                }
             }
+            metro.ChangeAccent("Blue");
         }
         private void SaveSamParamCommandExecute()
         {
@@ -1881,8 +1887,8 @@ namespace X1621LineUI.ViewModels
                 String fmt = (timeSpan < TimeSpan.Zero ? "\\-dd\\.hh\\:mm\\:ss" : "hh\\:mm\\:ss");
                 SpanSam1 = timeSpan.ToString(fmt);
 
-                SampleGridVisibility = (DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam ? "Visible" : "Collapsed";
-                if ((DateTime.Now - SamDateBigin1).TotalSeconds > 0 && IsSam)
+                SampleGridVisibility = (DateTime.Now - SamDateBigin1).TotalSeconds > 0 && (LastSam1 - SamDateBigin1).TotalSeconds < 0 && IsSam ? "Visible" : "Collapsed";
+                if ((DateTime.Now - SamDateBigin1).TotalSeconds > 0 && (LastSam1 - SamDateBigin1).TotalSeconds < 0 && IsSam)
                 {
                     if (Tester.IsInSampleMode)
                     {
