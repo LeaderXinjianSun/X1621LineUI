@@ -635,8 +635,8 @@ namespace SXJLibrary
                 
                 if (mysql.Connect())
                 {
-                    string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
-                        + "' AND SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND PCSSER = '" + index.ToString() + "'";
+                    string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
+                        + "' AND PCSSER = '" + index.ToString() + "'";
                     resultnum = mysql.executeQuery(stm);
                     mysql.executeQuery("COMMIT");
                 }

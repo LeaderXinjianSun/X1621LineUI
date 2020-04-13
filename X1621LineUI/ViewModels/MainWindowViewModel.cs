@@ -1090,7 +1090,7 @@ namespace X1621LineUI.ViewModels
         Scan scan1, scan2;
         //int CardStatus = 1;
         private EpsonRC90 epsonRC90; string LastBanci;
-        DateTime SamStartDatetime1, SamDateBigin1;
+        DateTime SamStartDatetime1, SamNextDatetime1, SamDateBigin1;
         int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000; bool[] X40;
         List<AlarmData> AlarmList = new List<AlarmData>(); string CurrentAlarm = "";
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\X1621串线上料机报警.xlsx";
@@ -1114,7 +1114,7 @@ namespace X1621LineUI.ViewModels
             this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
-            //if (false)
+                //if (false)
             {
                 System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
                 System.Windows.Application.Current.Shutdown();
@@ -1833,10 +1833,12 @@ namespace X1621LineUI.ViewModels
                     try
                     {
                         SamStartDatetime1 = Convert.ToDateTime(SampleDStartTimeAM);
+                        SamNextDatetime1 = Convert.ToDateTime(SampleDStartTimePM);
                     }
                     catch
                     {
                         SamStartDatetime1 = Convert.ToDateTime("06:00:00");
+                        SamNextDatetime1 = Convert.ToDateTime("12:00:00");
                     }
                 }
                 else
@@ -1846,10 +1848,12 @@ namespace X1621LineUI.ViewModels
                         try
                         {
                             SamStartDatetime1 = Convert.ToDateTime(SampleDStartTimePM);
+                            SamNextDatetime1 = Convert.ToDateTime(SampleNStartTimeAM);
                         }
                         catch
                         {
                             SamStartDatetime1 = Convert.ToDateTime("12:00:00");
+                            SamNextDatetime1 = Convert.ToDateTime("18:00:00");
                         }
                     }
                     else
@@ -1859,10 +1863,12 @@ namespace X1621LineUI.ViewModels
                             try
                             {
                                 SamStartDatetime1 = Convert.ToDateTime(SampleNStartTimeAM);
+                                SamNextDatetime1 = Convert.ToDateTime(SampleNStartTimePM).AddDays(1);
                             }
                             catch
                             {
                                 SamStartDatetime1 = Convert.ToDateTime("18:00:00");
+                                SamNextDatetime1 = Convert.ToDateTime("00:00:00").AddDays(1);
                             }
                         }
                         else
@@ -1870,10 +1876,12 @@ namespace X1621LineUI.ViewModels
                             try
                             {
                                 SamStartDatetime1 = Convert.ToDateTime(SampleNStartTimePM);
+                                SamNextDatetime1 = Convert.ToDateTime(SampleDStartTimeAM);
                             }
                             catch
                             {
                                 SamStartDatetime1 = Convert.ToDateTime("00:00:00");
+                                SamNextDatetime1 = Convert.ToDateTime("06:00:00");
                             }
                         }
                     }
@@ -1883,7 +1891,7 @@ namespace X1621LineUI.ViewModels
 
                 SamDateBigin1 = SamStartDatetime1.AddHours(-2);
 
-                var timeSpan = SamStartDatetime1 - DateTime.Now;
+                var timeSpan = LastSam1 > SamStartDatetime1 ? SamNextDatetime1 - DateTime.Now : SamStartDatetime1 - DateTime.Now;
                 String fmt = (timeSpan < TimeSpan.Zero ? "\\-dd\\.hh\\:mm\\:ss" : "hh\\:mm\\:ss");
                 SpanSam1 = timeSpan.ToString(fmt);
 
