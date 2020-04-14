@@ -1622,6 +1622,7 @@ namespace X1621LineUI.ViewModels
                 MessageStr += "\n";
             }
             MessageStr += System.DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + " " + str;
+            RunLog(str);
         }
         private async void UIRun()
         {
@@ -2662,7 +2663,10 @@ namespace X1621LineUI.ViewModels
                             stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
-                            mysql.executeQuery(stm);
+                            
+                            int rst = mysql.executeQuery(stm);
+                            AddMessage("板" + epsonRC90.BordBarcode[0] + "绑定结果 " + rst.ToString());
+                            epsonRC90.BordBarcode[0] = "Empty";
                         }
                         mysql.DisConnect();
                         Fx5u_mid.SetM("M2799", false);
@@ -2688,7 +2692,10 @@ namespace X1621LineUI.ViewModels
                             stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
-                            mysql.executeQuery(stm);
+                            
+                            int rst = mysql.executeQuery(stm);
+                            AddMessage("板" + epsonRC90.BordBarcode[1] + "绑定结果 " + rst.ToString());
+                            epsonRC90.BordBarcode[1] = "Empty";
                         }
                         mysql.DisConnect();
                         Fx5u_mid.SetM("M2804", false);
@@ -2901,7 +2908,17 @@ namespace X1621LineUI.ViewModels
                 Mysql mysql = new Mysql();
                 if (mysql.Connect())
                 {
-                    string stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC LIMIT 0,5";
+                    string stm;
+                    if (Station == 1)
+                    {
+                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + barcode + "','OFF')";
+
+                        int rst = mysql.executeQuery(stm);
+                        AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
+                    }
+
+
+                    stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC LIMIT 0,5";
                     DataSet ds = mysql.Select(stm);
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
@@ -3093,7 +3110,16 @@ namespace X1621LineUI.ViewModels
                 Mysql mysql = new Mysql();
                 if (mysql.Connect())
                 {
-                    string stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC LIMIT 0,5";
+                    string stm;
+                    if (Station == 1)
+                    {
+                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + barcode + "','OFF')";
+
+                        int rst = mysql.executeQuery(stm);
+                        AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
+                    }
+
+                    stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC LIMIT 0,5";
                     DataSet ds = mysql.Select(stm);
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
@@ -3626,6 +3652,43 @@ namespace X1621LineUI.ViewModels
                 AddMessage(ex.Message);
                 return defaultstring;
             }
+        }
+        void RunLog(string str)
+        {
+            try
+            {
+                string tempSaveFilee5 = System.AppDomain.CurrentDomain.BaseDirectory + @"RunLog";
+                DateTime dtim = DateTime.Now;
+                string DateNow = dtim.ToString("yyyy/MM/dd");
+                string TimeNow = dtim.ToString("HH:mm:ss");
+
+                if (!Directory.Exists(tempSaveFilee5))
+                {
+                    Directory.CreateDirectory(tempSaveFilee5);  //创建目录 
+                }
+
+                if (File.Exists(tempSaveFilee5 + "\\" + DateNow.Replace("/", "") + ".txt"))
+                {
+                    //第一种方法：
+                    FileStream fs = new FileStream(tempSaveFilee5 + "\\" + DateNow.Replace("/", "") + ".txt", FileMode.Append);
+                    StreamWriter sw = new StreamWriter(fs);
+                    sw.WriteLine("TTIME：" + TimeNow + " 执行事件：" + str);
+                    sw.Dispose();
+                    fs.Dispose();
+                    sw.Close();
+                    fs.Close();
+                }
+                else
+                {
+                    //不存在就新建一个文本文件,并写入一些内容 
+                    StreamWriter sw;
+                    sw = File.CreateText(tempSaveFilee5 + "\\" + DateNow.Replace("/", "") + ".txt");
+                    sw.WriteLine("TTIME：" + TimeNow + " 执行事件：" + str);
+                    sw.Dispose();
+                    sw.Close();
+                }
+            }
+            catch { }
         }
         #endregion
     }
