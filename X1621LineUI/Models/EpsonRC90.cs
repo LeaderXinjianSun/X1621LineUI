@@ -613,15 +613,15 @@ namespace SXJLibrary
                 BarInfo[index][i].TDate = DateTime.Now.ToString("yyyyMMdd");
                 BarInfo[index][i].TTime = DateTime.Now.ToString("HHmmss");
                 string machinestr = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
-                Mysql mysql = new Mysql();
-                if (mysql.Connect())
+                Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                if (oraDB.isConnect())
                 {
                     string stm = "INSERT INTO BARBIND (MACHINE,SCBARCODE,SCBODBAR,SDATE,STIME,PCSSER,RESULT) VALUES ('" + machinestr + "','" + BarInfo[index][i].Barcode + "','"
                                     + BordBarcode[index] + "','" + BarInfo[index][i].TDate + "','" + BarInfo[index][i].TTime + "','" + (i + 1).ToString() + "','" + BarInfo[index][i].Status.ToString() + "')";
-                    mysql.executeQuery(stm);
-                    mysql.executeQuery("COMMIT");
+                    oraDB.executeNonQuery(stm);
+                    oraDB.executeNonQuery("COMMIT");
                 }
-                mysql.DisConnect();
+                oraDB.disconnect();
             }
         }
         //放料到载盘；条码从夹爪转移到载盘
@@ -631,17 +631,15 @@ namespace SXJLibrary
             int resultnum = 0;
             await Task.Run(() =>
             {
-                Mysql mysql = new Mysql();
-                
-                if (mysql.Connect())
+                Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                if (oraDB.isConnect())
                 {
                     string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
                         + "' AND PCSSER = '" + index.ToString() + "'";
-                    resultnum = mysql.executeQuery(stm);
-                    mysql.executeQuery("COMMIT");
+                    resultnum = oraDB.executeNonQuery(stm);
+                    oraDB.executeNonQuery("COMMIT");
                 }
-                
-                mysql.DisConnect();
+                oraDB.disconnect();
 
             });
             string resultStr = "Release;" + (resultnum > 0 ? "OK" : "NG");
