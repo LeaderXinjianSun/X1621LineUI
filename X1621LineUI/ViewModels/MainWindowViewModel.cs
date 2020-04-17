@@ -1380,9 +1380,9 @@ namespace X1621LineUI.ViewModels
                 await Task.Run(()=> {
                     try
                     {
-                        
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string lineid = "";
                             switch (p.ToString())
@@ -1397,11 +1397,10 @@ namespace X1621LineUI.ViewModels
                                     break;
                             }
                             string stm = "UPDATE BODLINE SET Station9 = 0, Station8 = 0, Station7 = 0,Station10 = 0,Station11 = 0 WHERE LineID = '" + lineid + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("清空轨道" + lineid);
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     catch (Exception ex)
                     {
@@ -2562,9 +2561,9 @@ namespace X1621LineUI.ViewModels
                                 break;
                             default:
                                 break;
-                        }                       
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        }
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             switch (Station)
                             {
@@ -2583,10 +2582,9 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                         epsonRC90.BordBarcode[0] = epsonRC90.TemporaryBordBarcode[0];
                         epsonRC90.ResetBord(0);
                         //stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
@@ -2609,9 +2607,9 @@ namespace X1621LineUI.ViewModels
                             default:
                                 break;
                         }
-                       
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             switch (Station)
                             {
@@ -2630,10 +2628,9 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                         epsonRC90.BordBarcode[1] = epsonRC90.TemporaryBordBarcode[1];
                         epsonRC90.ResetBord(1);
                         //stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
@@ -2665,11 +2662,11 @@ namespace X1621LineUI.ViewModels
                         }
                         
                         SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (oraDB.isConnect() && mysql.Connect())
                         {
                             stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
 
                             int rst = oraDB.executeNonQuery(stm);
@@ -2678,6 +2675,7 @@ namespace X1621LineUI.ViewModels
                             epsonRC90.BordBarcode[0] = "Empty";
                             
                         }
+                        mysql.DisConnect();
                         oraDB.disconnect();
                         Fx5u_mid.SetM("M2799", false);
 
@@ -2698,11 +2696,11 @@ namespace X1621LineUI.ViewModels
                         }
                         
                         SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (oraDB.isConnect() && mysql.Connect())
                         {
                             stm = "UPDATE BODLINE SET Station" + Station.ToString() + " = 0 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
 
                             int rst = oraDB.executeNonQuery(stm);
@@ -2727,9 +2725,9 @@ namespace X1621LineUI.ViewModels
                     if (Fx5u_mid.ReadM("M2810"))
                     {
                         AddMessage("测试机A屏蔽");
-                        
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             switch (Station)
                             {
@@ -2744,18 +2742,18 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
+
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                         Fx5u_mid.SetM("M2810", false);
                     }
                     if (Fx5u_mid.ReadM("M2812"))
                     {
                         AddMessage("测试机A取消屏蔽");
-                        
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             switch (Station)
                             {
@@ -2770,19 +2768,19 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
+
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                         Fx5u_mid.SetM("M2812", false);
                     }
                     //B轨道
                     if (Fx5u_mid.ReadM("M2811"))
                     {
                         AddMessage("测试机B屏蔽");
-                        
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             switch (Station)
                             {
@@ -2797,18 +2795,18 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
+
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                         Fx5u_mid.SetM("M2811", false);
                     }
                     if (Fx5u_mid.ReadM("M2813"))
                     {
                         AddMessage("测试机B取消屏蔽");
-                        
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             switch (Station)
                             {
@@ -2823,10 +2821,10 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
+
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                         Fx5u_mid.SetM("M2813", false);
                     }
                 }
@@ -3028,11 +3026,11 @@ namespace X1621LineUI.ViewModels
             string lineid = lineIndex == 0 ? LineID1 : LineID2;
             try
             {
-                SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                if (oraDB.isConnect())
+                Mysql mysql = new Mysql();
+                if (mysql.Connect())
                 {
                     string stm = "SELECT * FROM BODLINE WHERE LineID = '" + lineid + "' ORDER BY SIDATE DESC";
-                    DataSet ds = oraDB.executeQuery(stm);
+                    DataSet ds = mysql.Select(stm);
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
                     {
@@ -3067,7 +3065,7 @@ namespace X1621LineUI.ViewModels
                         }
                     }
                 }
-                oraDB.disconnect();
+                mysql.DisConnect();
             }
             catch (Exception ex)
             {
@@ -3079,11 +3077,11 @@ namespace X1621LineUI.ViewModels
             string lineid = lineIndex == 0 ? LineID1 : LineID2;
             try
             {
-                SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                if (oraDB.isConnect())
+                Mysql mysql = new Mysql();
+                if (mysql.Connect())
                 {
                     string stm = "SELECT * FROM BODLINE WHERE LineID = '" + lineid + "' ORDER BY SIDATE DESC";
-                    DataSet ds = oraDB.executeQuery(stm);
+                    DataSet ds = mysql.Select(stm);
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
                     {
@@ -3118,7 +3116,7 @@ namespace X1621LineUI.ViewModels
                         }
                     }
                 }
-                oraDB.disconnect();
+                mysql.DisConnect();
             }
             catch (Exception ex)
             {
@@ -3233,12 +3231,12 @@ namespace X1621LineUI.ViewModels
                 System.Threading.Thread.Sleep(10000);
                 try
                 {
-                    SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                    if (oraDB.isConnect())
+                    Mysql mysql = new Mysql();
+                    if (mysql.Connect())
                     {
                         //【轨道A】
                         string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID1 + "' ORDER BY SIDATE DESC";
-                        DataSet ds = oraDB.executeQuery(stm);
+                        DataSet ds = mysql.Select(stm);
                         DataTable dt = ds.Tables["table0"];
                         if (dt.Rows.Count > 0)
                         {
@@ -3254,15 +3252,14 @@ namespace X1621LineUI.ViewModels
                                 Fx5u_mid.SetM("M2796", false);
                                 Fx5u_mid.SetM("M2596", false);
                                 stm = "UPDATE BODLINE SET Station9 = 1 WHERE LineID = '" + LineID1 + "'";
-                                oraDB.executeNonQuery(stm);
-                                oraDB.executeNonQuery("COMMIT");
+                                mysql.executeQuery(stm);
                                 AddMessage("线A进入1块板");
                             }
                         }
 
                         //【轨道B】
                         stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID2 + "' ORDER BY SIDATE DESC";
-                        ds = oraDB.executeQuery(stm);
+                        ds = mysql.Select(stm);
                         dt = ds.Tables["table0"];
                         if (dt.Rows.Count > 0)
                         {
@@ -3278,13 +3275,12 @@ namespace X1621LineUI.ViewModels
                                 Fx5u_mid.SetM("M2801", false);
                                 Fx5u_mid.SetM("M2601", false);
                                 stm = "UPDATE BODLINE SET Station9 = Station9 + 1 WHERE LineID = '" + LineID2 + "'";
-                                oraDB.executeNonQuery(stm);
-                                oraDB.executeNonQuery("COMMIT");
+                                mysql.executeQuery(stm);
                                 AddMessage("线B进入1块板");
                             }
                         }
                     }
-                    oraDB.disconnect();
+                    mysql.DisConnect();
                 }
                 catch (Exception ex)
                 {
@@ -3307,11 +3303,11 @@ namespace X1621LineUI.ViewModels
                     if (cycle1 > 20)
                     {
                         cycle1 = 0;
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID1 + "' ORDER BY SIDATE DESC";
-                            DataSet ds = oraDB.executeQuery(stm);
+                            DataSet ds = mysql.Select(stm);
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
@@ -3332,58 +3328,55 @@ namespace X1621LineUI.ViewModels
 
                             }
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                    
                     if (Fx5u_left2.ReadM("M2798"))//存储响应【A轨道】
                     {
                         Fx5u_left2.SetM("M2798", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station9 = 0, Station7 = Station7 + 1 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2799"))//放新板响应【A轨道】
                     {
                         Fx5u_left2.SetM("M2799", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station9 = 0, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块新板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2800"))//放存储板响应【A轨道】
                     {
                         Fx5u_left2.SetM("M2800", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块存储板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     //B轨道
                     cycle2++;
                     if (cycle2 > 20)
                     {
                         cycle2 = 0;
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID2 + "' ORDER BY SIDATE DESC";
-                            DataSet ds = oraDB.executeQuery(stm);
+                            DataSet ds = mysql.Select(stm);
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
@@ -3404,47 +3397,44 @@ namespace X1621LineUI.ViewModels
 
                             }
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     
                     if (Fx5u_left2.ReadM("M2804"))//存储响应【B轨道】
                     {
                         Fx5u_left2.SetM("M2804", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station9 = 0, Station7 = Station7 + 1 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2805"))//放新板响应【B轨道】
                     {
                         Fx5u_left2.SetM("M2805", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station9 = 0, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块新板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2806"))//放存储板响应【B轨道】
                     {
                         Fx5u_left2.SetM("M2806", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块存储板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                 }
                 catch (Exception ex)
@@ -3467,11 +3457,11 @@ namespace X1621LineUI.ViewModels
                     if (cycle1 > 20)
                     {
                         cycle1 = 0;
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID1 + "' ORDER BY SIDATE DESC";
-                            DataSet ds = oraDB.executeQuery(stm);
+                            DataSet ds = mysql.Select(stm);
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
@@ -3492,47 +3482,44 @@ namespace X1621LineUI.ViewModels
 
                             }
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     
                     if (Fx5u_left2.ReadM("M2798"))//存储响应【A轨道】
                     {
                         Fx5u_left2.SetM("M2798", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station8 = Station8 + 1 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台2存储1块板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2799"))//放新板响应【A轨道】
                     {
                         Fx5u_left2.SetM("M2799", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = 1 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块新板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2800"))//放存储板响应【A轨道】
                     {
                         Fx5u_left2.SetM("M2800", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = 1 WHERE LineID = '" + LineID1 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块存储板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     //B轨道
                     cycle2++;
@@ -3540,11 +3527,11 @@ namespace X1621LineUI.ViewModels
                     if (cycle2 > 20)
                     {
                         cycle2 = 0;
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "SELECT * FROM BODLINE WHERE LineID = '" + LineID2 + "' ORDER BY SIDATE DESC";
-                            DataSet ds = oraDB.executeQuery(stm);
+                            DataSet ds = mysql.Select(stm);
                             DataTable dt = ds.Tables["table0"];
                             if (dt.Rows.Count > 0)
                             {
@@ -3565,47 +3552,44 @@ namespace X1621LineUI.ViewModels
 
                             }
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     
                     if (Fx5u_left2.ReadM("M2804"))//存储响应【B轨道】
                     {
                         Fx5u_left2.SetM("M2804", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station8 = Station8 + 1 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台2存储1块板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2805"))//放新板响应【B轨道】
                     {
                         Fx5u_left2.SetM("M2805", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station11 = 1 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块新板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                     if (Fx5u_left2.ReadM("M2806"))//放存储板响应【B轨道】
                     {
                         Fx5u_left2.SetM("M2806", false);
-                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                        if (oraDB.isConnect())
+                        Mysql mysql = new Mysql();
+                        if (mysql.Connect())
                         {
                             string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = 1 WHERE LineID = '" + LineID2 + "'";
-                            oraDB.executeNonQuery(stm);
-                            oraDB.executeNonQuery("COMMIT");
+                            mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块存储板");
                         }
-                        oraDB.disconnect();
+                        mysql.DisConnect();
                     }
                 }
                 catch (Exception ex)
