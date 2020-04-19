@@ -51,30 +51,32 @@
         <GroupBox Header="大数据" Grid.Column="1">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <TextBlock VerticalAlignment="Center" Text="机种" Width="60"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="机种" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding PM}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <TextBlock VerticalAlignment="Center" Text="组别" Width="60"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="组别" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding GROUP1}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <TextBlock VerticalAlignment="Center" Text="轨道" Width="60"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="轨道" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding TRACK}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <TextBlock VerticalAlignment="Center" Text="机台编号" Width="60"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="机台编号" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding MACID}"></TextBox>
-                    <TextBlock VerticalAlignment="Center" Text="母机台编号" Width="60"></TextBlock>
-                    <TextBox Width="100" Text="{Binding MACID_M}"></TextBox>
+                    <!--<TextBlock VerticalAlignment="Center" Text="母机台编号" Width="70"></TextBlock>
+                    <TextBox Width="100" Text="{Binding MACID_M}"></TextBox>-->
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <TextBlock VerticalAlignment="Center" Text="工站" Width="60"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="工站" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding WORKSTATION}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <TextBlock VerticalAlignment="Center" Text="三色灯编号" Width="60"></TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="三色灯编号1" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding LIGHT_ID}"></TextBox>
+                    <TextBlock VerticalAlignment="Center" Text="三色灯编号2" Width="70"></TextBlock>
+                    <TextBox Width="100" Text="{Binding LIGHT_ID2}"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <Button Content="Alarm" Width="60" Height="30" IsEnabled="{Binding AlarmButtonIsEnabled}" Command="{Binding BigDataAlarmGetCommand}"></Button>

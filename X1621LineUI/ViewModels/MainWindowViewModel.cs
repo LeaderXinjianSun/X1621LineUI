@@ -837,6 +837,18 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("LIGHT_ID");
             }
         }
+        private string lIGHT_ID2;
+
+        public string LIGHT_ID2
+        {
+            get { return lIGHT_ID2; }
+            set
+            {
+                lIGHT_ID2 = value;
+                this.RaisePropertyChanged("LIGHT_ID2");
+            }
+        }
+
         private string siteID;
 
         public string SiteID
@@ -881,17 +893,17 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("LotName");
             }
         }
-        private string mACID_M;
+        //private string mACID_M;
 
-        public string MACID_M
-        {
-            get { return mACID_M; }
-            set
-            {
-                mACID_M = value;
-                this.RaisePropertyChanged("MACID_M");
-            }
-        }
+        //public string MACID_M
+        //{
+        //    get { return mACID_M; }
+        //    set
+        //    {
+        //        mACID_M = value;
+        //        this.RaisePropertyChanged("MACID_M");
+        //    }
+        //}
         private string alarmGridVisibility;
 
         public string AlarmGridVisibility
@@ -1280,8 +1292,9 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "BigData", "GROUP1", GROUP1);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "TRACK", TRACK);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID", MACID);
-            Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID_M", MACID_M);
+            //Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID_M", MACID_M);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID", LIGHT_ID);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID2", LIGHT_ID2);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "WORKSTATION", WORKSTATION);
 
             Inifile.INIWriteValue(iniParameterPath, "System", "LineID1", LineID1);
@@ -1335,7 +1348,7 @@ namespace X1621LineUI.ViewModels
                     Mysql mysql = new Mysql();
                     if (mysql.Connect())
                     {
-                        string stm = string.Format("SELECT * FROM HA_F4_DATA_ALARM WHERE PM = '{0}' AND MACID = '{1}' AND CLASS = '{2}'", PM, MACID, epsonRC90.GetBanci());
+                        string stm = string.Format("SELECT * FROM HA_F4_DATA_ALARM WHERE PM = '{0}' AND MACID = '{1}' AND CLASS = '{2}' AND GROUP1 = '{3}' AND TRACK = '{4}' AND WORKSTATION = '{5}'", PM, MACID, epsonRC90.GetBanci(), GROUP1, TRACK, WORKSTATION);
                         DataSet ds = mysql.Select(stm);
 
                         DataTable dt = ds.Tables["table0"];
@@ -1529,9 +1542,10 @@ namespace X1621LineUI.ViewModels
             GROUP1 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "GROUP1", "NA");
             TRACK = Inifile.INIGetStringValue(iniParameterPath, "BigData", "TRACK", "NA");
             MACID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "NA");
-            MACID_M = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID_M", "NA");
+            //MACID_M = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID_M", "NA");
             WORKSTATION = Inifile.INIGetStringValue(iniParameterPath, "BigData", "WORKSTATION", "X1621");
             LIGHT_ID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID", "NA");
+            LIGHT_ID2 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID2", "NA");
 
             LineID1 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID1", "Line1");
             LineID2 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID2", "Line2");
@@ -1956,8 +1970,8 @@ namespace X1621LineUI.ViewModels
                                 SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                                 if (oraDB.isConnect())
                                 {
-                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE MNO = '{0}' AND TRESULT = 'PASS' AND PARTNUM = '{1}' ORDER BY TESTDATE DESC,TESTTIME DESC",
-                                        MACID_M, PM);
+                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE TRESULT = 'PASS' AND PARTNUM LIKE '%{0}%' ORDER BY TESTDATE DESC,TESTTIME DESC",
+                                        PM);
                                     DataSet ds = oraDB.executeQuery(stm);
                                     DataTable dt = ds.Tables[0];
                                     if (dt.Rows.Count > 0)
@@ -2064,9 +2078,12 @@ namespace X1621LineUI.ViewModels
                                 string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK,WORKSTATION) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}','{10}')"
                                     , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK, WORKSTATION);
                                 _result = mysql.executeQuery(stm);
+                                stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK,WORKSTATION) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}','{10}')"
+    , PM, LIGHT_ID2, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK, WORKSTATION);
+                                _result = mysql.executeQuery(stm);
                                 AddMessage("插入数据库灯信号" + _result.ToString());
-                                stm = string.Format("INSERT INTO HA_F4_DATA_FPY (PM,MACID,CLASS,INPUT,OUTPUT,FAIL,FPY,WORKSTATION) VALUES ('{0}','{1}','{2}','0','0','0','0','{3}')"
-                                    , PM, MACID, epsonRC90.GetBanci(), WORKSTATION);
+                                stm = string.Format("INSERT INTO HA_F4_DATA_FPY (PM,MACID,CLASS,INPUT,OUTPUT,FAIL,FPY,WORKSTATION,GROUP1,TRACK) VALUES ('{0}','{1}','{2}','0','0','0','0','{3}','{4}','{5}')"
+                                    , PM, MACID, epsonRC90.GetBanci(), WORKSTATION, GROUP1, TRACK);
                                 _result = mysql.executeQuery(stm);
                                 AddMessage("插入数据库良率" + _result.ToString());
                             }
@@ -2172,9 +2189,13 @@ namespace X1621LineUI.ViewModels
                             if (mysql.Connect())
                             {
                                 string currentAlarm = LampColor == 4 ? CurrentAlarm : "NA";
-                                string stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}'"
+                                string stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}' AND GROUP1 = '{13}' AND TRACK = '{14}' AND WORKSTATION = '{15}'"
                                     , PM, LIGHT_ID, MACID, LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
-                                    , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"));
+                                    , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"), GROUP1, TRACK, WORKSTATION);
+                                _result = mysql.executeQuery(stm);
+                                stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}' AND GROUP1 = '{13}' AND TRACK = '{14}' AND WORKSTATION = '{15}'"
+    , PM, LIGHT_ID2, MACID, LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
+    , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"), GROUP1, TRACK, WORKSTATION);
                                 _result = mysql.executeQuery(stm);
                             }
                             mysql.DisConnect();
@@ -2211,8 +2232,8 @@ namespace X1621LineUI.ViewModels
                             if (mysql.Connect())
                             {
                                 double fpy = TestCountInput > 0 ? (double)TestCountOutput / TestCountInput * 100 : 0;
-                                string stm = string.Format("UPDATE HA_F4_DATA_FPY SET INPUT = '{3}',OUTPUT = '{4}',FAIL = '{5}',FPY = '{6}' WHERE PM = '{0}' AND MACID = '{1}' AND CLASS = '{2}'"
-                                    , PM, MACID, epsonRC90.GetBanci(), TestCountInput.ToString(), TestCountOutput.ToString(), (TestCountInput - TestCountOutput).ToString(), fpy.ToString("F1"));
+                                string stm = string.Format("UPDATE HA_F4_DATA_FPY SET INPUT = '{3}',OUTPUT = '{4}',FAIL = '{5}',FPY = '{6}' WHERE PM = '{0}' AND MACID = '{1}' AND CLASS = '{2}' AND GROUP1 = '{7}' AND TRACK = '{8}' AND WORKSTATION = '{9}'"
+                                    , PM, MACID, epsonRC90.GetBanci(), TestCountInput.ToString(), TestCountOutput.ToString(), (TestCountInput - TestCountOutput).ToString(), fpy.ToString("F1"), GROUP1, TRACK, WORKSTATION);
                                 _result = mysql.executeQuery(stm);
                             }
                             mysql.DisConnect();
@@ -2363,9 +2384,9 @@ namespace X1621LineUI.ViewModels
                     AddMessage("AlarmAction " + ex.Message);
                 }
             }
-            AlarmList[i].End = DateTime.Now;
+            AlarmList[i].End = DateTime.Now - LampGreenSw.Elapsed;
             AddMessage(AlarmList[i].Code + AlarmList[i].Content + "解除");
-            TimeSpan time = AlarmList[i].End - AlarmList[i].Start - LampGreenSw.Elapsed;
+            TimeSpan time = AlarmList[i].End - AlarmList[i].Start;
 
             string result = await Task<string>.Run(() =>
             {
@@ -2939,7 +2960,7 @@ namespace X1621LineUI.ViewModels
                     }
 
 
-                    stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' AND ROWNUM <= 5 ORDER BY SIDATE DESC";
+                    stm = "SELECT * FROM (SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 5 ";
                     DataSet ds = oraDB.executeQuery(stm);
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
@@ -3141,7 +3162,7 @@ namespace X1621LineUI.ViewModels
                         AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
                     }
 
-                    stm = "SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' AND ROWNUM <= 5 ORDER BY SIDATE DESC";
+                    stm = "SELECT * FROM (SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 5";
                     DataSet ds = oraDB.executeQuery(stm);
                     DataTable dt = ds.Tables["table0"];
                     if (dt.Rows.Count > 0)
