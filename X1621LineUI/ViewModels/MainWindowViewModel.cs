@@ -893,17 +893,17 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("LotName");
             }
         }
-        //private string mACID_M;
+        private string mACID_M;
 
-        //public string MACID_M
-        //{
-        //    get { return mACID_M; }
-        //    set
-        //    {
-        //        mACID_M = value;
-        //        this.RaisePropertyChanged("MACID_M");
-        //    }
-        //}
+        public string MACID_M
+        {
+            get { return mACID_M; }
+            set
+            {
+                mACID_M = value;
+                this.RaisePropertyChanged("MACID_M");
+            }
+        }
         private string alarmGridVisibility;
 
         public string AlarmGridVisibility
@@ -1126,7 +1126,7 @@ namespace X1621LineUI.ViewModels
             this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
-                //if (false)
+            //if (false)
             {
                 System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
                 System.Windows.Application.Current.Shutdown();
@@ -1292,7 +1292,7 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "BigData", "GROUP1", GROUP1);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "TRACK", TRACK);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID", MACID);
-            //Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID_M", MACID_M);
+            Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID_M", MACID_M);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID", LIGHT_ID);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID2", LIGHT_ID2);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "WORKSTATION", WORKSTATION);
@@ -1542,7 +1542,7 @@ namespace X1621LineUI.ViewModels
             GROUP1 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "GROUP1", "NA");
             TRACK = Inifile.INIGetStringValue(iniParameterPath, "BigData", "TRACK", "NA");
             MACID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "NA");
-            //MACID_M = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID_M", "NA");
+            MACID_M = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID_M", "NA");
             WORKSTATION = Inifile.INIGetStringValue(iniParameterPath, "BigData", "WORKSTATION", "X1621");
             LIGHT_ID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID", "NA");
             LIGHT_ID2 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID2", "NA");
@@ -1970,8 +1970,8 @@ namespace X1621LineUI.ViewModels
                                 SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                                 if (oraDB.isConnect())
                                 {
-                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE TRESULT = 'PASS' AND PARTNUM LIKE '%{0}%' ORDER BY TESTDATE DESC,TESTTIME DESC",
-                                        PM);
+                                    string stm = string.Format("SELECT * FROM CFT_DATA WHERE TRESULT = 'PASS' AND CFT01 LIKE '%{0}%' AND MNO = '{1}' ORDER BY TESTDATE DESC,TESTTIME DESC",
+                                        PM, PM + GROUP1 + TRACK + MACID_M);
                                     DataSet ds = oraDB.executeQuery(stm);
                                     DataTable dt = ds.Tables[0];
                                     if (dt.Rows.Count > 0)
