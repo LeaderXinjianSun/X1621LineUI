@@ -605,45 +605,61 @@ namespace SXJLibrary
         }
         public void ResetBord(int index)
         {
-            for (int i = 0; i < 15; i++)
+            try
             {
-                BarInfo[index][i].Barcode = "FAIL";
-                BarInfo[index][i].BordBarcode = BordBarcode[index];
-                BarInfo[index][i].Status = 0;
-                BarInfo[index][i].TDate = DateTime.Now.ToString("yyyyMMdd");
-                BarInfo[index][i].TTime = DateTime.Now.ToString("HHmmss");
-                string machinestr = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
-                Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                if (oraDB.isConnect())
+                for (int i = 0; i < 15; i++)
                 {
-                    string stm = "INSERT INTO BARBIND (MACHINE,SCBARCODE,SCBODBAR,SDATE,STIME,PCSSER,RESULT) VALUES ('" + machinestr + "','" + BarInfo[index][i].Barcode + "','"
-                                    + BordBarcode[index] + "','" + BarInfo[index][i].TDate + "','" + BarInfo[index][i].TTime + "','" + (i + 1).ToString() + "','" + BarInfo[index][i].Status.ToString() + "')";
-                    oraDB.executeNonQuery(stm);
-                    oraDB.executeNonQuery("COMMIT");
+                    BarInfo[index][i].Barcode = "FAIL";
+                    BarInfo[index][i].BordBarcode = BordBarcode[index];
+                    BarInfo[index][i].Status = 0;
+                    BarInfo[index][i].TDate = DateTime.Now.ToString("yyyyMMdd");
+                    BarInfo[index][i].TTime = DateTime.Now.ToString("HHmmss");
+                    string machinestr = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
+                    Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                    if (oraDB.isConnect())
+                    {
+                        string stm = "INSERT INTO BARBIND (MACHINE,SCBARCODE,SCBODBAR,SDATE,STIME,PCSSER,RESULT) VALUES ('" + machinestr + "','" + BarInfo[index][i].Barcode + "','"
+                                        + BordBarcode[index] + "','" + BarInfo[index][i].TDate + "','" + BarInfo[index][i].TTime + "','" + (i + 1).ToString() + "','" + BarInfo[index][i].Status.ToString() + "')";
+                        oraDB.executeNonQuery(stm);
+                        oraDB.executeNonQuery("COMMIT");
+                    }
+                    oraDB.disconnect();
                 }
-                oraDB.disconnect();
             }
+            catch (Exception ex)
+            {
+                ModelPrint(ex.Message);
+            }
+            
         }
         //放料到载盘；条码从夹爪转移到载盘
         async void SaveRelease(int _index,string[] rststr)
         {
-            int index = int.Parse(rststr[1]);
-            int resultnum = 0;
-            await Task.Run(() =>
+            try
             {
-                Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                if (oraDB.isConnect())
+                int index = int.Parse(rststr[1]);
+                int resultnum = 0;
+                await Task.Run(() =>
                 {
-                    string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
-                        + "' AND PCSSER = '" + index.ToString() + "'";
-                    resultnum = oraDB.executeNonQuery(stm);
-                    oraDB.executeNonQuery("COMMIT");
-                }
-                oraDB.disconnect();
+                    Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                    if (oraDB.isConnect())
+                    {
+                        string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
+                            + "' AND PCSSER = '" + index.ToString() + "'";
+                        resultnum = oraDB.executeNonQuery(stm);
+                        oraDB.executeNonQuery("COMMIT");
+                    }
+                    oraDB.disconnect();
 
-            });
-            string resultStr = "Release;" + (resultnum > 0 ? "OK" : "NG");
-            await TestSentNet.SendAsync(resultStr);
+                });
+                string resultStr = "Release;" + (resultnum > 0 ? "OK" : "NG");
+                await TestSentNet.SendAsync(resultStr);
+            }
+            catch (Exception ex)
+            {
+                ModelPrint(ex.Message);
+            }
+            
         }
         private void TestFinishOperate(int index)
         {

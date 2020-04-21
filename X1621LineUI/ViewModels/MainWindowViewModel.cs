@@ -2943,46 +2943,31 @@ namespace X1621LineUI.ViewModels
         }
         void Scan1GetBarcodeCallback(string barcode)
         {
-            epsonRC90.TemporaryBordBarcode[0] = barcode;
-            if (barcode != "Error")
+            try
             {
-                SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                if (oraDB.isConnect())
+                epsonRC90.TemporaryBordBarcode[0] = barcode;
+                if (barcode != "Error")
                 {
-                    string stm;
-                    if (Station == 1)
+                    SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                    if (oraDB.isConnect())
                     {
-                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + barcode + "','OFF')";
-
-                        int rst = oraDB.executeNonQuery(stm);
-                        oraDB.executeNonQuery("COMMIT");
-                        AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
-                    }
-
-
-                    stm = "SELECT * FROM (SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 5 ";
-                    DataSet ds = oraDB.executeQuery(stm);
-                    DataTable dt = ds.Tables["table0"];
-                    if (dt.Rows.Count > 0)
-                    {
-                        if (dt.Rows[0]["STATUS"] == DBNull.Value)
+                        string stm;
+                        if (Station == 1)
                         {
-                            Fx5u_mid.SetM("M2600", true);
-                            switch (Station)
-                            {
-                                case 1:
-                                    DockStation1Check(0);
-                                    break;
-                                case 5:
-                                    DockStation2Check(0);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + barcode + "','OFF')";
+
+                            int rst = oraDB.executeNonQuery(stm);
+                            oraDB.executeNonQuery("COMMIT");
+                            AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
                         }
-                        else
+
+
+                        stm = "SELECT * FROM (SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 5 ";
+                        DataSet ds = oraDB.executeQuery(stm);
+                        DataTable dt = ds.Tables["table0"];
+                        if (dt.Rows.Count > 0)
                         {
-                            if ((string)dt.Rows[0]["STATUS"] == "OFF")
+                            if (dt.Rows[0]["STATUS"] == DBNull.Value)
                             {
                                 Fx5u_mid.SetM("M2600", true);
                                 switch (Station)
@@ -2999,48 +2984,71 @@ namespace X1621LineUI.ViewModels
                             }
                             else
                             {
-                                AddMessage("板 " + barcode + " 已测过");
-                                Fx5u_mid.SetM("M2599", true);
-                                switch (Station)
+                                if ((string)dt.Rows[0]["STATUS"] == "OFF")
                                 {
-                                    case 1:
-                                    case 5:
-                                        Fx5u_right1.SetM("M2600", true);
-                                        break;
-                                    default:
-                                        break;
+                                    Fx5u_mid.SetM("M2600", true);
+                                    switch (Station)
+                                    {
+                                        case 1:
+                                            DockStation1Check(0);
+                                            break;
+                                        case 5:
+                                            DockStation2Check(0);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    AddMessage("板 " + barcode + " 已测过");
+                                    Fx5u_mid.SetM("M2599", true);
+                                    switch (Station)
+                                    {
+                                        case 1:
+                                        case 5:
+                                            Fx5u_right1.SetM("M2600", true);
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            Fx5u_mid.SetM("M2600", true);
+                            switch (Station)
+                            {
+                                case 1:
+                                    DockStation1Check(0);
+                                    break;
+                                case 5:
+                                    DockStation2Check(0);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        Fx5u_mid.SetM("M2597", true);
                     }
                     else
                     {
-                        Fx5u_mid.SetM("M2600", true);
-                        switch (Station)
-                        {
-                            case 1:
-                                DockStation1Check(0);
-                                break;
-                            case 5:
-                                DockStation2Check(0);
-                                break;
-                            default:
-                                break;
-                        }
+                        AddMessage("Mysql数据库查询失败");
+                        Fx5u_mid.SetM("M2598", true);
                     }
-                    Fx5u_mid.SetM("M2597", true);
+                    oraDB.disconnect();
                 }
                 else
                 {
-                    AddMessage("Mysql数据库查询失败");
                     Fx5u_mid.SetM("M2598", true);
                 }
-                oraDB.disconnect();
             }
-            else
+            catch (Exception ex)
             {
-                Fx5u_mid.SetM("M2598", true);
+                AddMessage(ex.Message);
             }
+            
         }
         void DockStation1Check(int lineIndex)
         {
@@ -3146,47 +3154,32 @@ namespace X1621LineUI.ViewModels
         }
         void Scan2GetBarcodeCallback(string barcode)
         {
-            epsonRC90.TemporaryBordBarcode[1] = barcode;
-            if (barcode != "Error")
+            try
             {
-                SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                if (oraDB.isConnect())
+                epsonRC90.TemporaryBordBarcode[1] = barcode;
+                if (barcode != "Error")
                 {
-                    string stm;
-                    if (Station == 1)
+                    SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                    if (oraDB.isConnect())
                     {
-                        stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + barcode + "','OFF')";
-
-                        int rst = oraDB.executeNonQuery(stm);
-                        oraDB.executeNonQuery("COMMIT");
-                        AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
-                    }
-
-                    stm = "SELECT * FROM (SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 5";
-                    DataSet ds = oraDB.executeQuery(stm);
-                    DataTable dt = ds.Tables["table0"];
-                    if (dt.Rows.Count > 0)
-                    {
-                        if (dt.Rows[0]["STATUS"] == DBNull.Value)
+                        string stm;
+                        if (Station == 1)
                         {
+                            stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + barcode + "','OFF')";
 
-                            Fx5u_mid.SetM("M2605", true);
-                            switch (Station)
-                            {
-                                case 1:
-                                    DockStation1Check(1);
-                                    break;
-                                case 5:
-                                    DockStation2Check(1);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            int rst = oraDB.executeNonQuery(stm);
+                            oraDB.executeNonQuery("COMMIT");
+                            AddMessage("1号机板" + barcode + "清空结果 " + rst.ToString());
                         }
-                        else
+
+                        stm = "SELECT * FROM (SELECT * FROM BODMSG WHERE SCBODBAR = '" + barcode + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 5";
+                        DataSet ds = oraDB.executeQuery(stm);
+                        DataTable dt = ds.Tables["table0"];
+                        if (dt.Rows.Count > 0)
                         {
-                            if ((string)dt.Rows[0]["STATUS"] == "OFF")
+                            if (dt.Rows[0]["STATUS"] == DBNull.Value)
                             {
+
                                 Fx5u_mid.SetM("M2605", true);
                                 switch (Station)
                                 {
@@ -3202,48 +3195,71 @@ namespace X1621LineUI.ViewModels
                             }
                             else
                             {
-                                AddMessage("板 " + barcode + " 已测过");
-                                Fx5u_mid.SetM("M2604", true);
-                                switch (Station)
+                                if ((string)dt.Rows[0]["STATUS"] == "OFF")
                                 {
-                                    case 1:
-                                    case 5:
-                                        Fx5u_right1.SetM("M2606", true);
-                                        break;
-                                    default:
-                                        break;
+                                    Fx5u_mid.SetM("M2605", true);
+                                    switch (Station)
+                                    {
+                                        case 1:
+                                            DockStation1Check(1);
+                                            break;
+                                        case 5:
+                                            DockStation2Check(1);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    AddMessage("板 " + barcode + " 已测过");
+                                    Fx5u_mid.SetM("M2604", true);
+                                    switch (Station)
+                                    {
+                                        case 1:
+                                        case 5:
+                                            Fx5u_right1.SetM("M2606", true);
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            Fx5u_mid.SetM("M2605", true);
+                            switch (Station)
+                            {
+                                case 1:
+                                    DockStation1Check(1);
+                                    break;
+                                case 5:
+                                    DockStation2Check(1);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        Fx5u_mid.SetM("M2602", true);
                     }
                     else
                     {
-                        Fx5u_mid.SetM("M2605", true);
-                        switch (Station)
-                        {
-                            case 1:
-                                DockStation1Check(1);
-                                break;
-                            case 5:
-                                DockStation2Check(1);
-                                break;
-                            default:
-                                break;
-                        }
+                        AddMessage("Mysql数据库查询失败");
+                        Fx5u_mid.SetM("M2603", true);
                     }
-                    Fx5u_mid.SetM("M2602", true);
+                    oraDB.disconnect();
                 }
                 else
                 {
-                    AddMessage("Mysql数据库查询失败");
                     Fx5u_mid.SetM("M2603", true);
                 }
-                oraDB.disconnect();
             }
-            else
+            catch (Exception ex)
             {
-                Fx5u_mid.SetM("M2603", true);
+                AddMessage(ex.Message);
             }
+            
         }
         void StationEnterRun()
         {
