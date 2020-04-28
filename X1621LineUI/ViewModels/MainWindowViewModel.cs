@@ -837,17 +837,17 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("LIGHT_ID");
             }
         }
-        private string lIGHT_ID2;
+        //private string lIGHT_ID2;
 
-        public string LIGHT_ID2
-        {
-            get { return lIGHT_ID2; }
-            set
-            {
-                lIGHT_ID2 = value;
-                this.RaisePropertyChanged("LIGHT_ID2");
-            }
-        }
+        //public string LIGHT_ID2
+        //{
+        //    get { return lIGHT_ID2; }
+        //    set
+        //    {
+        //        lIGHT_ID2 = value;
+        //        this.RaisePropertyChanged("LIGHT_ID2");
+        //    }
+        //}
 
         private string siteID;
 
@@ -1294,7 +1294,7 @@ namespace X1621LineUI.ViewModels
             Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID", MACID);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "MACID_M", MACID_M);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID", LIGHT_ID);
-            Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID2", LIGHT_ID2);
+            //Inifile.INIWriteValue(iniParameterPath, "BigData", "LIGHT_ID2", LIGHT_ID2);
             Inifile.INIWriteValue(iniParameterPath, "BigData", "WORKSTATION", WORKSTATION);
 
             Inifile.INIWriteValue(iniParameterPath, "System", "LineID1", LineID1);
@@ -1545,7 +1545,7 @@ namespace X1621LineUI.ViewModels
             MACID_M = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID_M", "NA");
             WORKSTATION = Inifile.INIGetStringValue(iniParameterPath, "BigData", "WORKSTATION", "X1621");
             LIGHT_ID = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID", "NA");
-            LIGHT_ID2 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID2", "NA");
+            //LIGHT_ID2 = Inifile.INIGetStringValue(iniParameterPath, "BigData", "LIGHT_ID2", "NA");
 
             LineID1 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID1", "Line1");
             LineID2 = Inifile.INIGetStringValue(iniParameterPath, "System", "LineID2", "Line2");
@@ -2078,9 +2078,9 @@ namespace X1621LineUI.ViewModels
                                 string stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK,WORKSTATION) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}','{10}')"
                                     , PM, LIGHT_ID, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK, WORKSTATION);
                                 _result = mysql.executeQuery(stm);
-                                stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK,WORKSTATION) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}','{10}')"
-    , PM, LIGHT_ID2, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK, WORKSTATION);
-                                _result = mysql.executeQuery(stm);
+    //                            stm = string.Format("INSERT INTO HA_F4_LIGHT (PM,LIGHT_ID,MACID,CLASS,LIGHT,SDATE,STIME,ALARM,TIME_1,TIME_2,TIME_3,TIME_4,TIME_5,GROUP1,TRACK,WORKSTATION) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','0','0','0','0','0','{8}','{9}','{10}')"
+    //, PM, LIGHT_ID2, MACID, epsonRC90.GetBanci(), LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), "NA", GROUP1, TRACK, WORKSTATION);
+    //                            _result = mysql.executeQuery(stm);
                                 AddMessage("插入数据库灯信号" + _result.ToString());
                                 stm = string.Format("INSERT INTO HA_F4_DATA_FPY (PM,MACID,CLASS,INPUT,OUTPUT,FAIL,FPY,WORKSTATION,GROUP1,TRACK) VALUES ('{0}','{1}','{2}','0','0','0','0','{3}','{4}','{5}')"
                                     , PM, MACID, epsonRC90.GetBanci(), WORKSTATION, GROUP1, TRACK);
@@ -2193,10 +2193,10 @@ namespace X1621LineUI.ViewModels
                                     , PM, LIGHT_ID, MACID, LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
                                     , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"), GROUP1, TRACK, WORKSTATION);
                                 _result = mysql.executeQuery(stm);
-                                stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}' AND GROUP1 = '{13}' AND TRACK = '{14}' AND WORKSTATION = '{15}'"
-    , PM, LIGHT_ID2, MACID, LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
-    , ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"), GROUP1, TRACK, WORKSTATION);
-                                _result = mysql.executeQuery(stm);
+    //                            stm = string.Format("UPDATE HA_F4_LIGHT SET LIGHT = '{3}',SDATE = '{4}',STIME = '{5}',ALARM = '{6}',TIME_1 = '{8}',TIME_2 = '{9}',TIME_3 = '{10}',TIME_4 = '{11}',TIME_5 = '{12}' WHERE PM = '{0}' AND LIGHT_ID = '{1}' AND MACID = '{2}' AND CLASS = '{7}' AND GROUP1 = '{13}' AND TRACK = '{14}' AND WORKSTATION = '{15}'"
+    //, PM, LIGHT_ID2, MACID, LampColor.ToString(), DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), currentAlarm, epsonRC90.GetBanci(), ((double)LampGreenElapse / 60).ToString("F2"), ((double)LampGreenFlickerElapse / 60).ToString("F2"), ((double)LampYellowElapse / 60).ToString("F2")
+    //, ((double)LampYellowFlickerElapse / 60).ToString("F2"), ((double)LampRedElapse / 60).ToString("F2"), GROUP1, TRACK, WORKSTATION);
+    //                            _result = mysql.executeQuery(stm);
                             }
                             mysql.DisConnect();
                             return _result.ToString();
