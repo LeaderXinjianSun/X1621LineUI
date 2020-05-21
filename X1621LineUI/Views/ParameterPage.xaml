@@ -75,8 +75,8 @@
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <TextBlock VerticalAlignment="Center" Text="三色灯编号1" Width="70"></TextBlock>
                     <TextBox Width="100" Text="{Binding LIGHT_ID}"></TextBox>
-                    <TextBlock VerticalAlignment="Center" Text="三色灯编号2" Width="70"></TextBlock>
-                    <TextBox Width="100" Text="{Binding LIGHT_ID2}"></TextBox>
+                    <!--<TextBlock VerticalAlignment="Center" Text="三色灯编号2" Width="70"></TextBlock>
+                    <TextBox Width="100" Text="{Binding LIGHT_ID2}"></TextBox>-->
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <Button Content="Alarm" Width="60" Height="30" IsEnabled="{Binding AlarmButtonIsEnabled}" Command="{Binding BigDataAlarmGetCommand}"></Button>

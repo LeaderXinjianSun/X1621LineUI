@@ -1080,6 +1080,39 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("WORKSTATION");
             }
         }
+        private ObservableCollection<int> adminAddNum;
+
+        public ObservableCollection<int> AdminAddNum
+        {
+            get { return adminAddNum; }
+            set
+            {
+                adminAddNum = value;
+                this.RaisePropertyChanged("AdminAddNum");
+            }
+        }
+        private bool showYieldAdminControlWindow;
+
+        public bool ShowYieldAdminControlWindow
+        {
+            get { return showYieldAdminControlWindow; }
+            set
+            {
+                showYieldAdminControlWindow = value;
+                this.RaisePropertyChanged("ShowYieldAdminControlWindow");
+            }
+        }
+        private bool quitYieldAdminControl;
+
+        public bool QuitYieldAdminControl
+        {
+            get { return quitYieldAdminControl; }
+            set
+            {
+                quitYieldAdminControl = value;
+                this.RaisePropertyChanged("QuitYieldAdminControl");
+            }
+        }
 
         #endregion
         #region 方法绑定
@@ -1093,6 +1126,7 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand SaveParameterCommand { get; set; }
         public DelegateCommand BigDataAlarmGetCommand { get; set; }
         public DelegateCommand<object> TrackInitCommand { get; set; }
+        public DelegateCommand YieldConfirmButtonCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
@@ -1124,6 +1158,7 @@ namespace X1621LineUI.ViewModels
             this.BigDataAlarmGetCommand = new DelegateCommand(new Action(this.BigDataAlarmGetCommandExecute));
             this.ChangeMaterialOperateCommand = new DelegateCommand<object>(new Action<object>(this.ChangeMaterialOperateCommandExecute));
             this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
+            this.YieldConfirmButtonCommand = new DelegateCommand(new Action(this.YieldConfirmButtonCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
             //if (false)
@@ -1409,7 +1444,25 @@ namespace X1621LineUI.ViewModels
                                 default:
                                     break;
                             }
-                            string stm = "UPDATE BODLINE SET Station9 = 0, Station8 = 0, Station7 = 0,Station10 = 0,Station11 = 0 WHERE LineID = '" + lineid + "'";
+                            string cleanstation = "";
+                            switch (Station)
+                            {
+                                case 1:
+                                    cleanstation = "Station9 = 0";
+                                    break;
+                                case 2:
+                                case 3:
+                                case 4:
+                                case 5:
+                                    cleanstation = "Station10 = 0";
+                                    break;
+                                case 6:
+                                    cleanstation = "Station11 = 0";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            string stm = "UPDATE BODLINE SET " + cleanstation + " WHERE LineID = '" + lineid + "'";
                             mysql.executeQuery(stm);
                             AddMessage("清空轨道" + lineid);
                         }
@@ -1423,11 +1476,31 @@ namespace X1621LineUI.ViewModels
             }
             metro.ChangeAccent("Blue");
         }
+        private void YieldConfirmButtonCommandExecute()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (epsonRC90.YanmadeTester[i].Yield_Nomal >= 95 || epsonRC90.YanmadeTester[i].TestCount_Nomal < 100 + AdminAddNum[i])
+                {
+                    ;
+                }
+                else
+                {
+                    AdminAddNum[i] = epsonRC90.YanmadeTester[i].TestCount_Nomal - 100 + (int)(epsonRC90.YanmadeTester[i].TestCount_Nomal * 0.1);
+                }
+            }
+            QuitYieldAdminControl = !QuitYieldAdminControl;
+        }
         #endregion
         #region 自定义函数
         private void Init()
         {
             #region 初始化
+            AdminAddNum = new ObservableCollection<int>();
+            for (int i = 0; i < 4; i++)
+            {
+                AdminAddNum.Add(0);
+            }
             MessageStr = "";
             AlarmGridVisibility = "Collapsed";
             HomePageVisibility = "Visible";
@@ -3351,7 +3424,7 @@ namespace X1621LineUI.ViewModels
                                 //int station7count = (int)dt.Rows[0]["Station7"];
                                 if (Fx5u_left2.ReadM("M2810"))//A轨道有料
                                 {
-                                    int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                                    int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station11"];
                                     if (bordcount < 5)//轨道+测试机板数量 < 5 ，下1块板
                                     {
                                         Fx5u_left2.SetM("M2610", true);
@@ -3374,7 +3447,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = 0, Station7 = Station7 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = 0 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
@@ -3398,7 +3471,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 + 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块存储板");
                         }
@@ -3420,7 +3493,7 @@ namespace X1621LineUI.ViewModels
                                 //int station7count = (int)dt.Rows[0]["Station7"];
                                 if (Fx5u_left2.ReadM("M2811"))//B轨道有料
                                 {
-                                    int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station10"] + (int)dt.Rows[0]["Station11"];
+                                    int bordcount = (int)dt.Rows[0]["Station2"] + (int)dt.Rows[0]["Station3"] + (int)dt.Rows[0]["Station4"] + (int)dt.Rows[0]["Station5"] + (int)dt.Rows[0]["Station6"] + (int)dt.Rows[0]["Station11"];
                                     if (bordcount < 5)//轨道+测试机板数量 < 5 ，下1块板
                                     {
                                         Fx5u_left2.SetM("M2611", true);
@@ -3443,7 +3516,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station9 = 0, Station7 = Station7 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station9 = 0 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1存储1块板");
                         }
@@ -3467,7 +3540,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station7 = Station7 - 1, Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 + 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台1放1块存储板");
                         }
@@ -3528,7 +3601,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station8 = Station8 + 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2存储1块板");
                         }
@@ -3552,7 +3625,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = 1 WHERE LineID = '" + LineID1 + "'";
+                            string stm = "UPDATE BODLINE SET Station11 = 1 WHERE LineID = '" + LineID1 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块存储板");
                         }
@@ -3598,7 +3671,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1, Station8 = Station8 + 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station10 = Station10 - 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2存储1块板");
                         }
@@ -3622,7 +3695,7 @@ namespace X1621LineUI.ViewModels
                         Mysql mysql = new Mysql();
                         if (mysql.Connect())
                         {
-                            string stm = "UPDATE BODLINE SET Station8 = Station8 - 1, Station11 = 1 WHERE LineID = '" + LineID2 + "'";
+                            string stm = "UPDATE BODLINE SET Station11 = 1 WHERE LineID = '" + LineID2 + "'";
                             mysql.executeQuery(stm);
                             AddMessage("线A接驳台2放1块存储板");
                         }
@@ -3635,7 +3708,7 @@ namespace X1621LineUI.ViewModels
                 }
             }
         }
-        private void ModelPrintEventProcess(string str)
+        private async void ModelPrintEventProcess(string str)
         {
            
             AddMessage(str);
@@ -3684,7 +3757,33 @@ namespace X1621LineUI.ViewModels
                 AlarmText = str;
                 AlarmGridVisibility = "Visible";
             }
-            #endregion           
+            #endregion
+            #region 良率报警
+            if (str.Contains("StatusOfYield"))
+            {
+                string str1 = "StatusOfYield";
+                for (int i = 0; i < 4; i++)
+                {
+                    if (epsonRC90.YanmadeTester[i].Yield_Nomal >= 95 || epsonRC90.YanmadeTester[i].TestCount_Nomal < 100 + AdminAddNum[i])
+                    {
+                        str1 += ";1";
+                    }
+                    else
+                    {
+                        str1 += ";0";
+                        //AdminAddNum[i] = epsonRC90.YanmadeTester[i].TestCount_Nomal - 100 + (int)(epsonRC90.YanmadeTester[i].TestCount_Nomal * 0.1);
+                    }
+                }
+                if (str1.Contains("0"))
+                {
+                    ShowYieldAdminControlWindow = !ShowYieldAdminControlWindow;
+                }
+                if (epsonRC90.TestSendStatus)
+                {
+                    await epsonRC90.TestSentNet.SendAsync(str);
+                }
+            }
+            #endregion
         }
         private string GetPassWord()
         {
@@ -3750,5 +3849,6 @@ namespace X1621LineUI.ViewModels
             catch { }
         }
         #endregion
+
     }
 }
