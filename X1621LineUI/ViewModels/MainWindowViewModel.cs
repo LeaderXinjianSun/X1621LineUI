@@ -1883,16 +1883,14 @@ namespace X1621LineUI.ViewModels
                 PassCount3 = epsonRC90.YanmadeTester[3].PassCount_Nomal;
 
                 TestCountOutput = epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount;
+                if (TestCountOutput > TestCountInput)
+                {
+                    TestCountInput = TestCountOutput;
+                    Inifile.INIWriteValue(iniParameterPath, "Summary", "TestCountInput", TestCountInput.ToString());
+                }
                 if (TestCountInput > 0)
                 {
-                    if ((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) < TestCountInput)
-                    {
-                        YieldTotal = Math.Round((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) / TestCountInput * 100, 2);
-                    }
-                    else
-                    {
-                        YieldTotal = 100;
-                    }
+                    YieldTotal = Math.Round((double)(epsonRC90.YanmadeTester[0].PassCount + epsonRC90.YanmadeTester[1].PassCount + epsonRC90.YanmadeTester[2].PassCount + epsonRC90.YanmadeTester[3].PassCount) / TestCountInput * 100, 2);
                 }
                 else
                 {
@@ -2683,6 +2681,7 @@ namespace X1621LineUI.ViewModels
                         epsonRC90.ResetBord(0);
                         //stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[0] + "','ON')";
                         //mysql.executeQuery(stm);
+                        Fx5u_mid.SetM("M2610", true);
                         Fx5u_mid.SetM("M2798", false);
 
                     }
@@ -2729,7 +2728,7 @@ namespace X1621LineUI.ViewModels
                         epsonRC90.ResetBord(1);
                         //stm = "INSERT INTO BODMSG (SCBODBAR, STATUS) VALUES('" + epsonRC90.BordBarcode[1] + "','ON')";
                         //mysql.executeQuery(stm);
-
+                        Fx5u_mid.SetM("M2611", true);
                         Fx5u_mid.SetM("M2803", false);
                     }
                 }

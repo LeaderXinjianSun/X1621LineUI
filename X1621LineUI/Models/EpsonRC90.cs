@@ -615,15 +615,30 @@ namespace SXJLibrary
                     BarInfo[index][i].TDate = DateTime.Now.ToString("yyyyMMdd");
                     BarInfo[index][i].TTime = DateTime.Now.ToString("HHmmss");
                     string machinestr = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
-                    Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
-                    if (oraDB.isConnect())
+                    while (true)
                     {
-                        string stm = "INSERT INTO BARBIND (MACHINE,SCBARCODE,SCBODBAR,SDATE,STIME,PCSSER,RESULT) VALUES ('" + machinestr + "','" + BarInfo[index][i].Barcode + "','"
-                                        + BordBarcode[index] + "','" + BarInfo[index][i].TDate + "','" + BarInfo[index][i].TTime + "','" + (i + 1).ToString() + "','" + BarInfo[index][i].Status.ToString() + "')";
-                        oraDB.executeNonQuery(stm);
-                        oraDB.executeNonQuery("COMMIT");
+                        int rst = 0;
+                        Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                        if (oraDB.isConnect())
+                        {
+                            string stm = "INSERT INTO BARBIND (MACHINE,SCBARCODE,SCBODBAR,SDATE,STIME,PCSSER,RESULT) VALUES ('" + machinestr + "','" + BarInfo[index][i].Barcode + "','"
+                                            + BordBarcode[index] + "','" + BarInfo[index][i].TDate + "','" + BarInfo[index][i].TTime + "','" + (i + 1).ToString() + "','" + BarInfo[index][i].Status.ToString() + "')";
+                            rst = oraDB.executeNonQuery(stm);
+                            oraDB.executeNonQuery("COMMIT");
+
+                        }
+                        oraDB.disconnect();
+                        if (rst <= 0)
+                        {
+                            System.Threading.Thread.Sleep(1000);
+                            ModelPrint("新料" + (i + 1).ToString() + "插入失败，重新插入");
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
-                    oraDB.disconnect();
+
                 }
             }
             catch (Exception ex)
