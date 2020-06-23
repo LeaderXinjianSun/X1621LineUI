@@ -109,7 +109,11 @@
                     <TextBox Width="100" Text="{Binding LotName}"></TextBox>
                 </StackPanel>
 
-
+                <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="连续NG： "></TextBlock>
+                    <TextBox Style="{StaticResource TextBoxPort}" Text="3" IsEnabled="False"></TextBox>
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="次"></TextBlock>
+                </StackPanel>
                 <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                     <TextBlock Style="{StaticResource TextBlockBase}" Text="良率高线： "></TextBlock>
                     <TextBox Style="{StaticResource TextBoxPort}" Text="98" IsEnabled="False"></TextBox>

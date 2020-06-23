@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:X1621LineUI.Views"
              mc:Ignorable="d" 
@@ -104,8 +105,8 @@
                     <TextBlock Style="{StaticResource YieldTextBlock}" Grid.Column="1" Text="{Binding PassStatusDisplayText2}" Foreground="{Binding PassStatusDisplayForeground2}"></TextBlock>
                     <TextBlock Style="{StaticResource YieldTextBlock}" Grid.Column="1" Grid.Row="1" Text="{Binding PassStatusDisplayText3}" Foreground="{Binding PassStatusDisplayForeground3}"></TextBlock>
                 </Grid>
-                <Button Style="{StaticResource AccentedSquareButtonStyle}" Grid.Row="1" Width="60" Height="30" Content="工时" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding FixtureCycleGridShowCommand}" CommandParameter="0"></Button>
-                <Grid Grid.Row="1" Visibility="{Binding FixtureCycleGridVisibility}" Background="White">
+                <!--<Button Grid.Row="1" Width="60" Height="30" Content="工时" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" Command="{Binding FixtureCycleGridShowCommand}" CommandParameter="0"></Button>-->
+                <Grid Grid.Row="1" Visibility="{Binding FixtureCycleGridVisibility,FallbackValue=Collapsed}" Background="White">
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
@@ -119,7 +120,7 @@
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="治具" Style="{StaticResource CycleTextBlock}"></TextBlock>
                     <TextBlock Text="1#" Grid.Column="1" Style="{StaticResource CycleTextBlock}"></TextBlock>
@@ -147,11 +148,76 @@
                     <TextBlock Text="{Binding TestCycle3}" Grid.Column="4" Grid.Row="3" Style="{StaticResource CycleTextBlock}"><Run></Run></TextBlock>
                     <TextBlock Text="{Binding TestCycleAve}" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="4" Style="{StaticResource CycleTextBlock}"></TextBlock>
 
-                    <Button Grid.Column="5" Grid.RowSpan="2" Height="30" VerticalAlignment="Top" Margin="1" Content="关闭" Background="Red" Foreground="White" Command="{Binding FixtureCycleGridShowCommand}" CommandParameter="1"></Button>
+                    
                 </Grid>
                 <Grid Grid.Row="2">
                     <TabControl TabStripPlacement ="Bottom">
                         <TabItem Header="产量">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="PreviewMouseDown">
+                                    <i:InvokeCommandAction Command="{Binding FixtureCycleGridShowCommand}" CommandParameter="1" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.3*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.4*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1.3*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.4*"></ColumnDefinition>
+                                    <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="穴1数量" Style="{StaticResource TextBlockGrid}"></TextBlock>
+                                <TextBlock Text="{Binding TestCount0}" Style="{StaticResource TextBlockGrid}" Grid.Column="1" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Column="2"></TextBlock>
+                                <TextBlock Text="穴1良品数" Style="{StaticResource TextBlockGrid}" Grid.Column="3"></TextBlock>
+                                <TextBlock Text="{Binding PassCount0}" Grid.Column="4" Style="{StaticResource TextBlockGrid}" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Column="5"></TextBlock>
+                                <TextBlock Text="穴2数量" Grid.Row="1" Style="{StaticResource TextBlockGrid}"></TextBlock>
+                                <TextBlock Text="{Binding TestCount1}" Style="{StaticResource TextBlockGrid}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Row="1" Grid.Column="2"></TextBlock>
+                                <TextBlock Text="穴2良品数" Style="{StaticResource TextBlockGrid}" Grid.Row="1" Grid.Column="3"></TextBlock>
+                                <TextBlock Text="{Binding PassCount1}" Grid.Row="1" Grid.Column="4" Style="{StaticResource TextBlockGrid}" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Row="1" Grid.Column="5"></TextBlock>
+
+                                <TextBlock Text="穴3数量" Grid.Row="2" Style="{StaticResource TextBlockGrid}"></TextBlock>
+                                <TextBlock Text="{Binding TestCount2}" Style="{StaticResource TextBlockGrid}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Row="2" Grid.Column="2"></TextBlock>
+                                <TextBlock Text="穴3良品数" Style="{StaticResource TextBlockGrid}" Grid.Row="2" Grid.Column="3"></TextBlock>
+                                <TextBlock Text="{Binding PassCount2}" Grid.Row="2" Grid.Column="4" Style="{StaticResource TextBlockGrid}" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Row="2" Grid.Column="5"></TextBlock>
+
+                                <TextBlock Text="穴4数量" Grid.Row="3" Style="{StaticResource TextBlockGrid}"></TextBlock>
+                                <TextBlock Text="{Binding TestCount3}" Style="{StaticResource TextBlockGrid}" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Row="3" Grid.Column="2"></TextBlock>
+                                <TextBlock Text="穴4良品数" Style="{StaticResource TextBlockGrid}" Grid.Row="3" Grid.Column="3"></TextBlock>
+                                <TextBlock Text="{Binding PassCount3}" Grid.Row="3" Grid.Column="4" Style="{StaticResource TextBlockGrid}" HorizontalAlignment="Left"></TextBlock>
+                                <TextBlock Text="片" Style="{StaticResource TextBlockGrid}" Grid.Row="3" Grid.Column="5"></TextBlock>
+                                <StackPanel Grid.Row="4" Grid.ColumnSpan="6" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource TextBlockGrid}" Text="上料机直通率 = output / input = "></TextBlock>
+                                    <TextBlock Text="{Binding TestCountOutput}" Style="{StaticResource TextBlockGrid}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left"></TextBlock>
+                                    <TextBlock Style="{StaticResource TextBlockGrid}" Text=" / "></TextBlock>
+                                    <TextBlock Text="{Binding TestCountInput}" Style="{StaticResource TextBlockGrid}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left"></TextBlock>
+                                    <TextBlock Style="{StaticResource TextBlockGrid}" Text=" = "></TextBlock>
+                                    <TextBlock Text="{Binding YieldTotal}" Grid.Row="4" Grid.Column="4" Style="{StaticResource TextBlockGrid}" HorizontalAlignment="Left"></TextBlock>
+                                    <TextBlock Text=" %" Style="{StaticResource TextBlockGrid}" Grid.Row="4" Grid.Column="5"></TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="流程">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="PreviewMouseDown">
+                                    <i:InvokeCommandAction Command="{Binding FixtureCycleGridShowCommand}" CommandParameter="0" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition></RowDefinition>

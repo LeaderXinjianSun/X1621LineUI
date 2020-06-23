@@ -1175,7 +1175,7 @@ namespace X1621LineUI.ViewModels
             this.FixtureCycleGridShowCommand = new DelegateCommand<object>(new Action<object>(this.FixtureCycleGridShowCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
-            //if (false)
+                //if (false)
             {
                 System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
                 System.Windows.Application.Current.Shutdown();
