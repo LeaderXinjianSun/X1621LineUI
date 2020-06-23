@@ -915,6 +915,18 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("AlarmGridVisibility");
             }
         }
+        private string fixtureCycleGridVisibility;
+
+        public string FixtureCycleGridVisibility
+        {
+            get { return fixtureCycleGridVisibility; }
+            set
+            {
+                fixtureCycleGridVisibility = value;
+                this.RaisePropertyChanged("FixtureCycleGridVisibility");
+            }
+        }
+
         private string alarmText;
 
         public string AlarmText
@@ -1127,6 +1139,7 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand BigDataAlarmGetCommand { get; set; }
         public DelegateCommand<object> TrackInitCommand { get; set; }
         public DelegateCommand YieldConfirmButtonCommand { get; set; }
+        public DelegateCommand<object> FixtureCycleGridShowCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
@@ -1159,6 +1172,7 @@ namespace X1621LineUI.ViewModels
             this.ChangeMaterialOperateCommand = new DelegateCommand<object>(new Action<object>(this.ChangeMaterialOperateCommandExecute));
             this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
             this.YieldConfirmButtonCommand = new DelegateCommand(new Action(this.YieldConfirmButtonCommandExecute));
+            this.FixtureCycleGridShowCommand = new DelegateCommand<object>(new Action<object>(this.FixtureCycleGridShowCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
             //if (false)
@@ -1491,6 +1505,17 @@ namespace X1621LineUI.ViewModels
             }
             QuitYieldAdminControl = !QuitYieldAdminControl;
         }
+        private void FixtureCycleGridShowCommandExecute(object p)
+        {
+            if (p.ToString() == "0")
+            {
+                FixtureCycleGridVisibility = "Visible";
+            }
+            else
+            {
+                FixtureCycleGridVisibility = "Collapsed";
+            }
+        }
         #endregion
         #region 自定义函数
         private void Init()
@@ -1502,6 +1527,7 @@ namespace X1621LineUI.ViewModels
                 AdminAddNum.Add(0);
             }
             MessageStr = "";
+            FixtureCycleGridVisibility = "Collapsed";
             AlarmGridVisibility = "Collapsed";
             HomePageVisibility = "Visible";
             ParameterPageVisibility = "Collapsed";

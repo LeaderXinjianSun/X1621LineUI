@@ -6,6 +6,13 @@
              xmlns:local="clr-namespace:X1621LineUI.Views"
              mc:Ignorable="d" 
              d:DesignHeight="631" d:DesignWidth="1024">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources\Dictionary1.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -100,6 +107,26 @@
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <TextBlock Text="LOT NAME" Width="80" VerticalAlignment="Center"></TextBlock>
                     <TextBox Width="100" Text="{Binding LotName}"></TextBox>
+                </StackPanel>
+
+
+                <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="良率高线： "></TextBlock>
+                    <TextBox Style="{StaticResource TextBoxPort}" Text="98" IsEnabled="False"></TextBox>
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="%"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="良率低线： "></TextBlock>
+                    <TextBox Style="{StaticResource TextBoxPort}" Text="95" IsEnabled="False"></TextBox>
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="%"></TextBlock>
+                </StackPanel>
+                <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="良率停机： "></TextBlock>
+                    <TextBox Style="{StaticResource TextBoxPort}" Text="95" IsEnabled="False"></TextBox>
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="%"></TextBlock>
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="投产数量： " Margin="10,0,0,0"></TextBlock>
+                    <TextBox Style="{StaticResource TextBoxPort}" Text="100" IsEnabled="False"></TextBox>
+                    <TextBlock Style="{StaticResource TextBlockBase}" Text="pcs"></TextBlock>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
