@@ -293,19 +293,6 @@ namespace SXJLibrary
                                     CheckSam();
                                     break;
                                 case "PickNew":
-                                    if (MaterialFileStatus)
-                                    {
-                                        try
-                                        {
-                                            Worksheet.Cells[11, 6].Value = Convert.ToInt32(Worksheet.Cells[11, 6].Value) + 1;
-                                            Worksheet.Cells[12, 6].Value = Convert.ToInt32(Worksheet.Cells[12, 6].Value) + 1;
-                                            Package.Save();
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            ModelPrint(ex.Message);
-                                        }
-                                    }
                                     break;
                                 case "LinkNG":
                                     break;

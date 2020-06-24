@@ -1792,12 +1792,6 @@ namespace X1621LineUI.ViewModels
                             MaterialChangeItemsSource.Add((string)epsonRC90.Worksheet.Cells[i * 2 + 3, 1].Value + "," + FlexID[i]);
                             MaterialChangeItemsSource.Add((string)epsonRC90.Worksheet.Cells[i * 2 + 3 + 1, 1].Value + "," + FlexID[i]);
                         }
-                        for (int i = 0; i < 2; i++)
-                        {
-                            epsonRC90.Worksheet.Cells[i + 11, 3].Value = "NA";
-                            epsonRC90.Worksheet.Cells[i + 11, 2].Value = MACID;
-                            MaterialChangeItemsSource.Add((string)epsonRC90.Worksheet.Cells[i + 11, 1].Value + "," + "NA");
-                        }
 
                         for (int i = 1; i <= epsonRC90.Worksheet.Dimension.End.Column; i++)
                         {
