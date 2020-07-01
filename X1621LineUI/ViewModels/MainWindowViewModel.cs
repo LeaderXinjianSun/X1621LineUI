@@ -760,6 +760,18 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("NGItemLimit");
             }
         }
+        private int nGItemLimit1;
+
+        public int NGItemLimit1
+        {
+            get { return nGItemLimit1; }
+            set
+            {
+                nGItemLimit1 = value;
+                this.RaisePropertyChanged("NGItemLimit1");
+            }
+        }
+
         private string sampleGridVisibility;
 
         public string SampleGridVisibility
@@ -1175,7 +1187,7 @@ namespace X1621LineUI.ViewModels
             this.FixtureCycleGridShowCommand = new DelegateCommand<object>(new Action<object>(this.FixtureCycleGridShowCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
-                //if (false)
+            //if (false)
             {
                 System.Windows.MessageBox.Show("软件安装目录必须为C:\\Debug");
                 System.Windows.Application.Current.Shutdown();
@@ -1328,6 +1340,7 @@ namespace X1621LineUI.ViewModels
             TesterID4 = Inifile.INIGetStringValue(iniFilepath, "A", "id4", "99999");
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemCount", NGItemCount.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit", NGItemLimit.ToString());
+            Inifile.INIWriteValue(iniParameterPath, "Sample", "NGItemLimit1", NGItemLimit1.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "IsSam", IsSam.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Clean", "IsClean", IsClean.ToString());
             Inifile.INIWriteValue(iniParameterPath, "Sample", "SampleDStartTimeAM", GetSampleTimeString(SampleDStartTimeAM, "06:00:00"));
@@ -1368,8 +1381,41 @@ namespace X1621LineUI.ViewModels
                         epsonRC90.Worksheet.Cells[(int)p + 3, 9].Value = Convert.ToInt32(epsonRC90.Worksheet.Cells[(int)p + 3, 9].Value) + 1;
                         epsonRC90.Worksheet.Cells[(int)p + 3, 7].Value = epsonRC90.Worksheet.Cells[(int)p + 3, 8].Value;
                         epsonRC90.Worksheet.Cells[(int)p + 3, 8].Value = System.DateTime.Now.ToString();
+                        var preCount = epsonRC90.Worksheet.Cells[(int)p + 3, 6].Value;
                         epsonRC90.Worksheet.Cells[(int)p + 3, 6].Value = 0;
                         epsonRC90.Package.Save();
+                        string materialChangeRecordPath = "D:\\耗材更换记录.xlsx";
+                        FileInfo xlFile = new FileInfo(materialChangeRecordPath);
+                        if (!File.Exists(materialChangeRecordPath))
+                        {
+                            using (var package = new ExcelPackage())
+                            {
+                                //Add a new worksheet to the empty workbook
+                                var worksheet = package.Workbook.Worksheets.Add("耗材更换记录");
+                                //Add the headers
+                                worksheet.Cells[1, 1].Value = "时间";
+                                worksheet.Cells[1, 2].Value = "项目";
+                                worksheet.Cells[1, 3].Value = "Auto NO";
+                                worksheet.Cells[1, 4].Value = "Tester ID";
+                                worksheet.Cells[1, 5].Value = "旧品已使用次数";
+
+                                
+                                // Save our new workbook in the output directory and we are done!
+                                package.SaveAs(xlFile);
+                            }
+                        }
+                        using (ExcelPackage package = new ExcelPackage(xlFile))
+                        {
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets["耗材更换记录"];
+                            int row = worksheet.Dimension.End.Row + 1;
+                            worksheet.Cells[row, 1].Value = DateTime.Now.ToString();
+                            worksheet.Cells[row, 2].Value = epsonRC90.Worksheet.Cells[(int)p + 3, 1].Value;
+                            worksheet.Cells[row, 3].Value = epsonRC90.Worksheet.Cells[(int)p + 3, 2].Value;
+                            worksheet.Cells[row, 4].Value = epsonRC90.Worksheet.Cells[(int)p + 3, 3].Value;
+                            worksheet.Cells[row, 5].Value = preCount;
+                            worksheet.Cells.AutoFitColumns(0);  //Autofit columns for all cells
+                            package.Save();
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -1631,7 +1677,7 @@ namespace X1621LineUI.ViewModels
             LastClean1 = Convert.ToDateTime(Inifile.INIGetStringValue(iniParameterPath, "Clean", "LastClean1", "2019/1/1 00:00:00"));
             NGItemCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemCount", "3"));
             NGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99"));
-
+            NGItemLimit1 = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit1", "99"));
             SampleDStartTimeAM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleDStartTimeAM", "06:00:00");
             SampleDStartTimePM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleDStartTimePM", "12:00:00");
             SampleNStartTimeAM = Inifile.INIGetStringValue(iniParameterPath, "Sample", "SampleNStartTimeAM", "18:00:00");

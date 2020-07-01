@@ -442,7 +442,8 @@ namespace SXJLibrary
             try
             {
                 int ngItemCount = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemCount", "3"));
-                int nGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99")); 
+                int nGItemLimit = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit", "99"));
+                int nGItemLimit1 = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "Sample", "NGItemLimit1", "99"));
                 string MNO = Inifile.INIGetStringValue(iniParameterPath, "BigData", "MACID", "X1621_1");
                 Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                 if (oraDB.isConnect())
@@ -490,7 +491,13 @@ namespace SXJLibrary
                                                     datetimestr = string.Empty;
                                                     datetimestr = string.Format("{0}/{1}/{2} {3}:{4}:{5}", datestr.Substring(0, 4), datestr.Substring(4, 2), datestr.Substring(6, 2), timestr.Substring(0, 2), timestr.Substring(2, 2), timestr.Substring(4, 2));
                                                     updatetime = Convert.ToDateTime(datetimestr);
-                                                    if ((DateTime.Now - updatetime).TotalDays <= nGItemLimit)
+
+                                                    //查样本使用次数
+                                                    stm = String.Format("Select * from BARSAMREC WHERE BARCODE = '{0}'", (string)dt.Rows[0]["BARCODE"]);
+                                                    DataSet s2 = oraDB.executeQuery(stm);
+                                                    DataTable dt2 = s2.Tables[0];
+
+                                                    if ((DateTime.Now - updatetime).TotalDays <= nGItemLimit && dt2.Rows.Count <= nGItemLimit1)
                                                     {
                                                         //插入样本记录
                                                         string parnum = Inifile.INIGetStringValue(iniFilepath, "Other", "pn", "FHAPHS9");
@@ -513,7 +520,14 @@ namespace SXJLibrary
                                                     }
                                                     else
                                                     {
-                                                        ModelPrint((string)dt.Rows[0]["BARCODE"] + "样本时间" + updatetime.ToString() + " > " + nGItemLimit.ToString() + "天");
+                                                        if ((DateTime.Now - updatetime).TotalDays > nGItemLimit)
+                                                        {
+                                                            ModelPrint((string)dt.Rows[0]["BARCODE"] + "样本时间" + updatetime.ToString() + " > " + nGItemLimit.ToString() + "天");
+                                                        }
+                                                        if (dt2.Rows.Count > nGItemLimit1)
+                                                        {
+                                                            ModelPrint((string)dt.Rows[0]["BARCODE"] + "样本次数" + dt2.Rows.Count.ToString() + " > " + nGItemLimit1.ToString() + "次");
+                                                        }
                                                         sampleContent[i][j] = "Limit";
                                                     }
                                                 }
