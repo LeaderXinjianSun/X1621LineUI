@@ -517,6 +517,14 @@ namespace SXJLibrary
                                                         string[] conte = { System.DateTime.Now.ToString(), parnum, "FLUKE", (string)dt.Rows[0]["BARCODE"], (string)dt1.Rows[0]["NGITEM"], tres, MNO, DateTime.Now.ToString("yyyyMMdd"), DateTime.Now.ToString("HHmmss"), flexid };
                                                         Csvfile.savetocsv(filepath, conte);
                                                         ModelPrint("插入样本记录 " + (string)dt.Rows[0]["BARCODE"] + " " +  updatetime.ToString());
+                                                        if (((string)dt1.Rows[0]["NGITEM"]).ToUpper() == ngitem.ToUpper())
+                                                        {
+                                                            sampleContent[i][j] = "ok";
+                                                        }
+                                                        else
+                                                        {
+                                                            sampleContent[i][j] = (string)dt1.Rows[0]["NGITEM"];
+                                                        }
                                                     }
                                                     else
                                                     {
@@ -529,6 +537,58 @@ namespace SXJLibrary
                                                             ModelPrint((string)dt.Rows[0]["BARCODE"] + "样本次数" + dt2.Rows.Count.ToString() + " > " + nGItemLimit1.ToString() + "次");
                                                         }
                                                         sampleContent[i][j] = "Limit";
+
+                                                        try
+                                                        {
+                                                            string sampleAlarmRecordPath = "D:\\样本报警记录.xlsx";
+                                                            FileInfo xlFile = new FileInfo(sampleAlarmRecordPath);
+                                                            if (!File.Exists(sampleAlarmRecordPath))
+                                                            {
+                                                                using (var package = new ExcelPackage())
+                                                                {
+                                                                    //Add a new worksheet to the empty workbook
+                                                                    var worksheet = package.Workbook.Worksheets.Add("样本报警记录");
+                                                                    //Add the headers
+                                                                    worksheet.Cells[1, 1].Value = "时间";
+                                                                    worksheet.Cells[1, 2].Value = "条码";
+                                                                    worksheet.Cells[1, 3].Value = "项目";
+                                                                    worksheet.Cells[1, 4].Value = "内容";
+
+
+                                                                    // Save our new workbook in the output directory and we are done!
+                                                                    package.SaveAs(xlFile);
+                                                                }
+                                                            }
+                                                            using (ExcelPackage package = new ExcelPackage(xlFile))
+                                                            {
+                                                                ExcelWorksheet worksheet = package.Workbook.Worksheets["样本报警记录"];
+                                                                int row = worksheet.Dimension.End.Row + 1;
+                                                                worksheet.Cells[row, 1].Value = DateTime.Now.ToString();
+                                                                worksheet.Cells[row, 2].Value = (string)dt.Rows[0]["BARCODE"];
+                                                                worksheet.Cells[row, 3].Value = (string)dt1.Rows[0]["NGITEM"];
+                                                                if ((DateTime.Now - updatetime).TotalDays > nGItemLimit)
+                                                                {
+                                                                    worksheet.Cells[row, 4].Value = "样本时间" + updatetime.ToString() + " > " + nGItemLimit.ToString() + "天";
+                                                                    if (dt2.Rows.Count > nGItemLimit1)
+                                                                    {
+                                                                        worksheet.Cells[row, 5].Value = "样本次数" + dt2.Rows.Count.ToString() + " > " + nGItemLimit1.ToString() + "次";
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (dt2.Rows.Count > nGItemLimit1)
+                                                                    {
+                                                                        worksheet.Cells[row, 4].Value = "样本次数" + dt2.Rows.Count.ToString() + " > " + nGItemLimit1.ToString() + "次";
+                                                                    }
+                                                                }
+                                                                worksheet.Cells.AutoFitColumns(0);  //Autofit columns for all cells
+                                                                package.Save();
+                                                            }
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            ModelPrint(ex.Message);
+                                                        }                                                        
                                                     }
                                                 }
                                             }
@@ -536,14 +596,7 @@ namespace SXJLibrary
                                             {
                                                 ModelPrint(ex.Message);
                                             }
-                                            if (((string)dt1.Rows[0]["NGITEM"]).ToUpper() == ngitem.ToUpper())
-                                            {
-                                                sampleContent[i][j] = "ok";
-                                            }
-                                            else
-                                            {
-                                                sampleContent[i][j] = (string)dt1.Rows[0]["NGITEM"];
-                                            }
+ 
                                         }
                                         else
                                         {
