@@ -2831,8 +2831,7 @@ namespace X1621LineUI.ViewModels
                             int rst = oraDB.executeNonQuery(stm);
                             AddMessage("板" + epsonRC90.BordBarcode[0] + "绑定结果 " + rst.ToString());
                             oraDB.executeNonQuery("COMMIT");
-                            epsonRC90.BordBarcode[0] = "Empty";
-                            
+                            CheckDataStatus(0);
                         }
                         mysql.DisConnect();
                         oraDB.disconnect();
@@ -2865,7 +2864,7 @@ namespace X1621LineUI.ViewModels
                             int rst = oraDB.executeNonQuery(stm);
                             AddMessage("板" + epsonRC90.BordBarcode[1] + "绑定结果 " + rst.ToString());
                             oraDB.executeNonQuery("COMMIT");
-                            epsonRC90.BordBarcode[1] = "Empty";
+                            CheckDataStatus(1);
                             
                         }
                         oraDB.disconnect();
@@ -3004,6 +3003,66 @@ namespace X1621LineUI.ViewModels
                 catch { }
                 #endregion
                 UICycle = sw.ElapsedMilliseconds;
+            }
+        }
+        async void CheckDataStatus(int _index)
+        {
+            bool result = false;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        SXJLibrary.Oracle oraDB = new SXJLibrary.Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
+                        if (oraDB.isConnect())
+                        {
+                            string stm = "SELECT * FROM (SELECT * FROM BARBIND WHERE SCBODBAR = '" + epsonRC90.BordBarcode[_index] + "' ORDER BY SIDATE DESC) WHERE ROWNUM <= 15";
+                            DataSet ds = oraDB.executeQuery(stm);
+                            DataTable dt = ds.Tables["table0"];
+                            if (dt.Rows.Count == 15)
+                            {
+                                int okcount = 0;
+                                for (int i = 0; i < 15; i++)
+                                {
+                                    DataRow[] drs = dt.Select(string.Format("PCSSER = '{0}'", (i + 1).ToString()));
+                                    if (drs.Length == 1 && epsonRC90.BarInfo[_index][i].Status == short.Parse((string)drs[0]["RESULT"]) && epsonRC90.BarInfo[_index][i].TDate == (string)drs[0]["SDATE"] && epsonRC90.BarInfo[_index][i].TTime == (string)drs[0]["STIME"])
+                                    {
+                                        okcount++;
+                                    }
+                                }
+                                result = okcount >= 15;
+                            }
+                        }
+                        oraDB.disconnect();
+                        if (result)
+                        {
+                            AddMessage(epsonRC90.BordBarcode[_index] + " 数据已更新到数据库");
+                            epsonRC90.BordBarcode[0] = "Empty";
+                            Fx5u_mid.SetM("M" + 2612 + _index, true);
+                            break;
+                        }
+                        else
+                        {
+                            AddMessage(epsonRC90.BordBarcode[_index] + " 数据未更新到数据库");
+                        }
+                        if (X40 != null)
+                        {
+                            if (!X40[3])
+                            {
+                                AddMessage(epsonRC90.BordBarcode[_index] + " 查询数据过程中，急停退出");
+                                epsonRC90.BordBarcode[0] = "Empty";
+                                break;
+                            }
+                        }
+                        System.Threading.Thread.Sleep(500);
+                    }
+                }
+                );
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
             }
         }
         void IORun()

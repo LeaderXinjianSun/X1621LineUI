@@ -752,13 +752,13 @@ namespace SXJLibrary
             SaveCSVfileRecord(DateTime.Now.ToString(), bar, rst, cyc + " s", index.ToString());
             if (isRecord && !Tester.IsInSampleMode && !Tester.IsInGRRMode)
             {
-                if (YanmadeTester[index - 1].TestSpan > 20)
+                if (YanmadeTester[index - 1].TestSpan > 15)
                 {
                     YanmadeTester[index - 1].UpdateNormalWithTestTimes(rst);
                 }
                 else
                 {
-                        ModelPrint(bar + " 测试时间小于20秒，不纳入良率统计");
+                        ModelPrint(bar + " 测试时间小于15秒，不纳入良率统计");
                 }
             }
             else

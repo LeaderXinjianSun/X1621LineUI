@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:X1621LineUI"
         xmlns:views="clr-namespace:X1621LineUI.Views"
         mc:Ignorable="d"
-        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 20200703}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="{Binding Station,StringFormat= 鵬鼎控股 測試工程部 D5X:{0} 20200707}" Height="691" Width="1024" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Icon="AVARY01.ico" Closing="Window_Closing">
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
