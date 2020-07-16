@@ -3030,6 +3030,26 @@ namespace X1621LineUI.ViewModels
                                     {
                                         okcount++;
                                     }
+                                    else
+                                    {
+                                        if (drs.Length != 1)
+                                        {
+                                            AddMessage((string)drs[0]["SCBODBAR"] + "条码数量为 " + drs.Length + " 而不是 1");
+                                        }
+                                        if (epsonRC90.BarInfo[_index][i].Status != short.Parse((string)drs[0]["RESULT"]))
+                                        {
+                                            AddMessage((string)drs[0]["SCBODBAR"] + "测试结果为 " + (string)drs[0]["RESULT"] + "而不是 " + epsonRC90.BarInfo[_index][i].Status);
+                                        }
+                                        if (epsonRC90.BarInfo[_index][i].TDate != (string)drs[0]["SDATE"])
+                                        {
+                                            AddMessage((string)drs[0]["SCBODBAR"] + "测试日期为 " + (string)drs[0]["SDATE"] + "而不是 " + epsonRC90.BarInfo[_index][i].TDate);
+                                        }
+                                        if (epsonRC90.BarInfo[_index][i].TTime != (string)drs[0]["STIME"])
+                                        {
+                                            AddMessage((string)drs[0]["SCBODBAR"] + "测试时间为 " + (string)drs[0]["STIME"] + "而不是 " + epsonRC90.BarInfo[_index][i].TTime);
+                                        }
+                                        System.Threading.Thread.Sleep(500);
+                                    }
                                 }
                                 result = okcount >= 15;
                             }

@@ -708,6 +708,7 @@ namespace SXJLibrary
             {
                 int index = int.Parse(rststr[1]);
                 int resultnum = 0;
+                BarInfo[_index][index - 1].Status = int.Parse(rststr[2]);
                 await Task.Run(() =>
                 {
                     Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
