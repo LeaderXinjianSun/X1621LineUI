@@ -268,27 +268,14 @@ namespace SXJLibrary
                                     TestResult tr = strs[1] == "OK" ? TestResult.Pass : TestResult.Ng;
                                     YanmadeTester[int.Parse(strs[2]) - 1].Update(tr);
                                     break;
-                                case "Start":
-                                    YanmadeTester[int.Parse(strs[1]) - 1].Start(TestFinishOperate);
-                                    break;
-                                case "Finish":
-                                    YanmadeTester[int.Parse(strs[1]) - 1].TestResult = strs[2] == "1" ? TestResult.Pass : TestResult.Ng;
-                                    YanmadeTester[int.Parse(strs[1]) - 1].TestStatus = TestStatus.Tested;
-                                    if (MaterialFileStatus)
-                                    {
-                                        try
-                                        {
-                                            int index = int.Parse(strs[1]) - 1;
-                                            Worksheet.Cells[index * 2 + 3, 6].Value = Convert.ToInt32(Worksheet.Cells[index * 2 + 3, 6].Value) + 1;
-                                            Worksheet.Cells[index * 2 + 1 + 3, 6].Value = Convert.ToInt32(Worksheet.Cells[index * 2 + 1 + 3, 6].Value) + 1;
-                                            Package.Save();
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            ModelPrint(ex.Message);
-                                        }
-                                    }
-                                    break;
+                                //case "Start":
+                                //    YanmadeTester[int.Parse(strs[1]) - 1].Start(TestFinishOperate);
+                                //    break;
+                                //case "Finish":
+                                //    YanmadeTester[int.Parse(strs[1]) - 1].TestResult = strs[2] == "1" ? TestResult.Pass : TestResult.Ng;
+                                //    YanmadeTester[int.Parse(strs[1]) - 1].TestStatus = TestStatus.Tested;
+
+                                //    break;
                                 case "CheckSample":
                                     CheckSam();
                                     break;
@@ -407,6 +394,20 @@ namespace SXJLibrary
                                 case "Finish":
                                     YanmadeTester[int.Parse(strs[1]) - 1].TestResult = strs[2] == "1" ? TestResult.Pass : TestResult.Ng;
                                     YanmadeTester[int.Parse(strs[1]) - 1].TestStatus = TestStatus.Tested;
+                                    if (MaterialFileStatus)
+                                    {
+                                        try
+                                        {
+                                            int index = int.Parse(strs[1]) - 1;
+                                            Worksheet.Cells[index * 2 + 3, 6].Value = Convert.ToInt32(Worksheet.Cells[index * 2 + 3, 6].Value) + 1;
+                                            Worksheet.Cells[index * 2 + 1 + 3, 6].Value = Convert.ToInt32(Worksheet.Cells[index * 2 + 1 + 3, 6].Value) + 1;
+                                            Package.Save();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ModelPrint(ex.Message);
+                                        }
+                                    }
                                     break;
                                 default:
                                     ModelPrint("无效指令： " + s);

@@ -3058,7 +3058,7 @@ namespace X1621LineUI.ViewModels
                         if (result)
                         {
                             AddMessage(epsonRC90.BordBarcode[_index] + " 数据已更新到数据库");
-                            epsonRC90.BordBarcode[0] = "Empty";
+                            epsonRC90.BordBarcode[_index] = "Empty";
                             Fx5u_mid.SetM("M" + 2612 + _index, true);
                             break;
                         }
@@ -3071,7 +3071,7 @@ namespace X1621LineUI.ViewModels
                             if (!X40[3])
                             {
                                 AddMessage(epsonRC90.BordBarcode[_index] + " 查询数据过程中，急停退出");
-                                epsonRC90.BordBarcode[0] = "Empty";
+                                epsonRC90.BordBarcode[_index] = "Empty";
                                 break;
                             }
                         }
