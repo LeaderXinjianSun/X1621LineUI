@@ -736,9 +736,6 @@ namespace SXJLibrary
                 }
                 //3是良品;4是不良品
                 BarInfo[_index][index - 1].Status = iniResult != "OK" && int.Parse(rststr[2]) == 3 ? 4 : int.Parse(rststr[2]);
-                //ModelPrint($"iniResult:{iniResult}");
-                //ModelPrint($"rststr[2]:{rststr[2]}");
-                //ModelPrint($"BarInfo[_index][index - 1].Statu:{BarInfo[_index][index - 1].Status}");
                 await Task.Run(() =>
                 {
                     Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
@@ -858,7 +855,7 @@ namespace SXJLibrary
                         ModelPrint(flexIndex.ToString() + "条码比对中 " + Math.Round(sw.Elapsed.TotalSeconds, 1).ToString());
                         string bar1 = Inifile.INIGetStringValue(iniFilepath, "A", "bar" + flexIndex.ToString(), "999");
                         //string rst = Inifile.INIGetStringValue(iniFilepath, "A", "result" + flexIndex.ToString(), "999");
-                        if (bar1 != preBarcode || sw.Elapsed.TotalSeconds > 10)
+                        if (bar1 != preBarcode || sw.Elapsed.TotalSeconds > 60)
                         {
                             if (bar1 != preBarcode)
                             {
@@ -868,7 +865,7 @@ namespace SXJLibrary
                             }
                             else
                             {
-                                ModelPrint($"{flexIndex}查询ini超过10秒，退出!");
+                                ModelPrint($"{flexIndex}查询ini超过60秒，退出!");
                                 linkStatus[flexIndex - 1] = false;
                             }
                             break;

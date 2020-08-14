@@ -4012,13 +4012,23 @@ namespace X1621LineUI.ViewModels
                 //WindowAlarmString = str;
                 //metro.ChangeAccent("red");
             }
-            if (str.Contains("查询ini超过10秒"))
+            if (str.Contains("查询ini超过"))
             {
-                AlarmText = str;
-                AlarmGridVisibility = "查询ini超过10秒,可能叠料!";
+                AlarmText = str + ",可能叠料!";
+                AlarmGridVisibility = "Visible";
                 //ShowAlarmWindow = !ShowAlarmWindow;
                 //WindowAlarmString = "查询ini超过10秒,可能叠料!";
                 //metro.ChangeAccent("red");
+                Fx5u_mid.SetM("M2607", true);
+            }
+            if (str.Contains("上传完成；结果为"))
+            {
+                if (!str.Contains("OK"))
+                {
+                    AlarmText = str + ",可能叠料!";
+                    AlarmGridVisibility = "Visible";
+                    Fx5u_mid.SetM("M2607", true);
+                }
             }
             #endregion
             #region 良率报警
