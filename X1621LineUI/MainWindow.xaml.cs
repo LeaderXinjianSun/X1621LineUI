@@ -27,6 +27,7 @@ namespace X1621LineUI
         {           
             InitializeComponent();
             this.SetBinding(ShowYieldAdminControlWindowProperty, "ShowYieldAdminControlWindow");
+            this.SetBinding(ShowAlarmWindowProperty, "ShowAlarmWindow");
             this.DataContext = new MainWindowViewModel();
         }
         public static YieldAdminControlWindow YieldAdminControlWindow = null;
@@ -53,6 +54,32 @@ namespace X1621LineUI
             get { return (bool)GetValue(ShowYieldAdminControlWindowProperty); }
             set { SetValue(ShowYieldAdminControlWindowProperty, value); }
         }
+
+        public bool ShowAlarmWindow
+        {
+            get { return (bool)GetValue(ShowAlarmWindowProperty); }
+            set { SetValue(ShowAlarmWindowProperty, value); }
+        }
+        public static AlarmWindow AlarmWindow = null;
+        // Using a DependencyProperty as the backing store for ShowAlarmWindow.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ShowAlarmWindowProperty =
+            DependencyProperty.Register("ShowAlarmWindow", typeof(bool), typeof(MainWindow), new PropertyMetadata(
+                new PropertyChangedCallback((d, e) =>
+                {
+                    if (AlarmWindow != null)
+                    {
+                        if (AlarmWindow.HasShow)
+                            return;
+                    }
+                    var mMainWindow = d as MainWindow;
+                    AlarmWindow = new AlarmWindow();// { Owner = this }.Show();
+                    AlarmWindow.Owner = Application.Current.MainWindow;
+                    AlarmWindow.DataContext = mMainWindow.DataContext;
+                    AlarmWindow.SetBinding(AlarmWindow.QuitAlarmWindowProperty, "QuitAlarmWindow");
+                    AlarmWindow.HasShow = true;
+                    AlarmWindow.Show();
+                })
+                ));
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

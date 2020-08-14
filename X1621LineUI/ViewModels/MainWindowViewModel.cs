@@ -1137,6 +1137,39 @@ namespace X1621LineUI.ViewModels
                 this.RaisePropertyChanged("QuitYieldAdminControl");
             }
         }
+        private bool showAlarmWindow;
+
+        public bool ShowAlarmWindow
+        {
+            get { return showAlarmWindow; }
+            set
+            {
+                showAlarmWindow = value;
+                this.RaisePropertyChanged("ShowAlarmWindow");
+            }
+        }
+        private bool quitAlarmWindow;
+
+        public bool QuitAlarmWindow
+        {
+            get { return quitAlarmWindow; }
+            set
+            {
+                quitAlarmWindow = value;
+                this.RaisePropertyChanged("QuitAlarmWindow");
+            }
+        }
+        private string windowAlarmString;
+
+        public string WindowAlarmString
+        {
+            get { return windowAlarmString; }
+            set
+            {
+                windowAlarmString = value;
+                this.RaisePropertyChanged("WindowAlarmString");
+            }
+        }
 
         #endregion
         #region 方法绑定
@@ -1152,6 +1185,7 @@ namespace X1621LineUI.ViewModels
         public DelegateCommand<object> TrackInitCommand { get; set; }
         public DelegateCommand YieldConfirmButtonCommand { get; set; }
         public DelegateCommand<object> FixtureCycleGridShowCommand { get; set; }
+        public DelegateCommand AlarmWindowClosedCommand { get; set; }
         #endregion
         #region 变量
         private string iniParameterPath = System.Environment.CurrentDirectory + "\\Parameter.ini";
@@ -1164,11 +1198,13 @@ namespace X1621LineUI.ViewModels
         DateTime SamStartDatetime1, SamNextDatetime1, SamDateBigin1;
         int LampColor = 1; Stopwatch LampGreenSw = new Stopwatch(); bool[] M300; bool[] M2000; bool[] X40;
         List<AlarmData> AlarmList = new List<AlarmData>(); string CurrentAlarm = "";
+        List<AlarmData> AlarmList1 = new List<AlarmData>(); string CurrentAlarm1 = "";
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\X1621串线上料机报警.xlsx";
         int LampGreenElapse, LampGreenFlickerElapse, LampYellowElapse, LampYellowFlickerElapse, LampRedElapse;
         int ErrorCount = 0; bool CardLockFlag; DateTime CardLockTime;
         bool isSendSamCMD = false, isSendCleanCMD = false;
         Metro metro = new Metro();
+        bool[] M2500 = new bool[64];
         #endregion
         #region 构造函数
         public MainWindowViewModel()
@@ -1185,6 +1221,7 @@ namespace X1621LineUI.ViewModels
             this.TrackInitCommand = new DelegateCommand<object>(new Action<object>(this.TrackInitCommandExecute));
             this.YieldConfirmButtonCommand = new DelegateCommand(new Action(this.YieldConfirmButtonCommandExecute));
             this.FixtureCycleGridShowCommand = new DelegateCommand<object>(new Action<object>(this.FixtureCycleGridShowCommandExecute));
+            this.AlarmWindowClosedCommand = new DelegateCommand(new Action(this.AlarmWindowClosedCommandExecute));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             if (System.Environment.CurrentDirectory != @"C:\Debug")
             //if (false)
@@ -1258,7 +1295,7 @@ namespace X1621LineUI.ViewModels
             }
         }
         private void LanguageChangeCommandExecute(object p)
-        {
+        {            
             switch (p.ToString())
             {
                 case "0":
@@ -1562,6 +1599,11 @@ namespace X1621LineUI.ViewModels
                 FixtureCycleGridVisibility = "Collapsed";
             }
         }
+        private void AlarmWindowClosedCommandExecute()
+        {
+            metro.ChangeAccent("Blue");
+            AddMessage("报警窗口关闭");
+        }
         #endregion
         #region 自定义函数
         private void Init()
@@ -1740,7 +1782,21 @@ namespace X1621LineUI.ViewModels
                             ad.State = false;
                             AlarmList.Add(ad);
                         }
-                        AddMessage("读取到" + worksheet.Dimension.End.Row.ToString() + "条报警");
+                        AddMessage("1读取到" + worksheet.Dimension.End.Row.ToString() + "条报警");
+
+                        worksheet = package.Workbook.Worksheets[1];
+                        for (int i = 1; i <= worksheet.Dimension.End.Row; i++)
+                        {
+                            AlarmData ad = new AlarmData();
+                            ad.Code = worksheet.Cells["A" + i.ToString()].Value == null ? "Null" : worksheet.Cells["A" + i.ToString()].Value.ToString();
+                            ad.Content = worksheet.Cells["B" + i.ToString()].Value == null ? "Null" : worksheet.Cells["B" + i.ToString()].Value.ToString();
+                            ad.Type = worksheet.Cells["C" + i.ToString()].Value == null ? "Null" : worksheet.Cells["C" + i.ToString()].Value.ToString();
+                            ad.Start = DateTime.Now;
+                            ad.End = DateTime.Now;
+                            ad.State = false;
+                            AlarmList1.Add(ad);
+                        }
+                        AddMessage("2读取到" + worksheet.Dimension.End.Row.ToString() + "条报警");
                     }
                 }
                 else
@@ -1788,7 +1844,11 @@ namespace X1621LineUI.ViewModels
         {
 
             int cardcount = 0, timetick = 0, timetick1 = 0;
-            bool first = true;
+            bool first = true;bool rstButton = false;
+            if (!Directory.Exists("D:\\报警记录"))
+            {
+                Directory.CreateDirectory("D:\\报警记录");
+            }
             Fx5u_mid.SetM("M2606", true);
             CardLockFlag = true;
             CardLockTime = DateTime.Now;
@@ -2174,12 +2234,57 @@ namespace X1621LineUI.ViewModels
                 #region 界面后台操作
                 if (X40 != null)
                 {
-                    if (X40[2])
+                    if (rstButton != X40[2])
                     {
-                        AlarmText = "";
-                        AlarmGridVisibility = "Collapsed";
+
+                        if (X40[2])
+                        {
+                            //WindowAlarmString = "";
+                            //QuitAlarmWindow = !QuitAlarmWindow;
+                            AlarmText = "";
+                            AlarmGridVisibility = "Collapsed";
+
+                        }
+                        rstButton = X40[2];
                     }
                 }
+                #endregion
+                #region 报警记录
+                try
+                {
+                    for (int i = 0; i < AlarmList1.Count; i++)
+                    {
+                        if (M2500[i] != AlarmList1[i].State && AlarmList1[i].Content != "Null")
+                        {
+                            AlarmList1[i].State = M2500[i];
+                            if (AlarmList1[i].State)
+                            {
+                                AlarmList1[i].Start = DateTime.Now;
+                                AlarmList1[i].End = DateTime.Now;
+                                AddMessage(AlarmList1[i].Code + AlarmList1[i].Content + "发生");
+                                //ShowAlarmWindow = !ShowAlarmWindow;
+                                //WindowAlarmString = AlarmList1[i].Content;
+                                //metro.ChangeAccent("red");
+                                AlarmText = AlarmList1[i].Content;
+                                AlarmGridVisibility = "Visible";
+                                if (CurrentAlarm1 != AlarmList1[i].Content || true)
+                                {
+                                    string banci = epsonRC90.GetBanci();
+                                    if (!File.Exists(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv")))
+                                    {
+                                        string[] heads = new string[] { "时间", "内容" };
+                                        Csvfile.savetocsv(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv"), heads);
+                                    }
+                                    string[] conts = new string[] { AlarmList1[i].Start.ToString(), AlarmList1[i].Content };
+                                    Csvfile.savetocsv(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv"), conts);
+                                    CurrentAlarm1 = AlarmList1[i].Content;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+                
                 #endregion
                 #region 换班
                 if (LastBanci != epsonRC90.GetBanci())
@@ -2831,7 +2936,7 @@ namespace X1621LineUI.ViewModels
                             int rst = oraDB.executeNonQuery(stm);
                             AddMessage("板" + epsonRC90.BordBarcode[0] + "绑定结果 " + rst.ToString());
                             oraDB.executeNonQuery("COMMIT");
-                            CheckDataStatus(0);
+                            //CheckDataStatus(0);
                         }
                         mysql.DisConnect();
                         oraDB.disconnect();
@@ -2864,7 +2969,7 @@ namespace X1621LineUI.ViewModels
                             int rst = oraDB.executeNonQuery(stm);
                             AddMessage("板" + epsonRC90.BordBarcode[1] + "绑定结果 " + rst.ToString());
                             oraDB.executeNonQuery("COMMIT");
-                            CheckDataStatus(1);
+                            //CheckDataStatus(1);
                             
                         }
                         oraDB.disconnect();
@@ -3103,7 +3208,7 @@ namespace X1621LineUI.ViewModels
                     }
                     Fx5u_mid.SetMultiM("M3016", Y50);
                     bool[] M2700 = Fx5u_mid.ReadMultiM("M2700", 64);
-                    bool[] M2500 = new bool[64];
+                    
                     for (int i = 0; i < 64; i++)
                     {
                         epsonRC90.Rc90In[i + 16] = M2700[i];
@@ -3894,12 +3999,26 @@ namespace X1621LineUI.ViewModels
             {
                 AlarmText = "上传软体异常";
                 AlarmGridVisibility = "Visible";
+                //ShowAlarmWindow = !ShowAlarmWindow;
+                //WindowAlarmString = "上传软体异常";
+                //metro.ChangeAccent("red");
                 AddMessage("上传软体异常");
             }
             if (str.Contains("寿命"))
             {
                 AlarmText = str;
                 AlarmGridVisibility = "Visible";
+                //ShowAlarmWindow = !ShowAlarmWindow;
+                //WindowAlarmString = str;
+                //metro.ChangeAccent("red");
+            }
+            if (str.Contains("查询ini超过10秒"))
+            {
+                AlarmText = str;
+                AlarmGridVisibility = "查询ini超过10秒,可能叠料!";
+                //ShowAlarmWindow = !ShowAlarmWindow;
+                //WindowAlarmString = "查询ini超过10秒,可能叠料!";
+                //metro.ChangeAccent("red");
             }
             #endregion
             #region 良率报警

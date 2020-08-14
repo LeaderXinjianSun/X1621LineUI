@@ -10,6 +10,7 @@ using BingLibrary.hjb;
 using System.Data;
 using BingLibrary.Net.net;
 using OfficeOpenXml;
+using System.Diagnostics;
 
 namespace SXJLibrary
 {
@@ -36,7 +37,9 @@ namespace SXJLibrary
         public ExcelPackage Package;
         public ExcelWorksheet Worksheet;
         public bool MaterialFileStatus = false;
-
+        string[] preFlexBarcode = new string[4];
+        string iniResult = "FAIL"; bool iniFinish = false;
+        bool[] linkStatus = new bool[] { true, true, true, true };
         #endregion
         #region 事件
         public delegate void PrintEventHandler(string ModelMessageStr);
@@ -267,6 +270,15 @@ namespace SXJLibrary
                                 case "TestResultCount":
                                     TestResult tr = strs[1] == "OK" ? TestResult.Pass : TestResult.Ng;
                                     YanmadeTester[int.Parse(strs[2]) - 1].Update(tr);
+                                    if (strs[1] == "OK")
+                                    {
+                                        CheckIni(preFlexBarcode[int.Parse(strs[2]) - 1], int.Parse(strs[2]));
+                                    }
+                                    else
+                                    {
+                                        iniFinish = true;
+                                        iniResult = "FAIL";
+                                    }                                   
                                     break;
                                 //case "Start":
                                 //    YanmadeTester[int.Parse(strs[1]) - 1].Start(TestFinishOperate);
@@ -291,7 +303,7 @@ namespace SXJLibrary
                                     string uploadrst = "OK";
                                     for (int i = 0; i < 4; i++)
                                     {
-                                        if (!uploadSoftwareStatus[i].status)
+                                        if (!linkStatus[i])
                                         {
                                             uploadrst = "NG";
                                             break;
@@ -390,6 +402,14 @@ namespace SXJLibrary
                             {
                                 case "Start":
                                     YanmadeTester[int.Parse(strs[1]) - 1].Start(TestFinishOperate);
+                                    try
+                                    {
+                                        preFlexBarcode[int.Parse(strs[1]) - 1] = Inifile.INIGetStringValue(iniFilepath, "A", "bar" + strs[1], "0");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        ModelPrint(ex.Message);
+                                    }
                                     break;
                                 case "Finish":
                                     YanmadeTester[int.Parse(strs[1]) - 1].TestResult = strs[2] == "1" ? TestResult.Pass : TestResult.Ng;
@@ -709,13 +729,22 @@ namespace SXJLibrary
             {
                 int index = int.Parse(rststr[1]);
                 int resultnum = 0;
-                BarInfo[_index][index - 1].Status = int.Parse(rststr[2]);
+                //等待查完上传软体结果
+                while (!iniFinish)
+                {
+                    await Task.Delay(200);
+                }
+                //3是良品;4是不良品
+                BarInfo[_index][index - 1].Status = iniResult != "OK" && int.Parse(rststr[2]) == 3 ? 4 : int.Parse(rststr[2]);
+                //ModelPrint($"iniResult:{iniResult}");
+                //ModelPrint($"rststr[2]:{rststr[2]}");
+                //ModelPrint($"BarInfo[_index][index - 1].Statu:{BarInfo[_index][index - 1].Status}");
                 await Task.Run(() =>
                 {
                     Oracle oraDB = new Oracle("qddb04.eavarytech.com", "mesdb04", "ictdata", "ictdata*168");
                     if (oraDB.isConnect())
                     {
-                        string stm = "UPDATE BARBIND SET RESULT = '" + rststr[2] + "' WHERE SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
+                        string stm = "UPDATE BARBIND SET RESULT = '" + BarInfo[_index][index - 1].Status.ToString() + "' WHERE SDATE = '" + BarInfo[_index][index - 1].TDate + "' AND STIME = '" + BarInfo[_index][index - 1].TTime + "' AND SCBARCODE = '" + BarInfo[_index][index - 1].Barcode + "' AND SCBODBAR = '" + BarInfo[_index][index - 1].BordBarcode
                             + "' AND PCSSER = '" + index.ToString() + "'";
                         resultnum = oraDB.executeNonQuery(stm);
                         oraDB.executeNonQuery("COMMIT");
@@ -723,6 +752,7 @@ namespace SXJLibrary
                     oraDB.disconnect();
 
                 });
+
                 string resultStr = "Release;" + (resultnum > 0 ? "OK" : "NG");
                 await TestSentNet.SendAsync(resultStr);
             }
@@ -736,14 +766,14 @@ namespace SXJLibrary
         {
             uploadSoftwareStatus[index - 1].testerCycle = YanmadeTester[index - 1].TestSpan.ToString();
             uploadSoftwareStatus[index - 1].result = YanmadeTester[index - 1].TestResult == TestResult.Pass ? "PASS" : "FAIL";
-            if (YanmadeTester[index - 1].TestSpan > 11 && uploadSoftwareStatus[index - 1].result == "PASS")
-            {
-                uploadSoftwareStatus[index - 1].StartCommand();
-            }
-            else
-            {
-                uploadSoftwareStatus[index - 1].StopCommand();
-            }
+            //if (YanmadeTester[index - 1].TestSpan > 11 && uploadSoftwareStatus[index - 1].result == "PASS")
+            //{
+            //    uploadSoftwareStatus[index - 1].StartCommand();
+            //}
+            //else
+            //{
+            //    uploadSoftwareStatus[index - 1].StopCommand();
+            //}
         }
         private void uploadprint(string str)
         {
@@ -812,6 +842,42 @@ namespace SXJLibrary
                 }
             }
             return rs;
+        }
+        private async void CheckIni(string preBarcode,int flexIndex)
+        {
+            Stopwatch sw = new Stopwatch();
+            iniFinish = false;
+            iniResult = "FAIL";
+            sw.Start();
+            await ((Func<Task>)(() =>
+            {
+                return Task.Run(() =>
+                {
+                    while (true)
+                    {                        
+                        ModelPrint(flexIndex.ToString() + "条码比对中 " + Math.Round(sw.Elapsed.TotalSeconds, 1).ToString());
+                        string bar1 = Inifile.INIGetStringValue(iniFilepath, "A", "bar" + flexIndex.ToString(), "999");
+                        //string rst = Inifile.INIGetStringValue(iniFilepath, "A", "result" + flexIndex.ToString(), "999");
+                        if (bar1 != preBarcode || sw.Elapsed.TotalSeconds > 10)
+                        {
+                            if (bar1 != preBarcode)
+                            {
+                                iniResult = Inifile.INIGetStringValue(iniFilepath, "A", "result" + flexIndex.ToString(), "999");
+                                ModelPrint(flexIndex.ToString() + "条码" + bar1 + "上传完成；结果为 " + iniResult);
+                                linkStatus[flexIndex - 1] = true;
+                            }
+                            else
+                            {
+                                ModelPrint($"{flexIndex}查询ini超过10秒，退出!");
+                                linkStatus[flexIndex - 1] = false;
+                            }
+                            break;
+                        }
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                });
+            }))();
+            iniFinish = true;
         }
 
         #endregion
