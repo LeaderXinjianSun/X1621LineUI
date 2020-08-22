@@ -2269,14 +2269,7 @@ namespace X1621LineUI.ViewModels
                                 AlarmGridVisibility = "Visible";
                                 if (CurrentAlarm1 != AlarmList1[i].Content || true)
                                 {
-                                    string banci = epsonRC90.GetBanci();
-                                    if (!File.Exists(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv")))
-                                    {
-                                        string[] heads = new string[] { "时间", "内容" };
-                                        Csvfile.savetocsv(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv"), heads);
-                                    }
-                                    string[] conts = new string[] { AlarmList1[i].Start.ToString(), AlarmList1[i].Content };
-                                    Csvfile.savetocsv(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv"), conts);
+                                    SaveAlarmtoCSV(AlarmList1[i].Content);
                                     CurrentAlarm1 = AlarmList1[i].Content;
                                 }
                             }
@@ -3999,10 +3992,15 @@ namespace X1621LineUI.ViewModels
             {
                 AlarmText = "上传软体异常";
                 AlarmGridVisibility = "Visible";
+                for (int i = 0; i < 4; i++)
+                {
+                    epsonRC90.linkStatus[i] = true;
+                }
                 //ShowAlarmWindow = !ShowAlarmWindow;
                 //WindowAlarmString = "上传软体异常";
                 //metro.ChangeAccent("red");
                 AddMessage("上传软体异常");
+                SaveAlarmtoCSV("上传软体异常");
             }
             if (str.Contains("寿命"))
             {
@@ -4011,23 +4009,26 @@ namespace X1621LineUI.ViewModels
                 //ShowAlarmWindow = !ShowAlarmWindow;
                 //WindowAlarmString = str;
                 //metro.ChangeAccent("red");
+                SaveAlarmtoCSV(str);
             }
             if (str.Contains("查询ini超过"))
             {
-                AlarmText = str + ",可能叠料!";
-                AlarmGridVisibility = "Visible";
+                //AlarmText = str + ",比对异常!";
+                //AlarmGridVisibility = "Visible";
                 //ShowAlarmWindow = !ShowAlarmWindow;
                 //WindowAlarmString = "查询ini超过10秒,可能叠料!";
                 //metro.ChangeAccent("red");
-                Fx5u_mid.SetM("M2607", true);
+                //Fx5u_mid.SetM("M2607", true);
+                SaveAlarmtoCSV(str + ",比对异常!");
             }
             if (str.Contains("上传完成；结果为"))
             {
-                if (!str.Contains("OK"))
+                if (str.Contains("BAR_SIP_NG"))
                 {
                     AlarmText = str + ",可能叠料!";
                     AlarmGridVisibility = "Visible";
                     Fx5u_mid.SetM("M2607", true);
+                    SaveAlarmtoCSV(str + ",可能叠料!");
                 }
             }
             #endregion
@@ -4120,6 +4121,17 @@ namespace X1621LineUI.ViewModels
                 }
             }
             catch { }
+        }
+        void SaveAlarmtoCSV(string alarmstr)
+        {
+            string banci = epsonRC90.GetBanci();
+            if (!File.Exists(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv")))
+            {
+                string[] heads = new string[] { "时间", "内容" };
+                Csvfile.savetocsv(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv"), heads);
+            }
+            string[] conts = new string[] { DateTime.Now.ToString(), alarmstr };
+            Csvfile.savetocsv(Path.Combine("D:\\报警记录", "X1621电测机报警记录" + banci + ".csv"), conts);
         }
         #endregion
 

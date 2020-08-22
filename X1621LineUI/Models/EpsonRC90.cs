@@ -39,7 +39,7 @@ namespace SXJLibrary
         public bool MaterialFileStatus = false;
         string[] preFlexBarcode = new string[4];
         string iniResult = "FAIL"; bool iniFinish = false;
-        bool[] linkStatus = new bool[] { true, true, true, true };
+        public bool[] linkStatus = new bool[] { true, true, true, true };
         #endregion
         #region 事件
         public delegate void PrintEventHandler(string ModelMessageStr);
@@ -763,14 +763,14 @@ namespace SXJLibrary
         {
             uploadSoftwareStatus[index - 1].testerCycle = YanmadeTester[index - 1].TestSpan.ToString();
             uploadSoftwareStatus[index - 1].result = YanmadeTester[index - 1].TestResult == TestResult.Pass ? "PASS" : "FAIL";
-            //if (YanmadeTester[index - 1].TestSpan > 11 && uploadSoftwareStatus[index - 1].result == "PASS")
-            //{
-            //    uploadSoftwareStatus[index - 1].StartCommand();
-            //}
-            //else
-            //{
-            //    uploadSoftwareStatus[index - 1].StopCommand();
-            //}
+            if (YanmadeTester[index - 1].TestSpan > 11 && uploadSoftwareStatus[index - 1].result == "PASS")
+            {
+                uploadSoftwareStatus[index - 1].StartCommand();
+            }
+            else
+            {
+                uploadSoftwareStatus[index - 1].StopCommand();
+            }
         }
         private void uploadprint(string str)
         {
